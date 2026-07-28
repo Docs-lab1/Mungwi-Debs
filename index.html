@@ -22,24 +22,23 @@
             -webkit-tap-highlight-color: transparent;
         }
         :root {
-            --primary: #0a2540;
-            --primary-light: #1a3a5c;
-            --primary-dark: #061a2e;
-            --accent: #ffcc00;
-            --accent-dark: #e6b800;
-            --bg: #f2f6fa;
+            --primary: #0f2b4c;
+            --primary-light: #1e3a5f;
+            --accent: #ffc107;
+            --accent-dark: #e6a800;
+            --bg: #f0f4f8;
             --card-bg: #ffffff;
-            --text: #1a2a3a;
-            --text-light: #4a5a6a;
-            --border: #dce2e8;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             --radius: 16px;
             --radius-sm: 10px;
         }
         html, body {
             height: 100%;
             width: 100%;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
@@ -50,7 +49,8 @@
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
+            background: rgba(15, 43, 76, 0.6);
+            backdrop-filter: blur(4px);
             z-index: 9999;
             justify-content: center;
             align-items: center;
@@ -58,26 +58,28 @@
         #adminLoginOverlay.show { display: flex; }
         .login-box {
             background: var(--card-bg);
-            padding: 30px;
+            padding: 40px 30px;
             border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            width: 100%; max-width: 420px; text-align: center;
         }
         .login-box .brand-lg { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
         .login-box .brand-lg i { color: var(--accent-dark); }
-        .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 20px; }
+        .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 25px; }
         .login-box input {
-            width: 100%; padding: 12px 15px; border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm); font-size: 16px; margin-bottom: 15px;
+            width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm); font-size: 15px; margin-bottom: 15px;
+            background: #f8fafc;
         }
-        .login-box input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.06); }
-        .login-box .btn { width: 100%; padding: 12px; font-size: 16px; }
+        .login-box input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(15, 43, 76, 0.05); }
+        .login-box .btn { width: 100%; padding: 14px; font-size: 15px; }
         .login-error { color: #ef4444; font-size: 13px; margin-bottom: 10px; display: none; }
         .hidden { display: none !important; }
 
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: #eef2f6; }
-        ::-webkit-scrollbar-thumb { background: #b0c4d8; border-radius: 10px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #eef2f6; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -89,104 +91,116 @@
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-primary:hover { background: var(--primary-light); }
-        .btn-accent { background: var(--accent); color: var(--primary-dark); }
+        .btn-accent { background: var(--accent); color: var(--primary); }
         .btn-accent:hover { background: var(--accent-dark); }
         .btn-success { background: #10b981; color: #fff; }
         .btn-success:hover { background: #059669; }
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
         .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
-        .btn-outline:hover { background: #f0f4f8; }
-        .btn-sm { padding: 6px 12px; font-size: 12px; min-height: 34px; min-width: 34px; }
-        .btn-login-admin { background: var(--accent); color: var(--primary-dark); font-weight: bold; }
+        .btn-outline:hover { background: #f1f5f9; }
+        .btn-sm { padding: 8px 12px; font-size: 13px; min-height: 36px; min-width: 36px; }
+        .btn-xs { padding: 4px 8px; font-size: 12px; min-height: 28px; min-width: 28px; border-radius: 6px; }
+        .btn-login-admin { background: var(--accent); color: var(--primary); font-weight: bold; }
         .btn-logout { background: #ef4444; color: #fff; }
 
+        /* Header */
         .app-header {
-            background: var(--primary); color: #fff; padding: 14px 16px;
+            background: var(--primary); color: #fff; padding: 16px 20px;
             display: flex; justify-content: space-between; align-items: center;
             position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15); min-height: 60px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px;
         }
-        .app-header .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; }
-        .app-header .brand i { font-size: 24px; color: var(--accent); }
+        .app-header .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.3px; }
+        .app-header .brand i { font-size: 26px; color: var(--accent); }
         .app-header .brand span { color: var(--accent); }
-        .app-header .header-right { display: flex; align-items: center; gap: 10px; }
+        .app-header .header-right { display: flex; align-items: center; gap: 12px; }
         .app-header .user-badge {
-            display: flex; align-items: center; gap: 6px; background: rgba(255, 255, 255, 0.12);
-            padding: 4px 12px 4px 10px; border-radius: 30px; font-size: 12px;
+            display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1);
+            padding: 6px 14px 6px 10px; border-radius: 30px; font-size: 13px;
         }
         .app-header .user-badge i { font-size: 14px; color: var(--accent); }
         .app-header .user-badge .role-tag {
-            background: var(--accent); color: var(--primary-dark); font-weight: 700;
-            font-size: 9px; padding: 2px 8px; border-radius: 20px; text-transform: uppercase;
+            background: var(--accent); color: var(--primary); font-weight: 700;
+            font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase;
         }
-        .app-header .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+        .app-header .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
         .app-header .status-dot.online { background: #10b981; }
         .app-header .status-dot.offline { background: #ef4444; }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 12px 12px 80px; width: 100%; }
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 14px; }
-        .card-title { font-size: 16px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-        .card-title i { font-size: 18px; color: var(--accent-dark); }
-        .card-title .badge { background: #eef2f6; color: var(--text-light); font-size: 11px; font-weight: 600; padding: 2px 10px; border-radius: 30px; margin-left: auto; }
+        /* Layout */
+        .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; width: 100%; }
+        .card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; transition: all 0.2s ease; }
+        .card-title { font-size: 17px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .card-title i { font-size: 20px; color: var(--accent-dark); }
+        .card-title .badge { background: #f1f5f9; color: var(--text-light); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 30px; margin-left: auto; }
 
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-        .stat-box { background: #f8fafc; border-radius: var(--radius-sm); padding: 12px 8px; text-align: center; border: 1px solid var(--border); }
-        .stat-box .num { font-size: 22px; font-weight: 800; color: var(--primary); line-height: 1.2; }
-        .stat-box .label { font-size: 10px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
-        .stat-box .icon { font-size: 16px; color: var(--accent-dark); display: block; margin-bottom: 2px; }
+        /* Stats */
+        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 4px; }
+        .stat-box { background: #f8fafc; border-radius: var(--radius-sm); padding: 16px 12px; text-align: center; border: 1px solid var(--border); }
+        .stat-box .num { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2; }
+        .stat-box .label { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .stat-box .icon { font-size: 18px; color: var(--accent-dark); display: block; margin-bottom: 4px; }
 
-        .tab-bar { display: flex; gap: 4px; background: #f0f4f8; border-radius: var(--radius-sm); padding: 4px; margin-bottom: 14px; overflow-x: auto; }
-        .tab-bar .tab { flex: 1; padding: 8px 10px; border: none; background: transparent; font-size: 12px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 38px; }
-        .tab-bar .tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
+        /* Tabs */
+        .tab-bar { display: flex; gap: 6px; background: #f1f5f9; border-radius: var(--radius-sm); padding: 6px; margin-bottom: 24px; overflow-x: auto; }
+        .tab-bar .tab { flex: 1; padding: 10px 12px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
+        .tab-bar .tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
         .tab-bar .tab i { font-size: 14px; }
         .tab-bar .tab.admin-only.hidden-tab { display: none; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .table-wrap { overflow-x: auto; margin-top: 8px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
-        table { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 580px; }
-        table th { background: #f0f4f8; color: var(--text); font-weight: 700; padding: 8px 10px; text-align: left; border-bottom: 2px solid var(--border); white-space: nowrap; font-size: 11px; text-transform: uppercase; }
-        table td { padding: 8px 10px; border-bottom: 1px solid #f0f4f8; vertical-align: middle; }
-        table tr:last-child td { border-bottom: none; }
+        /* Tables */
+        .table-wrap { overflow-x: auto; margin-top: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+        table thead tr { border-bottom: 2px solid var(--border); }
+        table th { background: #f8fafc; color: var(--text-light); font-weight: 600; padding: 14px 16px; text-align: left; white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+        table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        table tbody tr:last-child td { border-bottom: none; }
+        table tbody tr:hover { background: #f8fafc; }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .form-group { margin-bottom: 10px; }
-        .form-group label { display: block; font-weight: 600; font-size: 11px; color: var(--text-light); margin-bottom: 2px; text-transform: uppercase; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: #fafbfc; transition: 0.2s; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.06); background: #fff; }
+        /* Forms */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        .form-group { margin-bottom: 4px; }
+        .form-group label { display: block; font-weight: 600; font-size: 12px; color: var(--text-light); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: #fafbfc; transition: 0.2s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(15, 43, 76, 0.04); background: #fff; }
         .form-group input[type="number"] { -moz-appearance: textfield; }
         .form-group input[type="number"]::-webkit-outer-spin-button, .form-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
-        .section-label { font-weight: 700; font-size: 13px; color: var(--primary); margin: 12px 0 6px; display: flex; align-items: center; gap: 6px; }
-        .section-label i { color: var(--accent-dark); font-size: 14px; }
+        .section-label { font-weight: 700; font-size: 14px; color: var(--primary); margin: 16px 0 12px; display: flex; align-items: center; gap: 8px; }
+        .section-label i { color: var(--accent-dark); font-size: 15px; }
 
-        .entry-form-wrap { background: #f8fafc; border-radius: var(--radius-sm); padding: 14px; border: 1px solid var(--border); margin-bottom: 14px; }
-        .entry-form-wrap .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .entry-form-wrap .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .entry-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
-        .entry-actions .btn { flex: 1; min-width: 80px; }
+        .entry-form-wrap { background: #f8fafc; border-radius: var(--radius-sm); padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
+        .entry-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+        .entry-actions .btn { flex: 1; min-width: 120px; }
 
-        .school-selector { background: #f8fafc; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
-        .school-selector label { font-weight: 600; font-size: 13px; color: var(--text); }
-        .school-selector select { padding: 8px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); font-size: 14px; background: #fff; flex: 1; min-width: 140px; }
+        .school-selector { background: #f8fafc; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+        .school-selector label { font-weight: 600; font-size: 14px; color: var(--text); }
+        .school-selector select { padding: 8px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); font-size: 14px; background: #fff; flex: 1; min-width: 160px; }
 
-        .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; }
-        .flex { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mt-16 { margin-top: 16px; }
+        .flex { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .text-right { text-align: right; } .fw-600 { font-weight: 600; }
-        .text-ellipsis { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
+        .text-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
         .text-muted { color: var(--text-light); }
+        
+        /* School List Special Formatting */
+        .school-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .school-name { font-weight: 500; }
 
-        .empty-state { text-align: center; padding: 30px 10px; color: var(--text-light); }
-        .empty-state i { font-size: 36px; color: var(--border); margin-bottom: 8px; display: block; }
-        .empty-state p { font-size: 13px; }
+        .empty-state { text-align: center; padding: 40px 10px; color: var(--text-light); }
+        .empty-state i { font-size: 40px; color: var(--border); margin-bottom: 12px; display: block; }
+        .empty-state p { font-size: 14px; }
 
-        .table-scroll { max-height: 380px; overflow-y: auto; }
+        .table-scroll { max-height: 420px; overflow-y: auto; }
         .table-scroll table thead { position: sticky; top: 0; z-index: 5; }
 
-        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 12px 24px; border-radius: var(--radius-sm); font-size: 14px; z-index: 999; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); display: none; max-width: 90%; text-align: center; }
+        /* Toast */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px; z-index: 9999; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); display: none; max-width: 90%; text-align: center; }
         .toast.show { display: block; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         .toast-success { background: #10b981; }
@@ -194,17 +208,16 @@
         .toast-info { background: var(--primary); }
 
         @media (max-width: 640px) {
-            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
-            .stat-box .num { font-size: 18px; } .stat-box .label { font-size: 9px; }
+            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .form-grid, .form-grid-3, .entry-form-wrap .form-row, .entry-form-wrap .form-row-3 { grid-template-columns: 1fr; }
-            .app-header .brand { font-size: 14px; } .app-header .brand i { font-size: 20px; }
-            .tab-bar .tab { font-size: 11px; padding: 6px 8px; min-height: 34px; } .tab-bar .tab i { font-size: 12px; }
-            .card { padding: 12px; border-radius: 12px; }
+            .app-header .brand { font-size: 15px; } .app-header .brand i { font-size: 22px; }
+            .tab-bar .tab { font-size: 12px; padding: 6px 10px; min-height: 38px; } .tab-bar .tab i { font-size: 13px; }
+            .card { padding: 16px; }
             .btn { font-size: 13px; padding: 10px 14px; min-height: 40px; }
-            .container { padding: 8px 8px 70px; }
+            .container { padding: 16px 12px 70px; }
             .school-selector { flex-direction: column; align-items: stretch; }
             .entry-actions .btn { flex: 1 1 100%; }
-            table { font-size: 11px; min-width: 480px; } table th, table td { padding: 6px 8px; }
+            table { font-size: 12px; min-width: 480px; } table th, table td { padding: 8px 10px; }
         }
     </style>
 </head>
@@ -229,7 +242,7 @@
 
         <header class="app-header">
             <div class="brand">
-                <i class="fas fa-graduation-cap"></i> Mungwi <span>Data</span>
+                <i class="fas fa-graduation-cap"></i> Mungwi G & C <span>Data</span>
             </div>
             <div class="header-right">
                 <div class="user-badge">
@@ -275,13 +288,13 @@
                             <div class="card-title" style="margin-bottom:0;"><i class="fas fa-school"></i> Manage Schools</div>
                             <button class="btn btn-success btn-sm admin-only" onclick="showAddSchoolForm()"><i class="fas fa-plus"></i> Add</button>
                         </div>
-                        <div id="addSchoolForm" class="hidden admin-only" style="margin-top:12px;padding:12px;background:#f8fafc;border-radius:var(--radius-sm);border:1px solid var(--border);">
+                        <div id="addSchoolForm" class="hidden admin-only" style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:var(--radius-sm);border:1px solid var(--border);">
                             <div class="form-grid">
                                 <div class="form-group">
                                     <label>School Name</label>
                                     <input type="text" id="newSchoolName" placeholder="e.g. CHAMFUBU PRIMARY" />
                                 </div>
-                                <div class="form-group" style="display:flex;align-items:flex-end;gap:6px;">
+                                <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;">
                                     <button class="btn btn-primary btn-sm" onclick="addSchool()"><i class="fas fa-save"></i> Add</button>
                                     <button class="btn btn-outline btn-sm" onclick="document.getElementById('addSchoolForm').classList.add('hidden')">Cancel</button>
                                 </div>
@@ -289,7 +302,13 @@
                         </div>
                         <div class="table-wrap mt-8">
                             <table>
-                                <thead><tr><th>#</th><th>School</th><th style="text-align:right;">Actions</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px; text-align: center;">#</th>
+                                        <th>School Name</th>
+                                        <th style="width: 80px; text-align: right;">Action</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="schoolListBody"></tbody>
                             </table>
                         </div>
@@ -302,7 +321,7 @@
                             <select id="teacherSchoolSelect" onchange="loadTeacherData()"></select>
                         </div>
                         <div class="entry-form-wrap">
-                            <div style="font-weight:700;font-size:14px;color:var(--primary);margin-bottom:10px;" id="entryFormTitle">
+                            <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:16px;" id="entryFormTitle">
                                 <i class="fas fa-plus-circle" style="color:var(--accent-dark);"></i> Add New Entry
                             </div>
                             <form id="entryForm" onsubmit="return saveEntry(event)">
@@ -366,8 +385,8 @@
                         </div>
                         <div class="mt-12">
                             <div class="flex-between">
-                                <span style="font-weight:700;font-size:14px;color:var(--primary);"><i class="fas fa-list"></i> Entries</span>
-                                <span id="entryCount" style="font-size:12px;color:var(--text-light);">0 records</span>
+                                <span style="font-weight:700;font-size:15px;color:var(--primary);"><i class="fas fa-list"></i> Entries</span>
+                                <span id="entryCount" style="font-size:13px;color:var(--text-light);">0 records</span>
                             </div>
                             <div class="table-scroll mt-8">
                                 <table>
@@ -391,7 +410,7 @@
                         <div class="flex-between">
                             <div class="card-title" style="margin-bottom:0;"><i class="fas fa-table"></i> All Records</div>
                             <div class="flex">
-                                <select id="adminFilterSchool" onchange="loadData()" style="padding:6px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:12px;background:#fff;">
+                                <select id="adminFilterSchool" onchange="loadData()" style="padding:6px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;background:#fff;">
                                     <option value="">All Schools</option>
                                 </select>
                                 <button class="btn btn-primary btn-sm" onclick="loadData()"><i class="fas fa-sync"></i></button>
@@ -416,13 +435,10 @@
                 <div id="tab-adminExport" class="tab-content admin-only">
                     <div class="card">
                         <div class="card-title"><i class="fas fa-file-export"></i> Export Data</div>
-                        <p style="color:var(--text-light);margin-bottom:12px;font-size:13px;">Download all records as Excel or CSV.</p>
+                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download all records as Excel or CSV.</p>
                         <div class="flex">
                             <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel</button>
                             <button class="btn btn-outline" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-                        </div>
-                        <div style="margin-top:12px;font-size:12px;color:var(--text-light);">
-                            <i class="fas fa-info-circle"></i> Includes all fields: enrolment, dropouts, absenteeism, re-entry, OVC.
                         </div>
                     </div>
                 </div>
@@ -641,7 +657,7 @@
                             <td>${r.term || '-'}</td><td>${r.year || '-'}</td><td>${r.grade || '-'}</td>
                             <td>${r.enrolment_boys || 0}</td><td>${r.enrolment_girls || 0}</td><td><strong>${total}</strong></td>
                             <td>${r.age_range || '-'}</td><td>${r.teen_preg || 0}</td><td>${dropouts}</td><td>${absent}</td><td>${reentry}</td><td>${ovc}</td>
-                            <td style="text-align:right;"><button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i></button></td>
+                            <td style="text-align:right;"><button class="btn btn-danger btn-xs" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i></button></td>
                         </tr>`;
             }).join('');
         }
@@ -666,8 +682,13 @@
             const tbody = $('schoolListBody'); if (!tbody) return;
             const isAdmin = currentUserRole === 'admin';
             tbody.innerHTML = schools.map((s, i) =>
-                `<tr><td>${i+1}</td><td><span class="text-ellipsis">${s.name}</span></td>
-                         <td style="text-align:right;">${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteSchool('${s.id}')"><i class="fas fa-trash"></i></button>` : `<span style="color:#aaa; font-size:10px;">Read Only</span>`}</td></tr>`
+                `<tr>
+                    <td style="text-align: center; color: var(--text-light);">${i+1}</td>
+                    <td><span class="school-name">${s.name}</span></td>
+                    <td style="text-align: right;">
+                        ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteSchool('${s.id}')"><i class="fas fa-trash"></i></button>` : `<span style="color:#94a3b8; font-size:11px;">Read Only</span>`}
+                    </td>
+                </tr>`
             ).join('');
             const sel = $('adminFilterSchool'); if (sel) {
                 const currentVal = sel.value; sel.innerHTML = `<option value="">All Schools</option>` + schools.map(s => `<option value="${s.id}">${s.name}</option>`).join(''); sel.value = currentVal;
@@ -704,8 +725,8 @@
                             <td>${r.enrolment_boys || 0}</td><td>${r.enrolment_girls || 0}</td><td><strong>${total}</strong></td>
                             <td>${r.age_range || '-'}</td><td>${r.teen_preg || 0}</td><td>${dropouts}</td><td>${absent}</td><td>${reentry}</td><td>${ovc}</td>
                             <td style="text-align:right;">
-                                <button class="btn btn-primary btn-sm" onclick="editEntry('${r.id}')"><i class="fas fa-edit"></i></button>
-                                ${isAdmin ? `<button class="btn btn-danger btn-sm" onclick="deleteTeacherRecord('${r.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                                <button class="btn btn-primary btn-xs" onclick="editEntry('${r.id}')"><i class="fas fa-edit"></i></button>
+                                ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteTeacherRecord('${r.id}')"><i class="fas fa-trash"></i></button>` : ''}
                             </td>
                         </tr>`;
             }).join('');
