@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mungwi DEB - Data Submission</title>
+    <title>Mungwi DEB – Data Submission</title>
     <!-- Supabase & SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
@@ -1125,18 +1125,18 @@
     <!-- ===== JAVASCRIPT ===== -->
     <script>
         // ================================================================
-        //  CONFIG
+        //  CONFIG - SUPABASE KEYS
         // ================================================================
-        const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-        const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+        const SUPABASE_URL = 'https://vnkqhwqolwxoxfwrqqaj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZua3Fod3FvbHd4b3hmd3JxcWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNTA5MjcsImV4cCI6MjEwMDgyNjkyN30.KcNuU2QSpkYKJh8PkNtjKgPCeK13KJNGgXlJZLaY8W8';
         const ADMIN_EMAIL = 'admin@mungwi.gov';
         const ADMIN_PASSWORD = 'admin123';
 
         // ================================================================
         //  STATE
         // ================================================================
-        let currentView = 'school'; // 'school' | 'admin'
-        let currentRole = 'school'; // 'school' | 'admin'
+        let currentView = 'school';
+        let currentRole = 'school';
         let allSubmissions = [];
         let supabase = null;
 
@@ -1147,8 +1147,9 @@
             // Init Supabase
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase initialized');
             } catch (e) {
-                console.warn('Supabase not available, using mock mode.');
+                console.warn('Supabase not available, using mock mode.', e);
                 supabase = null;
             }
 
@@ -1210,7 +1211,6 @@
                         btn.textContent = '🔐 Admin Login'; return; }
 
                     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-                        // Local admin auth
                         localStorage.setItem('adminAuth', 'true');
                         document.getElementById('loginOverlay').style.display = 'none';
                         document.getElementById('roleBadge').textContent = '🔐 Admin';
@@ -1264,7 +1264,6 @@
         // ================================================================
         function toggleView() {
             if (currentRole === 'admin') {
-                // Switch to school view
                 currentRole = 'school';
                 document.getElementById('roleBadge').textContent = '🏫 School';
                 document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
@@ -1272,7 +1271,6 @@
                 showView('school');
                 toast('Switched to School view.', 'info');
             } else {
-                // Try to switch to admin
                 const auth = localStorage.getItem('adminAuth');
                 if (auth === 'true') {
                     currentRole = 'admin';
@@ -1390,17 +1388,16 @@
                     status: 'pending'
                 };
 
-                // Validate required fields
                 if (!data.grade) { toast('Please select a grade.', 'error');
                     btn.disabled = false;
                     btn.innerHTML = '📤 Submit Data'; return; }
 
-                // Save to Supabase or localStorage fallback
+                // Save to Supabase
                 if (supabase) {
                     const { error } = await supabase.from('submissions').insert([data]);
                     if (error) throw new Error(error.message);
                 } else {
-                    // Fallback: save to localStorage
+                    // Fallback: localStorage
                     const existing = JSON.parse(localStorage.getItem('submissions') || '[]');
                     data.id = 'local_' + Date.now();
                     data.created_at = new Date().toISOString();
@@ -1409,14 +1406,12 @@
                 }
 
                 toast('✅ Data submitted successfully!', 'success');
-                // Reset form
                 document.getElementById('schoolForm').reset();
                 document.getElementById('enrolTotal').value = 0;
                 document.getElementById('earlyMarryTotal').value = 0;
                 document.getElementById('absentTotal').value = 0;
                 document.getElementById('reentryTotal').value = 0;
                 document.getElementById('ovcTotal').value = 0;
-                // Recalc
                 calcTotal();
                 calcEarlyMarryTotal();
                 calcAbsentTotal();
@@ -1444,7 +1439,6 @@
                     if (error) throw new Error(error.message);
                     data = rows || [];
                 } else {
-                    // Fallback: localStorage
                     data = JSON.parse(localStorage.getItem('submissions') || '[]');
                     data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 }
@@ -1524,7 +1518,6 @@
                         .eq('id', id);
                     if (error) throw new Error(error.message);
                 } else {
-                    // localStorage fallback
                     const data = JSON.parse(localStorage.getItem('submissions') || '[]');
                     const idx = data.findIndex(r => r.id === id);
                     if (idx >= 0) { data[idx].status = status;
@@ -1566,7 +1559,6 @@
                 return;
             }
 
-            // Prepare flattened data for export
             const exportData = allSubmissions.map(r => ({
                 'School': r.school_name || '',
                 'Grade': r.grade || '',
@@ -1611,7 +1603,6 @@
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, 'Submissions');
 
-            // Auto column widths
             const cols = Object.keys(exportData[0] || {});
             ws['!cols'] = cols.map(c => ({ wch: Math.max(c.length * 1.2, 12) }));
 
@@ -1673,11 +1664,8 @@
         (function checkAutoLogin() {
             const adminAuth = localStorage.getItem('adminAuth');
             if (adminAuth === 'true') {
-                // Admin is already authenticated, but we need to show login overlay
-                // only if the user hasn't explicitly logged out
                 const overlay = document.getElementById('loginOverlay');
                 if (overlay && overlay.style.display !== 'none') {
-                    // Auto-login admin
                     document.getElementById('loginOverlay').style.display = 'none';
                     document.getElementById('roleBadge').textContent = '🔐 Admin';
                     document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
@@ -1690,8 +1678,8 @@
         })();
 
         console.log('✅ Mungwi DEB App loaded.');
+        console.log('🔑 Supabase URL:', SUPABASE_URL);
         console.log('ℹ️  Admin: admin@mungwi.gov / admin123');
-        console.log('ℹ️  Supabase URL:', SUPABASE_URL);
         console.log('ℹ️  Mode:', supabase ? 'Supabase connected' : 'LocalStorage fallback');
     </script>
 </body>
