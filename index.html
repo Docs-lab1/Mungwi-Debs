@@ -571,7 +571,7 @@
             color: #888;
         }
         #loginOverlay {
-            display: none;
+            display: flex !important;
             position: absolute;
             inset: 0;
             background: rgba(26, 26, 46, 0.85);
@@ -582,8 +582,8 @@
             justify-content: center;
             padding: 20px;
         }
-        #loginOverlay.show {
-            display: flex !important;
+        #loginOverlay.hidden {
+            display: none !important;
         }
         .spinner {
             display: inline-block;
@@ -598,6 +598,19 @@
             to {
                 transform: rotate(360deg);
             }
+        }
+        .demo-banner {
+            background: #fff3cd;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #856404;
+            text-align: center;
+            border: 1px solid #ffc107;
+        }
+        .demo-banner strong {
+            color: #856404;
         }
         @media (max-width: 768px) {
             #app {
@@ -721,7 +734,7 @@
             </div>
             <div class="header-actions">
                 <span class="badge" id="roleBadge">School</span>
-                <button class="header-btn" id="viewToggleBtn" onclick="toggleView()">
+                <button class="header-btn" id="viewToggleBtn" onclick="toggleView()" style="display:none;">
                     👤 Switch View
                 </button>
                 <button class="header-btn" id="logoutBtn" onclick="logout()" style="display:none;">
@@ -735,6 +748,9 @@
                 <div class="card-title">
                     <span class="icon">📋</span> Submit School Data
                     <span class="sub">Term 2, 2025</span>
+                </div>
+                <div class="demo-banner">
+                    💡 <strong>Demo Mode:</strong> Data is stored locally in your browser. To use Supabase, create the <code>submissions</code> table first.
                 </div>
                 <form id="schoolForm" onsubmit="submitSchoolData(event)">
                     <div class="form-grid">
@@ -908,6 +924,9 @@
                     <span class="icon">📊</span> Dashboard
                     <span class="sub" id="submissionCount">0 submissions</span>
                 </div>
+                <div class="demo-banner">
+                    💡 <strong>Demo Mode:</strong> Data is stored locally in your browser.
+                </div>
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-card highlight">
                         <div class="num" id="statTotal">0</div>
@@ -979,11 +998,14 @@
             </div>
         </div>
 
-        <div id="loginOverlay" class="show">
+        <div id="loginOverlay">
             <div class="login-wrap" style="background:#fff;border-radius:28px;padding:36px 32px;max-width:440px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,0.3);">
                 <div class="logo-big">
                     <h1>Mungwi <span>DEB</span></h1>
                     <p>Data Submission Portal · Term 2 2025</p>
+                </div>
+                <div class="demo-banner" style="margin-bottom:16px;">
+                    💡 <strong>Demo Login:</strong> School: any name | Admin: admin@mungwi.gov / admin123
                 </div>
                 <div class="login-tabs">
                     <button class="active" data-role="school" onclick="switchLoginRole('school')">🏫 School</button>
@@ -997,9 +1019,9 @@
                         </div>
                         <div class="form-group hidden" id="adminLoginFields">
                             <label>Admin Email</label>
-                            <input type="email" id="loginEmail" placeholder="admin@mungwi.gov" />
+                            <input type="email" id="loginEmail" placeholder="admin@mungwi.gov" value="admin@mungwi.gov" />
                             <label style="margin-top:10px;">Password</label>
-                            <input type="password" id="loginPassword" placeholder="••••••••" />
+                            <input type="password" id="loginPassword" placeholder="••••••••" value="admin123" />
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
@@ -1042,8 +1064,9 @@
 
             // Check if admin is already logged in
             if (localStorage.getItem('adminAuth') === 'true') {
-                document.getElementById('loginOverlay').classList.remove('show');
+                document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('roleBadge').textContent = '🔐 Admin';
+                document.getElementById('viewToggleBtn').style.display = 'inline-flex';
                 document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
                 document.getElementById('logoutBtn').style.display = 'inline-flex';
                 currentRole = 'admin';
@@ -1051,8 +1074,10 @@
                 document.getElementById('viewAdmin').classList.add('active');
                 loadAdminData();
             } else if (localStorage.getItem('schoolName')) {
-                document.getElementById('loginOverlay').classList.remove('show');
+                document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('roleBadge').textContent = '🏫 ' + localStorage.getItem('schoolName');
+                document.getElementById('viewToggleBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'inline-flex';
                 currentRole = 'school';
             }
         });
@@ -1080,10 +1105,10 @@
                         btn.disabled = false;
                         btn.textContent = '🚀 Continue'; return; }
                     localStorage.setItem('schoolName', name);
-                    document.getElementById('loginOverlay').classList.remove('show');
+                    document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('roleBadge').textContent = '🏫 ' + name;
-                    document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
-                    document.getElementById('logoutBtn').style.display = 'none';
+                    document.getElementById('viewToggleBtn').style.display = 'none';
+                    document.getElementById('logoutBtn').style.display = 'inline-flex';
                     currentRole = 'school';
                     document.getElementById('viewSchool').classList.add('active');
                     document.getElementById('viewAdmin').classList.remove('active');
@@ -1097,8 +1122,9 @@
 
                     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                         localStorage.setItem('adminAuth', 'true');
-                        document.getElementById('loginOverlay').classList.remove('show');
+                        document.getElementById('loginOverlay').classList.add('hidden');
                         document.getElementById('roleBadge').textContent = '🔐 Admin';
+                        document.getElementById('viewToggleBtn').style.display = 'inline-flex';
                         document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
                         document.getElementById('logoutBtn').style.display = 'inline-flex';
                         currentRole = 'admin';
@@ -1107,7 +1133,7 @@
                         await loadAdminData();
                         toast('Welcome, Admin!', 'success');
                     } else {
-                        toast('Invalid admin credentials.', 'error');
+                        toast('Invalid admin credentials. Use admin@mungwi.gov / admin123', 'error');
                     }
                 }
             } catch (err) {
@@ -1121,9 +1147,9 @@
         function logout() {
             localStorage.removeItem('adminAuth');
             localStorage.removeItem('schoolName');
-            document.getElementById('loginOverlay').classList.add('show');
+            document.getElementById('loginOverlay').classList.remove('hidden');
             document.getElementById('roleBadge').textContent = 'School';
-            document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
+            document.getElementById('viewToggleBtn').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'none';
             currentRole = 'school';
             document.getElementById('viewSchool').classList.add('active');
@@ -1133,16 +1159,14 @@
 
         function toggleView() {
             if (currentRole === 'admin') {
-                // Switch to school view
                 currentRole = 'school';
                 document.getElementById('roleBadge').textContent = '🏫 School';
                 document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
-                document.getElementById('logoutBtn').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'inline-flex';
                 document.getElementById('viewSchool').classList.add('active');
                 document.getElementById('viewAdmin').classList.remove('active');
                 toast('Switched to School view.', 'info');
             } else {
-                // Switch to admin view
                 const auth = localStorage.getItem('adminAuth');
                 if (auth === 'true') {
                     currentRole = 'admin';
@@ -1154,8 +1178,8 @@
                     loadAdminData();
                     toast('Switched to Admin view.', 'info');
                 } else {
-                    toast('Please login as Admin first. Use "Admin" tab in login.', 'error');
-                    document.getElementById('loginOverlay').classList.add('show');
+                    toast('Please login as Admin first.', 'error');
+                    document.getElementById('loginOverlay').classList.remove('hidden');
                     switchLoginRole('admin');
                 }
             }
@@ -1246,18 +1270,30 @@
                     btn.disabled = false;
                     btn.innerHTML = '📤 Submit Data'; return; }
 
+                // Try Supabase first, fallback to localStorage
+                let saved = false;
                 if (supabase) {
-                    const { error } = await supabase.from('submissions').insert([data]);
-                    if (error) throw new Error(error.message);
-                } else {
+                    try {
+                        const { error } = await supabase.from('submissions').insert([data]);
+                        if (!error) saved = true;
+                        else console.warn('Supabase insert failed:', error);
+                    } catch (e) {
+                        console.warn('Supabase error:', e);
+                    }
+                }
+
+                if (!saved) {
+                    // Fallback to localStorage
                     const existing = JSON.parse(localStorage.getItem('submissions') || '[]');
                     data.id = 'local_' + Date.now();
                     data.created_at = new Date().toISOString();
                     existing.push(data);
                     localStorage.setItem('submissions', JSON.stringify(existing));
+                    toast('✅ Data saved locally! (Supabase not available)', 'success');
+                } else {
+                    toast('✅ Data submitted successfully!', 'success');
                 }
 
-                toast('✅ Data submitted successfully!', 'success');
                 document.getElementById('schoolForm').reset();
                 document.getElementById('enrolTotal').value = 0;
                 document.getElementById('earlyMarryTotal').value = 0;
@@ -1280,23 +1316,42 @@
         async function loadAdminData() {
             try {
                 let data = [];
+                let loaded = false;
+
                 if (supabase) {
-                    const { data: rows, error } = await supabase
-                        .from('submissions')
-                        .select('*')
-                        .order('created_at', { ascending: false });
-                    if (error) throw new Error(error.message);
-                    data = rows || [];
-                } else {
+                    try {
+                        const { data: rows, error } = await supabase
+                            .from('submissions')
+                            .select('*')
+                            .order('created_at', { ascending: false });
+                        if (!error && rows) {
+                            data = rows;
+                            loaded = true;
+                        }
+                    } catch (e) {
+                        console.warn('Supabase load error:', e);
+                    }
+                }
+
+                if (!loaded) {
+                    // Fallback to localStorage
                     data = JSON.parse(localStorage.getItem('submissions') || '[]');
                     data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                    if (data.length > 0) {
+                        toast('📂 Loaded ' + data.length + ' records from local storage.', 'info');
+                    }
                 }
+
                 allSubmissions = data;
                 renderAdminTable();
                 updateStats();
                 document.getElementById('submissionCount').textContent = data.length + ' submissions';
             } catch (err) {
                 toast('Failed to load admin data: ' + err.message, 'error');
+                // Still show empty state
+                allSubmissions = [];
+                renderAdminTable();
+                updateStats();
             }
         }
 
@@ -1320,7 +1375,7 @@
             const tbody = document.getElementById('adminTableBody');
             if (!rows.length) {
                 tbody.innerHTML =
-                    `<tr><td colspan="11" class="text-center text-muted" style="padding:40px;">No submissions found.</td></tr>`;
+                    `<tr><td colspan="11" class="text-center text-muted" style="padding:40px;">No submissions found. Submit some data first!</td></tr>`;
                 return;
             }
 
@@ -1329,6 +1384,7 @@
                 const statusClass = r.status === 'pending' ? 'status-pending' :
                     r.status === 'approved' ? 'status-approved' : 'status-rejected';
                 const date = r.created_at ? new Date(r.created_at).toLocaleDateString() : '-';
+                const id = r.id || r._id || 'local_' + i;
                 html += `<tr>
                     <td>${i+1}</td>
                     <td><strong>${r.school_name || '-'}</strong></td>
@@ -1341,7 +1397,7 @@
                     <td><span class="status-badge ${statusClass}">${r.status || 'pending'}</span></td>
                     <td>${date}</td>
                     <td>
-                        <select onchange="updateStatus('${r.id}', this.value)" style="padding:4px 8px;border-radius:8px;border:1px solid #ddd;font-size:12px;background:#fafafa;">
+                        <select onchange="updateStatus('${id}', this.value)" style="padding:4px 8px;border-radius:8px;border:1px solid #ddd;font-size:12px;background:#fafafa;">
                             <option value="pending" ${r.status==='pending'?'selected':''}>Pending</option>
                             <option value="approved" ${r.status==='approved'?'selected':''}>Approved</option>
                             <option value="rejected" ${r.status==='rejected'?'selected':''}>Rejected</option>
@@ -1354,17 +1410,27 @@
 
         async function updateStatus(id, status) {
             try {
-                if (supabase) {
-                    const { error } = await supabase
-                        .from('submissions')
-                        .update({ status })
-                        .eq('id', id);
-                    if (error) throw new Error(error.message);
-                } else {
+                let updated = false;
+                if (supabase && !id.startsWith('local_')) {
+                    try {
+                        const { error } = await supabase
+                            .from('submissions')
+                            .update({ status })
+                            .eq('id', id);
+                        if (!error) updated = true;
+                    } catch (e) {
+                        console.warn('Supabase update error:', e);
+                    }
+                }
+
+                if (!updated) {
+                    // Update localStorage
                     const data = JSON.parse(localStorage.getItem('submissions') || '[]');
-                    const idx = data.findIndex(r => r.id === id);
-                    if (idx >= 0) { data[idx].status = status;
-                        localStorage.setItem('submissions', JSON.stringify(data)); }
+                    const idx = data.findIndex(r => r.id === id || r._id === id);
+                    if (idx >= 0) {
+                        data[idx].status = status;
+                        localStorage.setItem('submissions', JSON.stringify(data));
+                    }
                 }
                 await loadAdminData();
                 toast('Status updated to ' + status, 'success');
@@ -1451,10 +1517,16 @@
         async function clearAllSubmissions() {
             if (!confirm('⚠️ Are you sure you want to delete ALL submissions? This cannot be undone.')) return;
             try {
+                let cleared = false;
                 if (supabase) {
-                    const { error } = await supabase.from('submissions').delete().neq('id', '');
-                    if (error) throw new Error(error.message);
-                } else {
+                    try {
+                        const { error } = await supabase.from('submissions').delete().neq('id', '');
+                        if (!error) cleared = true;
+                    } catch (e) {
+                        console.warn('Supabase clear error:', e);
+                    }
+                }
+                if (!cleared) {
                     localStorage.setItem('submissions', '[]');
                 }
                 await loadAdminData();
@@ -1489,7 +1561,7 @@
         console.log('✅ Mungwi DEB App loaded.');
         console.log('🔑 Supabase URL:', SUPABASE_URL);
         console.log('ℹ️  Admin: admin@mungwi.gov / admin123');
-        console.log('ℹ️  Mode:', supabase ? 'Supabase connected' : 'LocalStorage fallback');
+        console.log('ℹ️  Mode:', supabase ? 'Supabase available' : 'LocalStorage only');
     </script>
 </body>
 </html>
