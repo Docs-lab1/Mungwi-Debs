@@ -632,7 +632,7 @@
                 <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="loadData()">
                     <i class="fas fa-sync"></i>
                 </button>
-                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="syncToSupabase()">
+                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="syncTosupabaseClient()">
                     <i class="fas fa-cloud-upload-alt"></i>
                 </button>
             </div>
@@ -815,7 +815,7 @@
         const SUPABASE_URL = 'https://vnkqhwqolwxoxfwrqqaj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZua3Fod3FvbHd4b3hmd3JxcWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNTA5MjcsImV4cCI6MjEwMDgyNjkyN30.KcNuU2QSpkYKJh8PkNtjKgPCeK13KJNGgXlJZLaY8W8';
 
-        let supabase = null;
+        let supabaseClient = null;
         let schools = [];
         let records = [];
         let teacherRecords = [];
@@ -861,10 +861,11 @@
         // ================================================================
         async function initSupabase() {
             try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Supabase client created');
 
-                // Test connection by trying to fetch from schools table                const { data, error } = await supabase.from('schools').select('count', { count: 'exact', head: true });
+                // Test connection by trying to fetch from schools table
+                const { data, error } = await supabaseClient.from('schools').select('count', { count: 'exact', head: true });
 
                 if (error) {
                     // Check if error is because table doesn't exist
@@ -903,9 +904,9 @@
             try {
                 // Load schools
                 let schoolsData = [];
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { data, error } = await supabase
+                        const { data, error } = await supabaseClient
                             .from('schools')
                             .select('*')
                             .order('name');
@@ -917,7 +918,7 @@
                             // If localStorage has data, sync it up
                             if (schoolsData.length > 0 && isSupabaseConnected) {
                                 for (const s of schoolsData) {
-                                    await supabase.from('schools').upsert(s, { onConflict: 'id' });
+                                    await supabaseClient.from('schools').upsert(s, { onConflict: 'id' });
                                 }
                             }
                         }
@@ -938,9 +939,9 @@
 
                 // Load records
                 let recordsData = [];
-                if (isSupabaseConnected && supabase) {
+                if (isSupabaseConnected && supabaseClient) {
                     try {
-                        const { data, error } = await supabase
+                        const { data, error } = await supabaseClient
                             .from('records')
                             .select('*')
                             .order('created_at', { ascending: false });
@@ -950,7 +951,7 @@
                             recordsData = JSON.parse(localStorage.getItem('records') || '[]');
                             if (recordsData.length > 0 && isSupabaseConnected) {
                                 for (const r of recordsData) {
-                                    await supabase.from('records').upsert(r, { onConflict: 'id' });
+                                    await supabaseClient.from('records').upsert(r, { onConflict: 'id' });
                                 }
                             }
                         }
@@ -1046,13 +1047,13 @@
 
             // Save to Supabase if connected
             let savedToSupabase = false;
-            if (isSupabaseConnected && supabase) {
+            if (isSupabaseConnected && supabaseClient) {
                 try {
                     for (const s of sampleSchools) {
-                        await supabase.from('schools').upsert(s, { onConflict: 'id' });
+                        await supabaseClient.from('schools').upsert(s, { onConflict: 'id' });
                     }
                     for (const r of sampleRecords) {
-                        await supabase.from('records').upsert(r, { onConflict: 'id' });
+                        await supabaseClient.from('records').upsert(r, { onConflict: 'id' });
                     }
                     savedToSupabase = true;
                     showToast('✅ Sample data saved to Supabase!', 'success');
@@ -1076,8 +1077,8 @@
         // ================================================================
         //  SYNC TO SUPABASE
         // ================================================================
-        async function syncToSupabase() {
-            if (!isSupabaseConnected || !supabase) {
+        async function syncTosupabaseClient() {
+            if (!isSupabaseConnected || !supabaseClient) {
                 showToast('⚠️ Not connected to Supabase. Check your internet.', 'error');
                 return;
             }
@@ -1087,12 +1088,12 @@
             try {
                 // Sync schools
                 for (const s of schools) {
-                    await supabase.from('schools').upsert(s, { onConflict: 'id' });
+                    await supabaseClient.from('schools').upsert(s, { onConflict: 'id' });
                 }
 
                 // Sync records
                 for (const r of records) {
-                    await supabase.from('records').upsert(r, { onConflict: 'id' });
+                    await supabaseClient.from('records').upsert(r, { onConflict: 'id' });
                 }
 
                 showToast('✅ All data synced to Supabase!', 'success');
@@ -1280,8 +1281,8 @@
             const newSchool = { id: 's' + Date.now(), name: name };
 
             try {
-                if (isSupabaseConnected && supabase) {
-                    const { error } = await supabase.from('schools').insert([newSchool]);
+                if (isSupabaseConnected && supabaseClient) {
+                    const { error } = await supabaseClient.from('schools').insert([newSchool]);
                     if (error) throw new Error(error.message);
                 }
                 schools.push(newSchool);
@@ -1300,8 +1301,8 @@
         async function deleteSchool(id) {
             if (!confirm('Delete this school? All associated data will be removed.')) return;
             try {
-                if (isSupabaseConnected && supabase) {
-                    const { error } = await supabase.from('schools').delete().eq('id', id);
+                if (isSupabaseConnected && supabaseClient) {
+                    const { error } = await supabaseClient.from('schools').delete().eq('id', id);
                     if (error) throw new Error(error.message);
                 }
                 schools = schools.filter(s => s.id !== id);
@@ -1323,8 +1324,8 @@
         async function deleteRecord(id) {
             if (!confirm('Delete this record?')) return;
             try {
-                if (isSupabaseConnected && supabase) {
-                    const { error } = await supabase.from('records').delete().eq('id', id);
+                if (isSupabaseConnected && supabaseClient) {
+                    const { error } = await supabaseClient.from('records').delete().eq('id', id);
                     if (error) throw new Error(error.message);
                 }
                 records = records.filter(r => r.id !== id);
@@ -1392,8 +1393,8 @@
         async function deleteTeacherRecord(id) {
             if (!confirm('Delete this entry?')) return;
             try {
-                if (isSupabaseConnected && supabase) {
-                    const { error } = await supabase.from('records').delete().eq('id', id);
+                if (isSupabaseConnected && supabaseClient) {
+                    const { error } = await supabaseClient.from('records').delete().eq('id', id);
                     if (error) throw new Error(error.message);
                 }
                 records = records.filter(r => r.id !== id);
@@ -1459,8 +1460,8 @@
             try {
                 if (editId) {
                     payload.id = editId;
-                    if (isSupabaseConnected && supabase) {
-                        const { error } = await supabase.from('records').update(payload).eq('id', editId);
+                    if (isSupabaseConnected && supabaseClient) {
+                        const { error } = await supabaseClient.from('records').update(payload).eq('id', editId);
                         if (error) throw new Error(error.message);
                     }
                     const idx = records.findIndex(r => r.id === editId);
@@ -1468,8 +1469,8 @@
                     showToast('✅ Record updated!', 'success');
                 } else {
                     payload.id = 'r' + Date.now();
-                    if (isSupabaseConnected && supabase) {
-                        const { error } = await supabase.from('records').insert([payload]);
+                    if (isSupabaseConnected && supabaseClient) {
+                        const { error } = await supabaseClient.from('records').insert([payload]);
                         if (error) throw new Error(error.message);
                     }
                     records.push(payload);
