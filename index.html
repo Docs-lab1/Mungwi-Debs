@@ -750,7 +750,7 @@
                     <span class="sub">Term 2, 2025</span>
                 </div>
                 <div class="demo-banner">
-                    💡 <strong>Demo Mode:</strong> Data is stored locally in your browser. To use Supabase, create the <code>submissions</code> table first.
+                    💡 <strong>Demo Mode:</strong> Data is stored locally in your browser.
                 </div>
                 <form id="schoolForm" onsubmit="submitSchoolData(event)">
                     <div class="form-grid">
@@ -1005,17 +1005,17 @@
                     <p>Data Submission Portal · Term 2 2025</p>
                 </div>
                 <div class="demo-banner" style="margin-bottom:16px;">
-                    💡 <strong>Demo Login:</strong> School: any name | Admin: admin@mungwi.gov / admin123
+                    💡 <strong>Quick Login:</strong> School: any name | Admin: admin@mungwi.gov / admin123
                 </div>
-                <div class="login-tabs">
-                    <button class="active" data-role="school" onclick="switchLoginRole('school')">🏫 School</button>
-                    <button data-role="admin" onclick="switchLoginRole('admin')">🔐 Admin</button>
+                <div class="login-tabs" id="loginTabs">
+                    <button class="active" data-role="school">🏫 School</button>
+                    <button data-role="admin">🔐 Admin</button>
                 </div>
-                <form id="loginForm" onsubmit="handleLogin(event)" class="login-form">
+                <form id="loginForm">
                     <div id="loginFields">
                         <div class="form-group" id="schoolLoginFields">
                             <label>School Name <span class="required">*</span></label>
-                            <input type="text" id="loginSchoolName" placeholder="Enter your school name" required />
+                            <input type="text" id="loginSchoolName" placeholder="Enter your school name" />
                         </div>
                         <div class="form-group hidden" id="adminLoginFields">
                             <label>Admin Email</label>
@@ -1047,7 +1047,9 @@
         let allSubmissions = [];
         let supabase = null;
 
+        // ========== INIT ==========
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Supabase
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Supabase initialized');
@@ -1055,6 +1057,22 @@
                 console.warn('Supabase not available, using mock mode.', e);
                 supabase = null;
             }
+
+            // Setup login tab switching
+            document.querySelectorAll('#loginTabs button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const role = this.dataset.role;
+                    switchLoginRole(role);
+                });
+            });
+
+            // Setup login form submit
+            document.getElementById('loginForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleLogin(e);
+            });
+
+            // Set default state
             switchLoginRole('school');
             calcTotal();
             calcEarlyMarryTotal();
@@ -1062,7 +1080,7 @@
             calcReentryTotal();
             calcOvcTotal();
 
-            // Check if admin is already logged in
+            // Check saved session
             if (localStorage.getItem('adminAuth') === 'true') {
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('roleBadge').textContent = '🔐 Admin';
@@ -1082,18 +1100,20 @@
             }
         });
 
+        // ========== LOGIN FUNCTIONS ==========
         let loginRole = 'school';
 
         function switchLoginRole(role) {
             loginRole = role;
-            document.querySelectorAll('.login-tabs button').forEach(b => b.classList.toggle('active', b.dataset.role === role));
+            document.querySelectorAll('#loginTabs button').forEach(b => {
+                b.classList.toggle('active', b.dataset.role === role);
+            });
             document.getElementById('schoolLoginFields').classList.toggle('hidden', role !== 'school');
             document.getElementById('adminLoginFields').classList.toggle('hidden', role !== 'admin');
             document.getElementById('loginBtn').textContent = role === 'school' ? '🚀 Continue as School' : '🔐 Admin Login';
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
+        function handleLogin(e) {
             const btn = document.getElementById('loginBtn');
             btn.disabled = true;
             btn.textContent = '⏳ Please wait...';
@@ -1101,9 +1121,12 @@
             try {
                 if (loginRole === 'school') {
                     const name = document.getElementById('loginSchoolName').value.trim();
-                    if (!name) { toast('Please enter your school name.', 'error');
+                    if (!name) {
+                        toast('Please enter your school name.', 'error');
                         btn.disabled = false;
-                        btn.textContent = '🚀 Continue'; return; }
+                        btn.textContent = '🚀 Continue';
+                        return;
+                    }
                     localStorage.setItem('schoolName', name);
                     document.getElementById('loginOverlay').classList.add('hidden');
                     document.getElementById('roleBadge').textContent = '🏫 ' + name;
@@ -1116,9 +1139,12 @@
                 } else {
                     const email = document.getElementById('loginEmail').value.trim();
                     const password = document.getElementById('loginPassword').value.trim();
-                    if (!email || !password) { toast('Please enter email and password.', 'error');
+                    if (!email || !password) {
+                        toast('Please enter email and password.', 'error');
                         btn.disabled = false;
-                        btn.textContent = '🔐 Admin Login'; return; }
+                        btn.textContent = '🔐 Admin Login';
+                        return;
+                    }
 
                     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                         localStorage.setItem('adminAuth', 'true');
@@ -1130,7 +1156,7 @@
                         currentRole = 'admin';
                         document.getElementById('viewSchool').classList.remove('active');
                         document.getElementById('viewAdmin').classList.add('active');
-                        await loadAdminData();
+                        loadAdminData();
                         toast('Welcome, Admin!', 'success');
                     } else {
                         toast('Invalid admin credentials. Use admin@mungwi.gov / admin123', 'error');
@@ -1162,7 +1188,6 @@
                 currentRole = 'school';
                 document.getElementById('roleBadge').textContent = '🏫 School';
                 document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
-                document.getElementById('logoutBtn').style.display = 'inline-flex';
                 document.getElementById('viewSchool').classList.add('active');
                 document.getElementById('viewAdmin').classList.remove('active');
                 toast('Switched to School view.', 'info');
@@ -1172,7 +1197,6 @@
                     currentRole = 'admin';
                     document.getElementById('roleBadge').textContent = '🔐 Admin';
                     document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
-                    document.getElementById('logoutBtn').style.display = 'inline-flex';
                     document.getElementById('viewSchool').classList.remove('active');
                     document.getElementById('viewAdmin').classList.add('active');
                     loadAdminData();
@@ -1185,6 +1209,7 @@
             }
         }
 
+        // ========== CALCULATIONS ==========
         function calcTotal() {
             const b = parseInt(document.getElementById('enrolBoys').value) || 0;
             const g = parseInt(document.getElementById('enrolGirls').value) || 0;
@@ -1215,6 +1240,7 @@
             document.getElementById('ovcTotal').value = b + g;
         }
 
+        // ========== SUBMIT DATA ==========
         async function submitSchoolData(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -1223,9 +1249,12 @@
 
             try {
                 const schoolName = document.getElementById('schoolName').value.trim();
-                if (!schoolName) { toast('Please enter school name.', 'error');
+                if (!schoolName) {
+                    toast('Please enter school name.', 'error');
                     btn.disabled = false;
-                    btn.innerHTML = '📤 Submit Data'; return; }
+                    btn.innerHTML = '📤 Submit Data';
+                    return;
+                }
 
                 const data = {
                     school_name: schoolName,
@@ -1266,33 +1295,21 @@
                     status: 'pending'
                 };
 
-                if (!data.grade) { toast('Please select a grade.', 'error');
+                if (!data.grade) {
+                    toast('Please select a grade.', 'error');
                     btn.disabled = false;
-                    btn.innerHTML = '📤 Submit Data'; return; }
-
-                // Try Supabase first, fallback to localStorage
-                let saved = false;
-                if (supabase) {
-                    try {
-                        const { error } = await supabase.from('submissions').insert([data]);
-                        if (!error) saved = true;
-                        else console.warn('Supabase insert failed:', error);
-                    } catch (e) {
-                        console.warn('Supabase error:', e);
-                    }
+                    btn.innerHTML = '📤 Submit Data';
+                    return;
                 }
 
-                if (!saved) {
-                    // Fallback to localStorage
-                    const existing = JSON.parse(localStorage.getItem('submissions') || '[]');
-                    data.id = 'local_' + Date.now();
-                    data.created_at = new Date().toISOString();
-                    existing.push(data);
-                    localStorage.setItem('submissions', JSON.stringify(existing));
-                    toast('✅ Data saved locally! (Supabase not available)', 'success');
-                } else {
-                    toast('✅ Data submitted successfully!', 'success');
-                }
+                // Save to localStorage
+                const existing = JSON.parse(localStorage.getItem('submissions') || '[]');
+                data.id = 'local_' + Date.now();
+                data.created_at = new Date().toISOString();
+                existing.push(data);
+                localStorage.setItem('submissions', JSON.stringify(existing));
+
+                toast('✅ Data saved successfully!', 'success');
 
                 document.getElementById('schoolForm').reset();
                 document.getElementById('enrolTotal').value = 0;
@@ -1313,42 +1330,20 @@
             btn.innerHTML = '📤 Submit Data';
         }
 
+        // ========== ADMIN FUNCTIONS ==========
         async function loadAdminData() {
             try {
-                let data = [];
-                let loaded = false;
-
-                if (supabase) {
-                    try {
-                        const { data: rows, error } = await supabase
-                            .from('submissions')
-                            .select('*')
-                            .order('created_at', { ascending: false });
-                        if (!error && rows) {
-                            data = rows;
-                            loaded = true;
-                        }
-                    } catch (e) {
-                        console.warn('Supabase load error:', e);
-                    }
-                }
-
-                if (!loaded) {
-                    // Fallback to localStorage
-                    data = JSON.parse(localStorage.getItem('submissions') || '[]');
-                    data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                    if (data.length > 0) {
-                        toast('📂 Loaded ' + data.length + ' records from local storage.', 'info');
-                    }
-                }
-
+                const data = JSON.parse(localStorage.getItem('submissions') || '[]');
+                data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 allSubmissions = data;
                 renderAdminTable();
                 updateStats();
                 document.getElementById('submissionCount').textContent = data.length + ' submissions';
+                if (data.length > 0) {
+                    toast('📂 Loaded ' + data.length + ' records.', 'info');
+                }
             } catch (err) {
                 toast('Failed to load admin data: ' + err.message, 'error');
-                // Still show empty state
                 allSubmissions = [];
                 renderAdminTable();
                 updateStats();
@@ -1384,7 +1379,7 @@
                 const statusClass = r.status === 'pending' ? 'status-pending' :
                     r.status === 'approved' ? 'status-approved' : 'status-rejected';
                 const date = r.created_at ? new Date(r.created_at).toLocaleDateString() : '-';
-                const id = r.id || r._id || 'local_' + i;
+                const id = r.id || 'local_' + i;
                 html += `<tr>
                     <td>${i+1}</td>
                     <td><strong>${r.school_name || '-'}</strong></td>
@@ -1408,31 +1403,15 @@
             tbody.innerHTML = html;
         }
 
-        async function updateStatus(id, status) {
+        function updateStatus(id, status) {
             try {
-                let updated = false;
-                if (supabase && !id.startsWith('local_')) {
-                    try {
-                        const { error } = await supabase
-                            .from('submissions')
-                            .update({ status })
-                            .eq('id', id);
-                        if (!error) updated = true;
-                    } catch (e) {
-                        console.warn('Supabase update error:', e);
-                    }
+                const data = JSON.parse(localStorage.getItem('submissions') || '[]');
+                const idx = data.findIndex(r => r.id === id);
+                if (idx >= 0) {
+                    data[idx].status = status;
+                    localStorage.setItem('submissions', JSON.stringify(data));
                 }
-
-                if (!updated) {
-                    // Update localStorage
-                    const data = JSON.parse(localStorage.getItem('submissions') || '[]');
-                    const idx = data.findIndex(r => r.id === id || r._id === id);
-                    if (idx >= 0) {
-                        data[idx].status = status;
-                        localStorage.setItem('submissions', JSON.stringify(data));
-                    }
-                }
-                await loadAdminData();
+                loadAdminData();
                 toast('Status updated to ' + status, 'success');
             } catch (err) {
                 toast('Failed to update status: ' + err.message, 'error');
@@ -1514,28 +1493,18 @@
             toast('📥 Excel exported successfully!', 'success');
         }
 
-        async function clearAllSubmissions() {
+        function clearAllSubmissions() {
             if (!confirm('⚠️ Are you sure you want to delete ALL submissions? This cannot be undone.')) return;
             try {
-                let cleared = false;
-                if (supabase) {
-                    try {
-                        const { error } = await supabase.from('submissions').delete().neq('id', '');
-                        if (!error) cleared = true;
-                    } catch (e) {
-                        console.warn('Supabase clear error:', e);
-                    }
-                }
-                if (!cleared) {
-                    localStorage.setItem('submissions', '[]');
-                }
-                await loadAdminData();
+                localStorage.setItem('submissions', '[]');
+                loadAdminData();
                 toast('🗑️ All submissions cleared.', 'info');
             } catch (err) {
                 toast('Failed to clear: ' + err.message, 'error');
             }
         }
 
+        // ========== TOAST ==========
         function toast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -1559,9 +1528,8 @@
         });
 
         console.log('✅ Mungwi DEB App loaded.');
-        console.log('🔑 Supabase URL:', SUPABASE_URL);
         console.log('ℹ️  Admin: admin@mungwi.gov / admin123');
-        console.log('ℹ️  Mode:', supabase ? 'Supabase available' : 'LocalStorage only');
+        console.log('ℹ️  Data stored in localStorage (demo mode)');
     </script>
 </body>
 </html>
