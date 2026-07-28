@@ -34,6 +34,7 @@
             --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
             --radius: 16px;
             --radius-sm: 10px;
+            --danger: #ef4444;
         }
         html, body {
             height: 100%;
@@ -111,22 +112,48 @@
             position: sticky; top: 0; z-index: 100;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px;
         }
-        .app-header .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: -0.3px; }
-        .app-header .brand i { font-size: 26px; color: var(--accent); }
-        .app-header .brand span { color: var(--accent); }
+        .app-header .brand { font-weight: 700; font-size: 20px; letter-spacing: -0.3px; }
         .app-header .header-right { display: flex; align-items: center; gap: 12px; }
-        .app-header .user-badge {
-            display: flex; align-items: center; gap: 8px; background: rgba(255, 255, 255, 0.1);
-            padding: 6px 14px 6px 10px; border-radius: 30px; font-size: 13px;
+
+        /* Floating Status Bar (Bottom Right) */
+        #statusFloat {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-radius: 30px;
+            padding: 8px 16px 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 50;
+            font-size: 13px;
+            color: var(--text-light);
         }
-        .app-header .user-badge i { font-size: 14px; color: var(--accent); }
-        .app-header .user-badge .role-tag {
+        #statusFloat .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+        #statusFloat .status-dot.online { background: #10b981; }
+        #statusFloat .status-dot.offline { background: #ef4444; }
+        #statusFloat .role-tag {
             background: var(--accent); color: var(--primary); font-weight: 700;
             font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase;
+            margin-left: 4px;
         }
-        .app-header .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
-        .app-header .status-dot.online { background: #10b981; }
-        .app-header .status-dot.offline { background: #ef4444; }
+        /* Admin Toggle Button inside the floating bar */
+        #statusFloat .admin-toggle {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #statusFloat .admin-toggle:hover { background: var(--accent-dark); }
+        #statusFloat .admin-toggle.danger { background: var(--danger); color: #fff; }
 
         /* Layout */
         .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; width: 100%; }
@@ -188,7 +215,6 @@
         .text-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
         .text-muted { color: var(--text-light); }
         
-        /* School List Special Formatting */
         .school-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .school-name { font-weight: 500; }
 
@@ -200,7 +226,7 @@
         .table-scroll table thead { position: sticky; top: 0; z-index: 5; }
 
         /* Toast */
-        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px; z-index: 9999; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); display: none; max-width: 90%; text-align: center; }
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px; z-index: 9999; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); display: none; max-width: 90%; text-align: center; }
         .toast.show { display: block; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         .toast-success { background: #10b981; }
@@ -210,7 +236,7 @@
         @media (max-width: 640px) {
             .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
             .form-grid, .form-grid-3, .entry-form-wrap .form-row, .entry-form-wrap .form-row-3 { grid-template-columns: 1fr; }
-            .app-header .brand { font-size: 15px; } .app-header .brand i { font-size: 22px; }
+            .app-header .brand { font-size: 18px; }
             .tab-bar .tab { font-size: 12px; padding: 6px 10px; min-height: 38px; } .tab-bar .tab i { font-size: 13px; }
             .card { padding: 16px; }
             .btn { font-size: 13px; padding: 10px 14px; min-height: 40px; }
@@ -218,6 +244,7 @@
             .school-selector { flex-direction: column; align-items: stretch; }
             .entry-actions .btn { flex: 1 1 100%; }
             table { font-size: 12px; min-width: 480px; } table th, table td { padding: 8px 10px; }
+            #statusFloat { bottom: 16px; right: 16px; padding: 6px 12px; font-size: 12px; }
         }
     </style>
 </head>
@@ -241,18 +268,18 @@
         <div id="toast" class="toast"></div>
 
         <header class="app-header">
-            <div class="brand">
-                <i class="fas fa-graduation-cap"></i> Mungwi G & C <span>Data</span>
-            </div>
+            <div class="brand">Mungwi DEBS</div>
             <div class="header-right">
-                <div class="user-badge">
-                    <span id="dbStatus"><span class="status-dot offline" id="statusDot"></span> <span id="statusText">Connecting...</span></span>
-                    <span class="role-tag" id="roleTag">USER</span>
-                </div>
-                <!-- Admin Login/Logout Button -->
-                <button id="adminToggleBtn" class="btn btn-sm btn-login-admin" onclick="openAdminLogin()"><i class="fas fa-user-shield"></i> Admin</button>
+                <button class="btn btn-sm btn-login-admin" onclick="openAdminLogin()" id="adminToggleBtn"><i class="fas fa-user-shield"></i> Admin</button>
             </div>
         </header>
+
+        <!-- Floating Status Bar at Bottom Right -->
+        <div id="statusFloat">
+            <span class="status-dot offline" id="statusDot"></span>
+            <span id="statusText">Connecting...</span>
+            <span class="role-tag" id="roleTag">USER</span>
+        </div>
 
         <div class="container">
             <div id="adminPanel">
@@ -895,37 +922,196 @@
         }
 
         // ================================================================
-        //  EXPORT FUNCTIONS (ADMIN ONLY)
+        //  PROFESSIONAL EXPORT FUNCTIONS (ADMIN ONLY)
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
             if (adminDataCache.length === 0) { showToast('No data to export.', 'error'); return; }
+            
             const schoolMap = {}; schools.forEach(s => schoolMap[s.id] = s.name);
+            
+            // Build the data rows for the sheet
             const rows = adminDataCache.map(r => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) + (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) + (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) + (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) + (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) + (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) + (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
                 const absent = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentry = (r.reentry_boys || 0) + (r.reentry_girls || 0);
                 const ovc = (r.ovc_boys || 0) + (r.ovc_girls || 0);
-                return { 'School': schoolMap[r.school_id] || r.school_id, 'Term': r.term || '', 'Year': r.year || '', 'Grade': r.grade || '', 'Enrolment Boys': r.enrolment_boys || 0, 'Enrolment Girls': r.enrolment_girls || 0, 'Enrolment Total': total, 'Age Range': r.age_range || '', 'Teen Pregnancy': r.teen_preg || 0, 'Dropouts Total': dropouts, 'Absenteeism Total': absent, 'Re-entry Total': reentry, 'OVC Total': ovc };
+                return {
+                    'School': schoolMap[r.school_id] || r.school_id,
+                    'Term': r.term || '',
+                    'Year': r.year || '',
+                    'Grade': r.grade || '',
+                    'Enrolment Boys': r.enrolment_boys || 0,
+                    'Enrolment Girls': r.enrolment_girls || 0,
+                    'Enrolment Total': total,
+                    'Age Range': r.age_range || '',
+                    'Teen Pregnancy': r.teen_preg || 0,
+                    'Dropouts Total': dropouts,
+                    'Absenteeism Total': absent,
+                    'Re-entry Total': reentry,
+                    'OVC Total': ovc,
+                };
             });
-            const wb = XLSX.utils.book_new(); const ws = XLSX.utils.json_to_sheet(rows); XLSX.utils.book_append_sheet(wb, ws, 'School Data'); XLSX.writeFile(wb, `Mungwi_Data_${new Date().toISOString().slice(0,10)}.xlsx`); showToast('✅ Export successful!', 'success');
+
+            const wb = XLSX.utils.book_new();
+            
+            // Create the worksheet
+            const ws = XLSX.utils.json_to_sheet(rows);
+            
+            // Format the file to look like a professional report
+            // Insert headers into the worksheet: 
+            // [A1] = "MUNGWI DISTRICT EDUCATION BOARD"
+            // [A2] = "Term 2, 2026" (or dynamic based on current data)
+            
+            // We need to shift the data down 2 rows first (A3 becomes A1 in terms of content)
+            // Simplified approach: We rebuild the array of data with merged headers
+            const wbData = [];
+            
+            // Header 1
+            wbData.push({ 
+                'School': 'MUNGWI DISTRICT EDUCATION BOARD', 
+                'Term': '', 'Year': '', 'Grade': '', 'Enrolment Boys': '', 'Enrolment Girls': '', 
+                'Enrolment Total': '', 'Age Range': '', 'Teen Pregnancy': '', 'Dropouts Total': '', 
+                'Absenteeism Total': '', 'Re-entry Total': '', 'OVC Total': '' 
+            });
+            // Header 2
+            wbData.push({ 
+                'School': 'Term 2, 2026', 
+                'Term': '', 'Year': '', 'Grade': '', 'Enrolment Boys': '', 'Enrolment Girls': '', 
+                'Enrolment Total': '', 'Age Range': '', 'Teen Pregnancy': '', 'Dropouts Total': '', 
+                'Absenteeism Total': '', 'Re-entry Total': '', 'OVC Total': '' 
+            });
+            // Blank row for readability
+            wbData.push({ 
+                'School': '', 
+                'Term': '', 'Year': '', 'Grade': '', 'Enrolment Boys': '', 'Enrolment Girls': '', 
+                'Enrolment Total': '', 'Age Range': '', 'Teen Pregnancy': '', 'Dropouts Total': '', 
+                'Absenteeism Total': '', 'Re-entry Total': '', 'OVC Total': '' 
+            });
+            
+            // Push the actual data
+            rows.forEach(r => wbData.push(r));
+
+            // Calculate Totals
+            let totalEnrolBoys = 0, totalEnrolGirls = 0, totalEnrol = 0;
+            let totalDropouts = 0, totalAbsent = 0, totalPreg = 0, totalReentry = 0, totalOVC = 0;
+
+            rows.forEach(r => {
+                totalEnrolBoys += r['Enrolment Boys'];
+                totalEnrolGirls += r['Enrolment Girls'];
+                totalEnrol += r['Enrolment Total'];
+                totalDropouts += r['Dropouts Total'];
+                totalAbsent += r['Absenteeism Total'];
+                totalPreg += r['Teen Pregnancy'];
+                totalReentry += r['Re-entry Total'];
+                totalOVC += r['OVC Total'];
+            });
+
+            // Push Totals row
+            wbData.push({
+                'School': 'TOTALS',
+                'Term': '', 'Year': '', 'Grade': '',
+                'Enrolment Boys': totalEnrolBoys,
+                'Enrolment Girls': totalEnrolGirls,
+                'Enrolment Total': totalEnrol,
+                'Age Range': '',
+                'Teen Pregnancy': totalPreg,
+                'Dropouts Total': totalDropouts,
+                'Absenteeism Total': totalAbsent,
+                'Re-entry Total': totalReentry,
+                'OVC Total': totalOVC
+            });
+
+            // Calculate Rates (%)
+            const dropRate = totalEnrol > 0 ? ((totalDropouts / totalEnrol) * 100).toFixed(1) : 0;
+            const absRate = totalEnrol > 0 ? ((totalAbsent / totalEnrol) * 100).toFixed(1) : 0;
+            const pregRate = totalEnrol > 0 ? ((totalPreg / totalEnrol) * 100).toFixed(1) : 0;
+            const reentryRate = totalEnrol > 0 ? ((totalReentry / totalEnrol) * 100).toFixed(1) : 0;
+
+            // Push Rates Row
+            wbData.push({
+                'School': 'RATES (%)',
+                'Term': '', 'Year': '', 'Grade': '',
+                'Enrolment Boys': '',
+                'Enrolment Girls': '',
+                'Enrolment Total': '100%',
+                'Age Range': '',
+                'Teen Pregnancy': pregRate + '%',
+                'Dropouts Total': dropRate + '%',
+                'Absenteeism Total': absRate + '%',
+                'Re-entry Total': reentryRate + '%',
+                'OVC Total': ''
+            });
+
+            // Convert new data array into a sheet
+            const newWs = XLSX.utils.json_to_sheet(wbData);
+
+            // Apply column width formatting
+            newWs['!cols'] = [
+                { wch: 30 }, // School
+                { wch: 10 }, // Term
+                { wch: 8 },  // Year
+                { wch: 8 },  // Grade
+                { wch: 14 }, // Boys
+                { wch: 14 }, // Girls
+                { wch: 14 }, // Total
+                { wch: 12 }, // Age Range
+                { wch: 14 }, // Teen Preg
+                { wch: 14 }, // Dropouts
+                { wch: 15 }, // Absenteeism
+                { wch: 14 }, // Re-entry
+                { wch: 14 }  // OVC
+            ];
+
+            XLSX.utils.book_append_sheet(wb, newWs, 'School Data');
+            XLSX.writeFile(wb, `Mungwi_DEBS_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+            showToast('✅ Professional Report Exported!', 'success');
         }
+
         function exportToCSV() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
             if (adminDataCache.length === 0) { showToast('No data to export.', 'error'); return; }
             const schoolMap = {}; schools.forEach(s => schoolMap[s.id] = s.name);
-            let csv = 'School,Term,Year,Grade,Enrolment Boys,Enrolment Girls,Enrolment Total,Age Range,Teen Pregnancy,Dropouts Total,Absenteeism Total,Re-entry Total,OVC Total\n';
+            
+            let csv = 'MUNGWI DISTRICT EDUCATION BOARD\n';
+            csv += 'Term 2, 2026\n\n';
+            csv += 'School,Term,Year,Grade,Enrolment Boys,Enrolment Girls,Enrolment Total,Age Range,Teen Pregnancy,Dropouts Total,Absenteeism Total,Re-entry Total,OVC Total\n';
+            
+            let totalEnrolBoys = 0, totalEnrolGirls = 0, totalEnrol = 0;
+            let totalDropouts = 0, totalAbsent = 0, totalPreg = 0, totalReentry = 0, totalOVC = 0;
+
             adminDataCache.forEach(r => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) + (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) + (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) + (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) + (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) + (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) + (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
                 const absent = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentry = (r.reentry_boys || 0) + (r.reentry_girls || 0);
                 const ovc = (r.ovc_boys || 0) + (r.ovc_girls || 0);
+                
+                totalEnrolBoys += (r.enrolment_boys || 0);
+                totalEnrolGirls += (r.enrolment_girls || 0);
+                totalEnrol += total;
+                totalDropouts += dropouts;
+                totalAbsent += absent;
+                totalPreg += (r.teen_preg || 0);
+                totalReentry += reentry;
+                totalOVC += ovc;
+
                 csv += `"${schoolMap[r.school_id] || r.school_id}","${r.term||''}",${r.year||''},"${r.grade||''}",${r.enrolment_boys||0},${r.enrolment_girls||0},${total},"${r.age_range||''}",${r.teen_preg||0},${dropouts},${absent},${reentry},${ovc}\n`;
             });
+
+            // Totals Row
+            csv += `"TOTALS","","","",${totalEnrolBoys},${totalEnrolGirls},${totalEnrol},"",${totalPreg},${totalDropouts},${totalAbsent},${totalReentry},${totalOVC}\n`;
+            
+            // Rates Row
+            const dropRate = totalEnrol > 0 ? ((totalDropouts / totalEnrol) * 100).toFixed(1) : 0;
+            const absRate = totalEnrol > 0 ? ((totalAbsent / totalEnrol) * 100).toFixed(1) : 0;
+            const pregRate = totalEnrol > 0 ? ((totalPreg / totalEnrol) * 100).toFixed(1) : 0;
+            const reentryRate = totalEnrol > 0 ? ((totalReentry / totalEnrol) * 100).toFixed(1) : 0;
+            csv += `"RATES (%)","","","","","","100%","",${pregRate}%,${dropRate}%,${absRate}%,${reentryRate}%,""`;
+
             const blob = new Blob([csv], { type: 'text/csv' }); const url = URL.createObjectURL(blob);
-            const a = document.createElement('a'); a.href = url; a.download = `Mungwi_Data_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); showToast('✅ Export successful!', 'success');
+            const a = document.createElement('a'); a.href = url; a.download = `Mungwi_DEBS_Report_${new Date().toISOString().slice(0,10)}.csv`; a.click(); URL.revokeObjectURL(url); showToast('✅ Export successful!', 'success');
         }
 
         // ================================================================
