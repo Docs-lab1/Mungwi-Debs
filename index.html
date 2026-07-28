@@ -1535,6 +1535,36 @@
         }
 
         // ================================================================
+        //  TAB SWITCHING LOGIC
+        // ================================================================
+        function setupTabs() {
+            const tabs = document.querySelectorAll('.tab-bar .tab');
+            const contents = {
+                adminDashboard: document.getElementById('tab-adminDashboard'),
+                adminSchools: document.getElementById('tab-adminSchools'),
+                adminData: document.getElementById('tab-adminData'),
+                adminExport: document.getElementById('tab-adminExport')
+            };
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Hide all tab contents
+                    Object.values(contents).forEach(c => c.classList.remove('active'));
+
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    // Show the corresponding content
+                    const targetId = this.getAttribute('data-tab');
+                    if (contents[targetId]) {
+                        contents[targetId].classList.add('active');
+                    }
+                });
+            });
+        }
+
+        // ================================================================
         //  BOOT
         // ================================================================
         async function init() {
@@ -1552,6 +1582,9 @@
                     loadTeacherData();
                 };
             }
+
+            // Setup tabs
+            setupTabs();
 
             console.log('📊 Mungwi District School Data System loaded.');
             console.log('🔗 Supabase URL:', SUPABASE_URL);
