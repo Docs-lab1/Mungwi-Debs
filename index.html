@@ -571,7 +571,7 @@
             color: #888;
         }
         #loginOverlay {
-            display: flex !important;
+            display: none;
             position: absolute;
             inset: 0;
             background: rgba(26, 26, 46, 0.85);
@@ -581,6 +581,9 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+        }
+        #loginOverlay.show {
+            display: flex !important;
         }
         #loginOverlay.hidden {
             display: none !important;
@@ -998,7 +1001,7 @@
             </div>
         </div>
 
-        <div id="loginOverlay">
+        <div id="loginOverlay" class="show">
             <div class="login-wrap" style="background:#fff;border-radius:28px;padding:36px 32px;max-width:440px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,0.3);">
                 <div class="logo-big">
                     <h1>Mungwi <span>DEB</span></h1>
@@ -1060,7 +1063,8 @@
 
             // Setup login tab switching
             document.querySelectorAll('#loginTabs button').forEach(btn => {
-                btn.addEventListener('click', function() {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
                     const role = this.dataset.role;
                     switchLoginRole(role);
                 });
@@ -1082,7 +1086,7 @@
 
             // Check saved session
             if (localStorage.getItem('adminAuth') === 'true') {
-                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('loginOverlay').className = 'hidden';
                 document.getElementById('roleBadge').textContent = '🔐 Admin';
                 document.getElementById('viewToggleBtn').style.display = 'inline-flex';
                 document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
@@ -1092,7 +1096,7 @@
                 document.getElementById('viewAdmin').classList.add('active');
                 loadAdminData();
             } else if (localStorage.getItem('schoolName')) {
-                document.getElementById('loginOverlay').classList.add('hidden');
+                document.getElementById('loginOverlay').className = 'hidden';
                 document.getElementById('roleBadge').textContent = '🏫 ' + localStorage.getItem('schoolName');
                 document.getElementById('viewToggleBtn').style.display = 'none';
                 document.getElementById('logoutBtn').style.display = 'inline-flex';
@@ -1128,7 +1132,7 @@
                         return;
                     }
                     localStorage.setItem('schoolName', name);
-                    document.getElementById('loginOverlay').classList.add('hidden');
+                    document.getElementById('loginOverlay').className = 'hidden';
                     document.getElementById('roleBadge').textContent = '🏫 ' + name;
                     document.getElementById('viewToggleBtn').style.display = 'none';
                     document.getElementById('logoutBtn').style.display = 'inline-flex';
@@ -1148,7 +1152,7 @@
 
                     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                         localStorage.setItem('adminAuth', 'true');
-                        document.getElementById('loginOverlay').classList.add('hidden');
+                        document.getElementById('loginOverlay').className = 'hidden';
                         document.getElementById('roleBadge').textContent = '🔐 Admin';
                         document.getElementById('viewToggleBtn').style.display = 'inline-flex';
                         document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
@@ -1173,7 +1177,7 @@
         function logout() {
             localStorage.removeItem('adminAuth');
             localStorage.removeItem('schoolName');
-            document.getElementById('loginOverlay').classList.remove('hidden');
+            document.getElementById('loginOverlay').className = 'show';
             document.getElementById('roleBadge').textContent = 'School';
             document.getElementById('viewToggleBtn').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'none';
@@ -1203,7 +1207,7 @@
                     toast('Switched to Admin view.', 'info');
                 } else {
                     toast('Please login as Admin first.', 'error');
-                    document.getElementById('loginOverlay').classList.remove('hidden');
+                    document.getElementById('loginOverlay').className = 'show';
                     switchLoginRole('admin');
                 }
             }
