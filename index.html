@@ -45,62 +45,34 @@
             overflow-x: hidden;
         }
 
-        /* Login Page Styles */
-        #loginPage {
-            display: flex;
+        /* Admin Login Modal Styles */
+        #adminLoginOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 20px;
         }
+        #adminLoginOverlay.show { display: flex; }
         .login-box {
             background: var(--card-bg);
-            padding: 40px 30px;
+            padding: 30px;
             border-radius: var(--radius);
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
+            width: 100%; max-width: 400px; text-align: center;
         }
-        .login-box .brand-lg {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        .login-box .brand-lg i {
-            color: var(--accent-dark);
-        }
-        .login-box p {
-            color: var(--text-light);
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
+        .login-box .brand-lg { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .login-box .brand-lg i { color: var(--accent-dark); }
+        .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 20px; }
         .login-box input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            margin-bottom: 15px;
+            width: 100%; padding: 12px 15px; border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm); font-size: 16px; margin-bottom: 15px;
         }
-        .login-box input:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.06);
-        }
-        .login-box .btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 16px;
-        }
-        .login-error {
-            color: #ef4444;
-            font-size: 13px;
-            margin-bottom: 10px;
-            display: none;
-        }
+        .login-box input:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.06); }
+        .login-box .btn { width: 100%; padding: 12px; font-size: 16px; }
+        .login-error { color: #ef4444; font-size: 13px; margin-bottom: 10px; display: none; }
         .hidden { display: none !important; }
 
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -126,8 +98,8 @@
         .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
         .btn-outline:hover { background: #f0f4f8; }
         .btn-sm { padding: 6px 12px; font-size: 12px; min-height: 34px; min-width: 34px; }
-        .btn-logout { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); }
-        .btn-logout:hover { background: rgba(255,255,255,0.1); }
+        .btn-login-admin { background: var(--accent); color: var(--primary-dark); font-weight: bold; }
+        .btn-logout { background: #ef4444; color: #fff; }
 
         .app-header {
             background: var(--primary); color: #fff; padding: 14px 16px;
@@ -238,21 +210,21 @@
 </head>
 <body>
 
-    <!-- Login Page -->
-    <div id="loginPage">
+    <!-- Admin Login Popup -->
+    <div id="adminLoginOverlay">
         <div class="login-box">
-            <div class="brand-lg"><i class="fas fa-graduation-cap"></i> Mungwi Data</div>
-            <p>Enter password to access system</p>
+            <div class="brand-lg"><i class="fas fa-lock"></i> Admin Access</div>
+            <p>Enter password to view admin features</p>
             <div id="loginError" class="login-error">❌ Incorrect password!</div>
-            <input type="password" id="loginPassword" placeholder="Enter Password" onkeydown="if(event.key==='Enter') login()" />
-            <button class="btn btn-primary" onclick="login()"><i class="fas fa-lock-open"></i> Login</button>
+            <input type="password" id="loginPassword" placeholder="Enter Password" onkeydown="if(event.key==='Enter') adminLogin()" />
+            <button class="btn btn-primary" onclick="adminLogin()"><i class="fas fa-lock-open"></i> Login</button>
             <br><br>
-            <small style="color:#aaa; font-size:11px;">Default: admin123</small>
+            <button class="btn btn-outline btn-sm" onclick="closeAdminLogin()">Cancel</button>
         </div>
     </div>
 
     <!-- Main App -->
-    <div id="appView" class="hidden">
+    <div id="appView">
         <div id="toast" class="toast"></div>
 
         <header class="app-header">
@@ -264,7 +236,8 @@
                     <span id="dbStatus"><span class="status-dot offline" id="statusDot"></span> <span id="statusText">Connecting...</span></span>
                     <span class="role-tag" id="roleTag">USER</span>
                 </div>
-                <button class="btn btn-sm btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                <!-- Admin Login/Logout Button -->
+                <button id="adminToggleBtn" class="btn btn-sm btn-login-admin" onclick="openAdminLogin()"><i class="fas fa-user-shield"></i> Admin</button>
             </div>
         </header>
 
@@ -472,36 +445,51 @@
         let teacherSchoolId = null;
         let adminDataCache = [];
         let isSupabaseConnected = false;
-        let currentUserRole = 'user'; // 'admin' or 'user'
+        let currentUserRole = 'user'; // Default is 'user' (Teacher). 'admin' is unlocked.
 
         const $ = id => document.getElementById(id);
 
         // ================================================================
-        //  LOGIN / LOGOUT
+        //  ADMIN LOGIN / LOGOUT (Optional for Admins)
         // ================================================================
-        function login() {
+        function openAdminLogin() {
+            if(currentUserRole === 'admin') {
+                if(confirm('Logout from Admin mode?')) {
+                    currentUserRole = 'user';
+                    applyPermissions();
+                    $('roleTag').textContent = 'USER';
+                    $('adminToggleBtn').innerHTML = '<i class="fas fa-user-shield"></i> Admin';
+                    $('adminToggleBtn').className = 'btn btn-sm btn-login-admin';
+                    showToast('👋 Switched to User Mode', 'info');
+                }
+                return;
+            }
+            $('adminLoginOverlay').classList.add('show');
+            $('loginPassword').value = '';
+            $('loginError').style.display = 'none';
+            setTimeout(() => $('loginPassword').focus(), 100);
+        }
+
+        function closeAdminLogin() {
+            $('adminLoginOverlay').classList.remove('show');
+        }
+
+        function adminLogin() {
             const pass = $('loginPassword').value;
             if (pass === ADMIN_PASSWORD) {
                 currentUserRole = 'admin';
                 $('loginError').style.display = 'none';
-                $('loginPage').classList.add('hidden');
-                $('appView').classList.remove('hidden');
+                $('adminLoginOverlay').classList.remove('show');
                 $('roleTag').textContent = 'ADMIN';
+                $('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> Admin';
+                $('adminToggleBtn').className = 'btn btn-sm btn-danger';
                 applyPermissions();
-                initApp();
+                showToast('🔓 Welcome Admin!', 'success');
             } else {
                 $('loginError').style.display = 'block';
                 $('loginPassword').value = '';
+                $('loginPassword').focus();
             }
-        }
-
-        function logout() {
-            if(!confirm('Are you sure you want to logout?')) return;
-            currentUserRole = 'user';
-            $('appView').classList.add('hidden');
-            $('loginPage').classList.remove('hidden');
-            $('loginPassword').value = '';
-            $('loginError').style.display = 'none';
         }
 
         function applyPermissions() {
@@ -513,9 +501,10 @@
             // Ensure active tab is visible
             const activeTab = document.querySelector('.tab-bar .tab.active');
             if(activeTab && activeTab.classList.contains('hidden-tab')) {
-                // Fallback to Schools tab if admin tab is hidden
                 document.querySelector('.tab[data-tab="adminSchools"]').click();
             }
+            // Refresh school list to show/hide delete buttons
+            loadSchools();
         }
 
         // ================================================================
@@ -770,7 +759,6 @@
             document.querySelectorAll('#entryForm input[type="number"]').forEach(el => el.value = '0');
             document.querySelectorAll('#entryForm input[type="text"]').forEach(el => el.value = '');
             $('fGrade').value = ''; $('fAgeRange').value = '';
-            // Reset validation style
             $('fGrade').style.borderColor = ''; $('fTerm').style.borderColor = ''; $('fYear').style.borderColor = '';
         }
 
@@ -940,8 +928,12 @@
             await initSupabase(); await loadData(); // Load data
             const teacherSelect = $('teacherSchoolSelect'); if (teacherSelect) { teacherSelect.onchange = function() { teacherSchoolId = this.value; loadTeacherData(); }; }
             setupTabs();
+            applyPermissions(); // Ensure user-only mode is applied on load
             console.log('📊 Mungwi System loaded. Role:', currentUserRole);
         }
+
+        // Start the app immediately - no login gate for users!
+        document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
