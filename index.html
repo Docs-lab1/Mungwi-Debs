@@ -4,14 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mungwi DEB – Data Submission</title>
-    <!-- Supabase & SheetJS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
     </script>
 
     <style>
-        /* ===== RESET & BASE ===== */
         *,
         *::before,
         *::after {
@@ -30,8 +28,6 @@
             padding: 16px;
             margin: 0;
         }
-
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -44,8 +40,6 @@
             background: #ffb300;
             border-radius: 8px;
         }
-
-        /* ===== APP CONTAINER ===== */
         #app {
             width: 100%;
             max-width: 1200px;
@@ -55,10 +49,7 @@
             overflow: hidden;
             position: relative;
             min-height: 90vh;
-            transition: all 0.3s ease;
         }
-
-        /* ===== HEADER ===== */
         .app-header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             padding: 20px 28px;
@@ -78,12 +69,12 @@
             font-size: 20px;
             letter-spacing: -0.3px;
         }
+        .app-header .logo span {
+            color: #ffb300;
+        }
         .app-header .logo svg {
             width: 36px;
             height: 36px;
-        }
-        .app-header .logo span {
-            color: #ffb300;
         }
         .app-header .header-actions {
             display: flex;
@@ -118,16 +109,6 @@
             background: rgba(255, 179, 0, 0.2);
             border-color: #ffb300;
         }
-        .header-btn.active {
-            background: #ffb300;
-            color: #1a1a2e;
-            border-color: #ffb300;
-        }
-        .header-btn.active:hover {
-            background: #f5a800;
-        }
-
-        /* ===== VIEWS ===== */
         .view {
             display: none;
             padding: 28px 28px 32px;
@@ -146,8 +127,6 @@
                 transform: translateY(0);
             }
         }
-
-        /* ===== CARDS ===== */
         .card {
             background: #ffffff;
             border-radius: 18px;
@@ -177,8 +156,6 @@
             color: #888;
             margin-left: auto;
         }
-
-        /* ===== FORM ===== */
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -227,11 +204,6 @@
             color: #888;
             cursor: not-allowed;
         }
-        .form-group .hint {
-            font-size: 11px;
-            color: #999;
-            margin-top: 2px;
-        }
         .form-section-title {
             grid-column: 1 / -1;
             font-size: 15px;
@@ -247,8 +219,6 @@
         .form-section-title .emoji {
             font-size: 20px;
         }
-
-        /* inline pair (boys / girls) */
         .pair {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -262,8 +232,6 @@
             padding: 8px 12px;
             font-size: 13px;
         }
-
-        /* ===== BUTTONS ===== */
         .btn {
             padding: 12px 28px;
             border-radius: 40px;
@@ -302,6 +270,13 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(26, 26, 46, 0.25);
         }
+        .btn-success {
+            background: #2ecc71;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #27ae60;
+        }
         .btn-outline {
             background: transparent;
             border: 2px solid #1a1a2e;
@@ -310,13 +285,6 @@
         .btn-outline:hover {
             background: #1a1a2e;
             color: #fff;
-        }
-        .btn-success {
-            background: #2ecc71;
-            color: #fff;
-        }
-        .btn-success:hover {
-            background: #27ae60;
         }
         .btn-danger {
             background: #e74c3c;
@@ -339,63 +307,6 @@
             flex-wrap: wrap;
             margin-top: 8px;
         }
-
-        /* ===== TABLE ===== */
-        .table-wrap {
-            overflow-x: auto;
-            border-radius: 14px;
-            border: 1px solid #f0f0f0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            min-width: 700px;
-        }
-        table th {
-            background: #f8f8fa;
-            color: #1a1a2e;
-            font-weight: 700;
-            padding: 12px 14px;
-            text-align: left;
-            border-bottom: 2px solid #e8e8e8;
-            white-space: nowrap;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-        table td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #f0f0f0;
-            vertical-align: middle;
-        }
-        table tr:hover td {
-            background: #fafafc;
-        }
-        table .status-badge {
-            padding: 3px 12px;
-            border-radius: 40px;
-            font-size: 11px;
-            font-weight: 700;
-            display: inline-block;
-        }
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-        .status-approved {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* ===== ADMIN STATS ===== */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -432,8 +343,94 @@
         .stat-card.highlight .label {
             color: #ffb300;
         }
-
-        /* ===== TOAST ===== */
+        .table-wrap {
+            overflow-x: auto;
+            border-radius: 14px;
+            border: 1px solid #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            min-width: 700px;
+        }
+        table th {
+            background: #f8f8fa;
+            color: #1a1a2e;
+            font-weight: 700;
+            padding: 12px 14px;
+            text-align: left;
+            border-bottom: 2px solid #e8e8e8;
+            white-space: nowrap;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+        table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle;
+        }
+        table tr:hover td {
+            background: #fafafc;
+        }
+        .status-badge {
+            padding: 3px 12px;
+            border-radius: 40px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .admin-table-wrap {
+            max-height: 500px;
+            overflow-y: auto;
+            border-radius: 14px;
+            border: 1px solid #f0f0f0;
+        }
+        .admin-table-wrap table th {
+            position: sticky;
+            top: 0;
+            z-index: 3;
+            background: #f8f8fa;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .filter-bar input,
+        .filter-bar select {
+            padding: 8px 14px;
+            border-radius: 40px;
+            border: 1.5px solid #e0e0e0;
+            font-size: 13px;
+            background: #fafafa;
+            font-family: inherit;
+            flex: 1;
+            min-width: 140px;
+        }
+        .filter-bar input:focus,
+        .filter-bar select:focus {
+            outline: none;
+            border-color: #ffb300;
+        }
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -490,8 +487,6 @@
         .toast .close-toast:hover {
             color: #fff;
         }
-
-        /* ===== LOGIN ===== */
         .login-wrap {
             max-width: 440px;
             margin: 0 auto;
@@ -548,8 +543,62 @@
             font-size: 13px;
             font-weight: 600;
         }
-
-        /* ===== RESPONSIVE ===== */
+        .hidden {
+            display: none !important;
+        }
+        .text-muted {
+            color: #888;
+            font-size: 13px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mt-24 {
+            margin-top: 24px;
+        }
+        .w-full {
+            width: 100%;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        #loginOverlay {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: rgba(26, 26, 46, 0.85);
+            z-index: 100;
+            backdrop-filter: blur(6px);
+            border-radius: 28px;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        #loginOverlay.show {
+            display: flex !important;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 179, 0, 0.2);
+            border-top: 3px solid #ffb300;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
         @media (max-width: 768px) {
             #app {
                 border-radius: 16px;
@@ -655,133 +704,16 @@
                 font-size: 18px;
             }
         }
-
-        /* ===== MISC ===== */
-        .text-muted {
-            color: #888;
-            font-size: 13px;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .mt-8 {
-            margin-top: 8px;
-        }
-        .mt-16 {
-            margin-top: 16px;
-        }
-        .mt-24 {
-            margin-top: 24px;
-        }
-        .gap-8 {
-            gap: 8px;
-        }
-        .flex {
-            display: flex;
-        }
-        .flex-center {
-            align-items: center;
-            justify-content: center;
-        }
-        .flex-wrap {
-            flex-wrap: wrap;
-        }
-        .w-full {
-            width: 100%;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #888;
-        }
-        .empty-state .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        .empty-state h3 {
-            color: #1a1a2e;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-        .badge-count {
-            background: #ffb300;
-            color: #1a1a2e;
-            border-radius: 40px;
-            padding: 1px 10px;
-            font-size: 12px;
-            font-weight: 700;
-            margin-left: 6px;
-        }
-
-        /* loading spinner */
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 179, 0, 0.2);
-            border-top: 3px solid #ffb300;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .hidden {
-            display: none !important;
-        }
-
-        /* filter bar */
-        .filter-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 18px;
-        }
-        .filter-bar input,
-        .filter-bar select {
-            padding: 8px 14px;
-            border-radius: 40px;
-            border: 1.5px solid #e0e0e0;
-            font-size: 13px;
-            background: #fafafa;
-            font-family: inherit;
-            flex: 1;
-            min-width: 140px;
-        }
-        .filter-bar input:focus,
-        .filter-bar select:focus {
-            outline: none;
-            border-color: #ffb300;
-        }
-
-        /* admin table scroll */
-        .admin-table-wrap {
-            max-height: 500px;
-            overflow-y: auto;
-            border-radius: 14px;
-            border: 1px solid #f0f0f0;
-        }
-        .admin-table-wrap table th {
-            position: sticky;
-            top: 0;
-            z-index: 3;
-            background: #f8f8fa;
-        }
     </style>
 </head>
 
 <body>
     <div id="app">
-        <!-- ===== HEADER ===== -->
         <header class="app-header">
             <div class="logo">
                 <svg viewBox="0 0 36 36" fill="none">
                     <rect x="2" y="2" width="32" height="32" rx="8" fill="#ffb300" />
-                    <path d="M10 24V12l6 4-6 4v4l6-4v4l6-4v-4l6 4V12l-6 4V12l-6 4V12l-6 4z"
-                    stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M10 24V12l6 4-6 4v4l6-4v4l6-4v-4l6 4V12l-6 4V12l-6 4V12l-6 4z" stroke="#1a1a2e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
                     <circle cx="10" cy="12" r="2" fill="#1a1a2e" />
                     <circle cx="22" cy="12" r="2" fill="#1a1a2e" />
                 </svg>
@@ -798,7 +730,6 @@
             </div>
         </header>
 
-        <!-- ===== VIEW: SCHOOL FORM ===== -->
         <div class="view active" id="viewSchool">
             <div class="card">
                 <div class="card-title">
@@ -807,14 +738,10 @@
                 </div>
                 <form id="schoolForm" onsubmit="submitSchoolData(event)">
                     <div class="form-grid">
-
-                        <!-- School Name -->
                         <div class="form-group full">
                             <label>School Name <span class="required">*</span></label>
                             <input type="text" id="schoolName" placeholder="e.g. Chamfubu Primary" required />
                         </div>
-
-                        <!-- Grade & Enrolment -->
                         <div class="form-group">
                             <label>Grade / Class <span class="required">*</span></label>
                             <select id="grade" required>
@@ -838,8 +765,6 @@
                             <label>Age Range</label>
                             <input type="text" id="ageRange" placeholder="e.g. 6–11" />
                         </div>
-
-                        <!-- Enrolment -->
                         <div class="form-group full">
                             <label style="font-weight:700;font-size:14px;">📊 Enrolment</label>
                             <div class="pair">
@@ -857,8 +782,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Teen Pregnancy -->
                         <div class="form-group full">
                             <label>👶 Teen Pregnancy</label>
                             <div class="pair">
@@ -868,8 +791,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Early Marriages -->
                         <div class="form-group full">
                             <label>💍 Early Marriages</label>
                             <div class="pair">
@@ -887,11 +808,7 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Drop Outs -->
                         <div class="form-section-title full"><span class="emoji">🚪</span> Drop Outs Due To:</div>
-
-                        <!-- Pregnancy -->
                         <div class="form-group full">
                             <label>Pregnancy</label>
                             <div class="pair">
@@ -899,7 +816,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropPregG" min="0" value="0" /></div>
                             </div>
                         </div>
-                        <!-- Marriage -->
                         <div class="form-group full">
                             <label>Marriage</label>
                             <div class="pair">
@@ -907,7 +823,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropMarryG" min="0" value="0" /></div>
                             </div>
                         </div>
-                        <!-- Death -->
                         <div class="form-group full">
                             <label>Death</label>
                             <div class="pair">
@@ -915,7 +830,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropDeathG" min="0" value="0" /></div>
                             </div>
                         </div>
-                        <!-- Illness -->
                         <div class="form-group full">
                             <label>Illness</label>
                             <div class="pair">
@@ -923,7 +837,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropIllnessG" min="0" value="0" /></div>
                             </div>
                         </div>
-                        <!-- Orphaned -->
                         <div class="form-group full">
                             <label>Orphaned</label>
                             <div class="pair">
@@ -931,7 +844,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropOrphanG" min="0" value="0" /></div>
                             </div>
                         </div>
-                        <!-- Economic -->
                         <div class="form-group full">
                             <label>Economic</label>
                             <div class="pair">
@@ -939,7 +851,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropEconG" min="0" value="0" /></div>
                             </div>
                         </div>
-                        <!-- OVC -->
                         <div class="form-group full">
                             <label>OVC</label>
                             <div class="pair">
@@ -947,8 +858,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="dropOvcG" min="0" value="0" /></div>
                             </div>
                         </div>
-
-                        <!-- Absenteeism -->
                         <div class="form-group full">
                             <label>📅 Absenteeism Cases</label>
                             <div class="pair">
@@ -957,8 +866,6 @@
                                 <div class="form-group"><label>Total (auto)</label><input type="number" id="absentTotal" disabled /></div>
                             </div>
                         </div>
-
-                        <!-- Re-entry -->
                         <div class="form-group full">
                             <label>🔄 Re-entry Cases</label>
                             <div class="pair">
@@ -967,8 +874,6 @@
                                 <div class="form-group"><label>Total (auto)</label><input type="number" id="reentryTotal" disabled /></div>
                             </div>
                         </div>
-
-                        <!-- Re-admission -->
                         <div class="form-group full">
                             <label>📌 Re-admission</label>
                             <div class="pair">
@@ -976,8 +881,6 @@
                                 <div class="form-group"><label>Girls</label><input type="number" id="readmitG" min="0" value="0" /></div>
                             </div>
                         </div>
-
-                        <!-- OVC -->
                         <div class="form-group full">
                             <label>🧒 Orphans & Vulnerable Children (OVC)</label>
                             <div class="pair">
@@ -986,8 +889,6 @@
                                 <div class="form-group"><label>Total (auto)</label><input type="number" id="ovcTotal" disabled /></div>
                             </div>
                         </div>
-
-                        <!-- Submit -->
                         <div class="form-group full mt-16">
                             <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
                                 📤 Submit Data
@@ -1001,7 +902,6 @@
             </div>
         </div>
 
-        <!-- ===== VIEW: ADMIN ===== -->
         <div class="view" id="viewAdmin">
             <div class="card" style="margin-bottom:20px;">
                 <div class="card-title">
@@ -1034,14 +934,12 @@
                         <div class="label">Teen Pregnancies</div>
                     </div>
                 </div>
-
                 <div class="btn-group" style="margin-top:4px;">
                     <button class="btn btn-success" onclick="exportExcel()">📥 Export to Excel</button>
                     <button class="btn btn-secondary" onclick="refreshAdmin()">🔄 Refresh</button>
                     <button class="btn btn-outline btn-sm" onclick="clearAllSubmissions()" style="margin-left:auto;">🗑️ Clear All</button>
                 </div>
             </div>
-
             <div class="card">
                 <div class="card-title">
                     <span class="icon">📋</span> All Submissions
@@ -1081,8 +979,7 @@
             </div>
         </div>
 
-        <!-- ===== LOGIN OVERLAY ===== -->
-        <div id="loginOverlay" style="display:none;position:absolute;inset:0;background:rgba(26,26,46,0.85);z-index:100;backdrop-filter:blur(6px);border-radius:28px;display:none;align-items:center;justify-content:center;padding:20px;">
+        <div id="loginOverlay" class="show">
             <div class="login-wrap" style="background:#fff;border-radius:28px;padding:36px 32px;max-width:440px;width:100%;box-shadow:0 30px 80px rgba(0,0,0,0.3);">
                 <div class="logo-big">
                     <h1>Mungwi <span>DEB</span></h1>
@@ -1094,12 +991,10 @@
                 </div>
                 <form id="loginForm" onsubmit="handleLogin(event)" class="login-form">
                     <div id="loginFields">
-                        <!-- School fields -->
                         <div class="form-group" id="schoolLoginFields">
                             <label>School Name <span class="required">*</span></label>
                             <input type="text" id="loginSchoolName" placeholder="Enter your school name" required />
                         </div>
-                        <!-- Admin fields -->
                         <div class="form-group hidden" id="adminLoginFields">
                             <label>Admin Email</label>
                             <input type="email" id="loginEmail" placeholder="admin@mungwi.gov" />
@@ -1118,33 +1013,19 @@
         </div>
     </div>
 
-    <!-- ===== TOAST CONTAINER ===== -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- ============================================================ -->
-    <!-- ===== JAVASCRIPT ===== -->
     <script>
-        // ================================================================
-        //  CONFIG - SUPABASE KEYS
-        // ================================================================
         const SUPABASE_URL = 'https://vnkqhwqolwxoxfwrqqaj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZua3Fod3FvbHd4b3hmd3JxcWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNTA5MjcsImV4cCI6MjEwMDgyNjkyN30.KcNuU2QSpkYKJh8PkNtjKgPCeK13KJNGgXlJZLaY8W8';
         const ADMIN_EMAIL = 'admin@mungwi.gov';
         const ADMIN_PASSWORD = 'admin123';
 
-        // ================================================================
-        //  STATE
-        // ================================================================
-        let currentView = 'school';
         let currentRole = 'school';
         let allSubmissions = [];
         let supabase = null;
 
-        // ================================================================
-        //  INIT
-        // ================================================================
         document.addEventListener('DOMContentLoaded', function() {
-            // Init Supabase
             try {
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Supabase initialized');
@@ -1152,25 +1033,30 @@
                 console.warn('Supabase not available, using mock mode.', e);
                 supabase = null;
             }
-
-            // Show login overlay on load
-            document.getElementById('loginOverlay').style.display = 'flex';
-            document.getElementById('roleBadge').textContent = 'School';
-
-            // Set default login role
             switchLoginRole('school');
-
-            // Calc initial totals
             calcTotal();
             calcEarlyMarryTotal();
             calcAbsentTotal();
             calcReentryTotal();
             calcOvcTotal();
+
+            // Check if admin is already logged in
+            if (localStorage.getItem('adminAuth') === 'true') {
+                document.getElementById('loginOverlay').classList.remove('show');
+                document.getElementById('roleBadge').textContent = '🔐 Admin';
+                document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
+                document.getElementById('logoutBtn').style.display = 'inline-flex';
+                currentRole = 'admin';
+                document.getElementById('viewSchool').classList.remove('active');
+                document.getElementById('viewAdmin').classList.add('active');
+                loadAdminData();
+            } else if (localStorage.getItem('schoolName')) {
+                document.getElementById('loginOverlay').classList.remove('show');
+                document.getElementById('roleBadge').textContent = '🏫 ' + localStorage.getItem('schoolName');
+                currentRole = 'school';
+            }
         });
 
-        // ================================================================
-        //  LOGIN
-        // ================================================================
         let loginRole = 'school';
 
         function switchLoginRole(role) {
@@ -1193,17 +1079,16 @@
                     if (!name) { toast('Please enter your school name.', 'error');
                         btn.disabled = false;
                         btn.textContent = '🚀 Continue'; return; }
-                    // School login: just set the name and proceed
                     localStorage.setItem('schoolName', name);
-                    document.getElementById('loginOverlay').style.display = 'none';
+                    document.getElementById('loginOverlay').classList.remove('show');
                     document.getElementById('roleBadge').textContent = '🏫 ' + name;
                     document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
                     document.getElementById('logoutBtn').style.display = 'none';
                     currentRole = 'school';
-                    showView('school');
+                    document.getElementById('viewSchool').classList.add('active');
+                    document.getElementById('viewAdmin').classList.remove('active');
                     toast('Welcome, ' + name + '!', 'success');
                 } else {
-                    // Admin login
                     const email = document.getElementById('loginEmail').value.trim();
                     const password = document.getElementById('loginPassword').value.trim();
                     if (!email || !password) { toast('Please enter email and password.', 'error');
@@ -1212,31 +1097,17 @@
 
                     if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                         localStorage.setItem('adminAuth', 'true');
-                        document.getElementById('loginOverlay').style.display = 'none';
+                        document.getElementById('loginOverlay').classList.remove('show');
                         document.getElementById('roleBadge').textContent = '🔐 Admin';
                         document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
                         document.getElementById('logoutBtn').style.display = 'inline-flex';
                         currentRole = 'admin';
-                        showView('admin');
+                        document.getElementById('viewSchool').classList.remove('active');
+                        document.getElementById('viewAdmin').classList.add('active');
                         await loadAdminData();
                         toast('Welcome, Admin!', 'success');
                     } else {
-                        // Try Supabase auth if available
-                        if (supabase) {
-                            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                            if (error) throw new Error(error.message);
-                            localStorage.setItem('adminAuth', 'true');
-                            document.getElementById('loginOverlay').style.display = 'none';
-                            document.getElementById('roleBadge').textContent = '🔐 Admin';
-                            document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
-                            document.getElementById('logoutBtn').style.display = 'inline-flex';
-                            currentRole = 'admin';
-                            showView('admin');
-                            await loadAdminData();
-                            toast('Welcome, Admin!', 'success');
-                        } else {
-                            toast('Invalid admin credentials.', 'error');
-                        }
+                        toast('Invalid admin credentials.', 'error');
                     }
                 }
             } catch (err) {
@@ -1250,60 +1121,46 @@
         function logout() {
             localStorage.removeItem('adminAuth');
             localStorage.removeItem('schoolName');
-            document.getElementById('loginOverlay').style.display = 'flex';
+            document.getElementById('loginOverlay').classList.add('show');
             document.getElementById('roleBadge').textContent = 'School';
             document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
             document.getElementById('logoutBtn').style.display = 'none';
             currentRole = 'school';
-            showView('school');
+            document.getElementById('viewSchool').classList.add('active');
+            document.getElementById('viewAdmin').classList.remove('active');
             toast('Logged out.', 'info');
         }
 
-        // ================================================================
-        //  VIEW TOGGLE
-        // ================================================================
         function toggleView() {
             if (currentRole === 'admin') {
+                // Switch to school view
                 currentRole = 'school';
                 document.getElementById('roleBadge').textContent = '🏫 School';
                 document.getElementById('viewToggleBtn').textContent = '👤 Switch View';
                 document.getElementById('logoutBtn').style.display = 'none';
-                showView('school');
+                document.getElementById('viewSchool').classList.add('active');
+                document.getElementById('viewAdmin').classList.remove('active');
                 toast('Switched to School view.', 'info');
             } else {
+                // Switch to admin view
                 const auth = localStorage.getItem('adminAuth');
                 if (auth === 'true') {
                     currentRole = 'admin';
                     document.getElementById('roleBadge').textContent = '🔐 Admin';
                     document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
                     document.getElementById('logoutBtn').style.display = 'inline-flex';
-                    showView('admin');
+                    document.getElementById('viewSchool').classList.remove('active');
+                    document.getElementById('viewAdmin').classList.add('active');
                     loadAdminData();
                     toast('Switched to Admin view.', 'info');
                 } else {
                     toast('Please login as Admin first. Use "Admin" tab in login.', 'error');
-                    document.getElementById('loginOverlay').style.display = 'flex';
+                    document.getElementById('loginOverlay').classList.add('show');
                     switchLoginRole('admin');
                 }
             }
         }
 
-        function showView(view) {
-            currentView = view;
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            if (view === 'school') {
-                document.getElementById('viewSchool').classList.add('active');
-                document.getElementById('viewToggleBtn').textContent = currentRole === 'admin' ? '👤 Switch to School' :
-                    '👤 Switch View';
-            } else {
-                document.getElementById('viewAdmin').classList.add('active');
-                document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
-            }
-        }
-
-        // ================================================================
-        //  CALCULATIONS
-        // ================================================================
         function calcTotal() {
             const b = parseInt(document.getElementById('enrolBoys').value) || 0;
             const g = parseInt(document.getElementById('enrolGirls').value) || 0;
@@ -1334,9 +1191,6 @@
             document.getElementById('ovcTotal').value = b + g;
         }
 
-        // ================================================================
-        //  SUBMIT SCHOOL DATA
-        // ================================================================
         async function submitSchoolData(e) {
             e.preventDefault();
             const btn = document.getElementById('submitBtn');
@@ -1392,12 +1246,10 @@
                     btn.disabled = false;
                     btn.innerHTML = '📤 Submit Data'; return; }
 
-                // Save to Supabase
                 if (supabase) {
                     const { error } = await supabase.from('submissions').insert([data]);
                     if (error) throw new Error(error.message);
                 } else {
-                    // Fallback: localStorage
                     const existing = JSON.parse(localStorage.getItem('submissions') || '[]');
                     data.id = 'local_' + Date.now();
                     data.created_at = new Date().toISOString();
@@ -1425,9 +1277,6 @@
             btn.innerHTML = '📤 Submit Data';
         }
 
-        // ================================================================
-        //  ADMIN: LOAD DATA
-        // ================================================================
         async function loadAdminData() {
             try {
                 let data = [];
@@ -1456,9 +1305,6 @@
             toast('Refreshed.', 'info');
         }
 
-        // ================================================================
-        //  ADMIN: RENDER TABLE
-        // ================================================================
         function renderAdminTable() {
             const filter = document.getElementById('adminFilter').value.toLowerCase().trim();
             const statusFilter = document.getElementById('adminStatusFilter').value;
@@ -1506,9 +1352,6 @@
             tbody.innerHTML = html;
         }
 
-        // ================================================================
-        //  ADMIN: UPDATE STATUS
-        // ================================================================
         async function updateStatus(id, status) {
             try {
                 if (supabase) {
@@ -1530,9 +1373,6 @@
             }
         }
 
-        // ================================================================
-        //  ADMIN: STATS
-        // ================================================================
         function updateStats() {
             const data = allSubmissions;
             const total = data.length;
@@ -1550,9 +1390,6 @@
             document.getElementById('statTeenPreg').textContent = teenPreg;
         }
 
-        // ================================================================
-        //  EXPORT TO EXCEL
-        // ================================================================
         function exportExcel() {
             if (!allSubmissions.length) {
                 toast('No data to export.', 'error');
@@ -1611,9 +1448,6 @@
             toast('📥 Excel exported successfully!', 'success');
         }
 
-        // ================================================================
-        //  CLEAR ALL (admin only)
-        // ================================================================
         async function clearAllSubmissions() {
             if (!confirm('⚠️ Are you sure you want to delete ALL submissions? This cannot be undone.')) return;
             try {
@@ -1630,9 +1464,6 @@
             }
         }
 
-        // ================================================================
-        //  TOAST SYSTEM
-        // ================================================================
         function toast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -1649,33 +1480,11 @@
             }, 5000);
         }
 
-        // ================================================================
-        //  KEYBOARD SHORTCUTS
-        // ================================================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.toast').forEach(t => t.remove());
             }
         });
-
-        // ================================================================
-        //  AUTO-LOGIN CHECK
-        // ================================================================
-        (function checkAutoLogin() {
-            const adminAuth = localStorage.getItem('adminAuth');
-            if (adminAuth === 'true') {
-                const overlay = document.getElementById('loginOverlay');
-                if (overlay && overlay.style.display !== 'none') {
-                    document.getElementById('loginOverlay').style.display = 'none';
-                    document.getElementById('roleBadge').textContent = '🔐 Admin';
-                    document.getElementById('viewToggleBtn').textContent = '👤 Switch to School';
-                    document.getElementById('logoutBtn').style.display = 'inline-flex';
-                    currentRole = 'admin';
-                    showView('admin');
-                    loadAdminData();
-                }
-            }
-        })();
 
         console.log('✅ Mungwi DEB App loaded.');
         console.log('🔑 Supabase URL:', SUPABASE_URL);
