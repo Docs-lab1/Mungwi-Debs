@@ -632,9 +632,6 @@
                 <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="loadData()">
                     <i class="fas fa-sync"></i>
                 </button>
-                <button class="btn btn-sm btn-outline" style="color:#fff;border-color:rgba(255,255,255,0.3);" onclick="syncTosupabaseClient()">
-                    <i class="fas fa-cloud-upload-alt"></i>
-                </button>
             </div>
         </header>
 
@@ -1072,35 +1069,6 @@
 
             // Reload
             await loadData();
-        }
-
-        // ================================================================
-        //  SYNC TO SUPABASE
-        // ================================================================
-        async function syncTosupabaseClient() {
-            if (!isSupabaseConnected || !supabaseClient) {
-                showToast('⚠️ Not connected to Supabase. Check your internet.', 'error');
-                return;
-            }
-
-            showToast('🔄 Syncing to Supabase...', 'info');
-
-            try {
-                // Sync schools
-                for (const s of schools) {
-                    await supabaseClient.from('schools').upsert(s, { onConflict: 'id' });
-                }
-
-                // Sync records
-                for (const r of records) {
-                    await supabaseClient.from('records').upsert(r, { onConflict: 'id' });
-                }
-
-                showToast('✅ All data synced to Supabase!', 'success');
-            } catch (err) {
-                showToast('❌ Sync failed: ' + err.message, 'error');
-                console.error('Sync error:', err);
-            }
         }
 
         // ================================================================
