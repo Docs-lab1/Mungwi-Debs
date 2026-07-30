@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - PERFECT COLUMN ALIGNMENT
+        //  PROFESSIONAL EXPORT - POLISHED, BOLD, BORDERED, RATE UNDER TOTAL
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -806,7 +806,7 @@
             // ----------------------------------------------------------------
             // LOOP THROUGH EACH SCHOOL AND CREATE A SEPARATE SHEET
             // ----------------------------------------------------------------
-            schools.forEach((school, index) => {
+            schools.forEach((school) => {
                 const schoolRecords = records.filter(r => r.school_id === school.id);
                 if (schoolRecords.length === 0) return;
 
@@ -969,7 +969,7 @@
                 wsData.push(totalRow);
 
                 // ----------------------------------------------------------------
-                // CALCULATE RATES
+                // CALCULATE RATES (DIRECTLY UNDER TOTALS)
                 // ----------------------------------------------------------------
                 let rateRow = Array(35).fill('');
                 rateRow[1] = 'RATE'; // Col B
@@ -984,6 +984,8 @@
                 // APPEND THIS SHEET TO THE WORKBOOK
                 // ----------------------------------------------------------------
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Apply Professional Styling
                 ws['!cols'] = [ 
                     { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, 
                     { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, 
@@ -992,6 +994,46 @@
                     { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
                     { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } 
                 ];
+                
+                // Apply Borders and Bold to specific cells
+                const range = XLSX.utils.decode_range(ws['!ref']);
+                ws['!rows'] = [];
+                ws['!rows'][6] = { hpx: 20 }; // Row height for school name
+
+                // Bold the headers and school row
+                for(let c = range.s.c; c <= range.e.c; c++) {
+                    // Row 1 (Ministry), Row 7 (Label), Row 11 (School Name)
+                    const cell1 = XLSX.utils.encode_cell({r:0, c:c});
+                    const cell7 = XLSX.utils.encode_cell({r:6, c:c});
+                    const cell11 = XLSX.utils.encode_cell({r:10, c:c});
+                    if(ws[cell1]) ws[cell1].s = { bold: true };
+                    if(ws[cell7]) ws[cell7].s = { bold: true };
+                    if(ws[cell11]) ws[cell11].s = { bold: true };
+                }
+
+                // Bold the data headers (Row 17), Totals, and Rates
+                let lastDataRow = wsData.length - 3; // Total row
+                let secondLastDataRow = wsData.length - 2; // Rate row
+                for(let r = 17; r < wsData.length - 1; r++) {
+                    for(let c = 1; c < 35; c++) { // Start at Col B
+                        const cell = XLSX.utils.encode_cell({r:r, c:c});
+                        if(ws[cell]) {
+                            ws[cell].s = { 
+                                border: {
+                                    top: {style: "thin"},
+                                    bottom: {style: "thin"},
+                                    left: {style: "thin"},
+                                    right: {style: "thin"}
+                                },
+                                alignment: { horizontal: (c === 1 ? "left" : "center") } // Center numbers, left align Grade
+                            };
+                            if(r === lastDataRow || r === secondLastDataRow) {
+                                ws[cell].s.bold = true; // Bold the Totals and Rates
+                            }
+                        }
+                    }
+                }
+
                 // Sanitize sheet name (Excel max 31 chars)
                 let sheetName = school.name.substring(0, 31); 
                 XLSX.utils.book_append_sheet(wb, ws, sheetName);
@@ -1047,7 +1089,7 @@
 
             // Save the file
             XLSX.writeFile(wb, `TERMLY REPORTING TOOL, 2026.xlsx`);
-            showToast('✅ One sheet per school exported!', 'success');
+            showToast('✅ Professional, Clean Export Completed!', 'success');
         }
 
         // ================================================================
