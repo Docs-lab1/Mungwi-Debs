@@ -704,7 +704,7 @@
             // 1. Get all unique grades sorted logically
             const allGrades = ['ECE', '1', '2', '3', '4', '5', '6', '7', 'FROM 1', 'FROM 2', '10', '11', '12'];
 
-            // 2. Prepare the final flat array for the Excel sheet
+            // 2. Prepare the final array for the Excel sheet using EXACT column matching (B=1, C=2, D=3, etc.)
             let wsDataMOE = [];
 
             // --- ROW 1: Ministry Header (A5 in template) ---
@@ -717,68 +717,70 @@
                 wsDataMOE.push(Array(35).fill(''));
             }
 
-            // --- ROW 15: Complex Headers (Name, Grade, etc.) ---
+            // --- ROW 15: Complex Headers ---
             let row15 = Array(35).fill('');
-            row15[1] = 'NAME OF SCHOOL';
-            row15[2] = 'GRADE';
-            row15[5] = 'AGE RANGE';
-            row15[6] = 'TEEN PREG';
-            row15[7] = 'NO OF EARLY MARRIAGES';
-            row15[10] = 'NO OF DROP OUTS  DUE TO:';
-            row15[25] = 'ABSENTEEISM CASES';
-            row15[28] = 'NO OF RE-ENTRY CASES';
-            row15[31] = 'RE-ADMISSION';
-            row15[33] = 'DEFILEMENT';
+            row15[1] = 'NAME OF SCHOOL'; // Col B
+            row15[2] = 'GRADE';          // Col C
+            row15[5] = 'AGE RANGE';      // Col F (Index 5)
+            row15[6] = 'TEEN PREG';      // Col G (Index 6)
+            row15[7] = 'NO OF EARLY MARRIAGES'; // Col H (Index 7)
+            row15[10] = 'NO OF DROP OUTS  DUE TO:'; // Col K
+            row15[25] = 'ABSENTEEISM CASES'; // Col Z
+            row15[28] = 'NO OF RE-ENTRY CASES'; // Col AC
+            row15[31] = 'RE-ADMISSION'; // Col AF            row15[33] = 'DEFILEMENT';   // Col AH
             wsDataMOE.push(row15);
 
-            // --- ROW 16: Sub-Headers (Dropout reasons, etc.) ---
+            // --- ROW 16: Sub-Headers (Dropout reasons) ---
             let row16 = Array(35).fill('');
-            row16[10] = 'Pregnancy';
-            row16[12] = 'Marriage';
-            row16[14] = 'DEATH';
-            row16[16] = 'ILLNESS';
-            row16[18] = 'ORPHANED';
-            row16[20] = 'ECONOMIC';
-            row16[22] = 'OVC';
+            row16[10] = 'Pregnancy'; // Col K
+            row16[12] = 'Marriage';  // Col M
+            row16[14] = 'DEATH';     // Col O
+            row16[16] = 'ILLNESS';   // Col Q
+            row16[18] = 'ORPHANED';  // Col S
+            row16[20] = 'ECONOMIC';  // Col U
+            row16[22] = 'OVC';       // Col W
             wsDataMOE.push(row16);
 
-            // --- ROW 17: Empty row to separate headers ---
+            // --- ROW 17: Empty ---
             wsDataMOE.push(Array(35).fill(''));
 
             // --- ROW 18: PERFECTLY ALIGNED NUMERIC HEADERS ---
+            // Base index 0 represents Column A. 
+            // Col B = 1, Col C = 2, Col D = 3 ... Col AI = 34.
             let row18 = Array(35).fill('');
-            row18[2] = 'Boys';      // Col C
-            row18[3] = 'Girls';     // Col D
-            row18[4] = 'Total';     // Col E
-            row18[5] = 'Age Range'; // Col F (Not "Totals" - keeping your screenshot's label)
-            row18[6] = 'Girls';     // Col G
-            row18[7] = 'Boys';      // Col H
-            row18[8] = 'Girls';     // Col I
-            row18[9] = 'Total';     // Col J
-            row18[10] = 'Boys';     // Col K
-            row18[11] = 'Girls';    // Col L
-            row18[12] = 'Boys';     // Col M
-            row18[13] = 'Girls';    // Col N
-            row18[14] = 'BOYS';     // Col O
-            row18[15] = 'GIRLS';    // Col P
-            row18[16] = 'BOYS';     // Col Q
-            row18[17] = 'GIRLS';    // Col R
-            row18[18] = 'BOYS';     // Col S
-            row18[19] = 'GIRLS';    // Col T
-            row18[20] = 'BOYS';     // Col U
-            row18[21] = 'GIRLS';    // Col V
-            row18[22] = 'BOYS';     // Col W
-            row18[23] = 'GIRLS';    // Col X
-            row18[25] = 'Boys';     // Col Z
-            row18[26] = 'Girls';    // Col AA
-            row18[27] = 'Total';    // Col AB
-            row18[28] = 'Boys';     // Col AC
-            row18[29] = 'Girls';    // Col AD
-            row18[30] = 'Total';    // Col AE
-            row18[31] = 'BOYS';     // Col AF
-            row18[32] = 'GIRLS';    // Col AG
-            row18[33] = 'BOYS';     // Col AH
-            row18[34] = 'GIRLS';    // Col AI
+            row18[1] = '';            // Col B (Empty - Reserved for School Name)
+            row18[2] = 'Boys';        // Col C - Enrolment Boys
+            row18[3] = 'Girls';       // Col D - Enrolment Girls
+            row18[4] = 'Total';       // Col E - Enrolment Total
+            row18[5] = 'Age Range';   // Col F - Age Range
+            row18[6] = 'Girls';       // Col G - Teen Preg
+            row18[7] = 'Boys';        // Col H - Early Marriage Boys
+            row18[8] = 'Girls';       // Col I - Early Marriage Girls
+            row18[9] = 'Total';       // Col J - Early Marriage Total
+            row18[10] = 'Boys';       // Col K - Dropout Preg Boys
+            row18[11] = 'Girls';      // Col L - Dropout Preg Girls
+            row18[12] = 'Boys';       // Col M - Dropout Marriage Boys
+            row18[13] = 'Girls';      // Col N - Dropout Marriage Girls
+            row18[14] = 'BOYS';       // Col O - Dropout Death Boys
+            row18[15] = 'GIRLS';      // Col P - Dropout Death Girls
+            row18[16] = 'BOYS';       // Col Q - Dropout Illness Boys
+            row18[17] = 'GIRLS';      // Col R - Dropout Illness Girls
+            row18[18] = 'BOYS';       // Col S - Dropout Orphaned Boys
+            row18[19] = 'GIRLS';      // Col T - Dropout Orphaned Girls
+            row18[20] = 'BOYS';       // Col U - Dropout Economic Boys
+            row18[21] = 'GIRLS';      // Col V - Dropout Economic Girls
+            row18[22] = 'BOYS';       // Col W - Dropout OVC Boys
+            row18[23] = 'GIRLS';      // Col X - Dropout OVC Girls
+            row18[25] = 'Boys';       // Col Z - Absenteeism Boys
+            row18[26] = 'Girls';      // Col AA - Absenteeism Girls
+            row18[27] = 'Total';      // Col AB - Absenteeism Total
+            row18[28] = 'Boys';       // Col AC - Re-entry Boys
+            row18[29] = 'Girls';      // Col AD - Re-entry Girls
+            row18[30] = 'Total';      // Col AE - Re-entry Total
+            row18[31] = 'BOYS';       // Col AF - Readmission Boys
+            row18[32] = 'GIRLS';      // Col AG - Readmission Girls
+            row18[33] = 'BOYS';       // Col AH - Defilement Boys
+            row18[34] = 'GIRLS';      // Col AI - Defilement Girls
             wsDataMOE.push(row18);
 
             // --- LOOP THROUGH EACH SCHOOL ---
@@ -786,7 +788,7 @@
                 const schoolRecords = records.filter(r => r.school_id === school.id);
                 if (schoolRecords.length === 0) return;
 
-                // 1. School Name Row
+                // 1. School Name Row (Col B)
                 let schoolNameRow = Array(35).fill('');
                 schoolNameRow[1] = school.name;
                 wsDataMOE.push(schoolNameRow);
@@ -796,60 +798,60 @@
                     const r = schoolRecords.find(rec => rec.grade === gradeName);
                     let row = Array(35).fill('');
                     
-                    // Enrolment (Col C, D, E, F)
-                    row[2] = gradeName; // Col C
-                    row[3] = gv(r, 'enrolment_boys'); // Col D
-                    row[4] = gv(r, 'enrolment_girls'); // Col E
+                    // Enrolment
+                    row[2] = gradeName;                     // Col C
+                    row[3] = gv(r, 'enrolment_boys');       // Col D
+                    row[4] = gv(r, 'enrolment_girls');      // Col E
                     row[5] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Col F
-                    row[6] = gv(r, 'age_range'); // Col G
+                    row[6] = gv(r, 'age_range');            // Col G
                     
                     // Teen Preg (Col H)
-                    row[7] = gv(r, 'teen_preg');
+                    row[7] = gv(r, 'teen_preg');            // Col H (Index 7)
                     
                     // Early Marriages (Col I, J, K)
-                    row[8] = gv(r, 'early_marriage_boys');
-                    row[9] = gv(r, 'early_marriage_girls');
-                    row[10] = gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); 
+                    row[8] = gv(r, 'early_marriage_boys');  // Col I
+                    row[9] = gv(r, 'early_marriage_girls'); // Col J
+                    row[10] = gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); // Col K
                     
                     // Dropouts: Pregnancy (Col L, M)
-                    row[11] = gv(r, 'dropout_preg_boys');
-                    row[12] = gv(r, 'dropout_preg_girls');
+                    row[11] = gv(r, 'dropout_preg_boys');   // Col L
+                    row[12] = gv(r, 'dropout_preg_girls');  // Col M
                     // Dropouts: Marriage (Col N, O)
-                    row[13] = gv(r, 'dropout_marriage_boys');
-                    row[14] = gv(r, 'dropout_marriage_girls');
+                    row[13] = gv(r, 'dropout_marriage_boys'); // Col N
+                    row[14] = gv(r, 'dropout_marriage_girls'); // Col O
                     // Dropouts: Death (Col P, Q)
-                    row[15] = gv(r, 'dropout_death_boys');
-                    row[16] = gv(r, 'dropout_death_girls');
+                    row[15] = gv(r, 'dropout_death_boys');  // Col P
+                    row[16] = gv(r, 'dropout_death_girls'); // Col Q
                     // Dropouts: Illness (Col R, S)
-                    row[17] = gv(r, 'dropout_illness_boys');
-                    row[18] = gv(r, 'dropout_illness_girls');
+                    row[17] = gv(r, 'dropout_illness_boys'); // Col R
+                    row[18] = gv(r, 'dropout_illness_girls'); // Col S
                     // Dropouts: Orphaned (Col T, U)
-                    row[19] = gv(r, 'dropout_orphaned_boys');
-                    row[20] = gv(r, 'dropout_orphaned_girls');
+                    row[19] = gv(r, 'dropout_orphaned_boys'); // Col T
+                    row[20] = gv(r, 'dropout_orphaned_girls'); // Col U
                     // Dropouts: Economic (Col V, W)
-                    row[21] = gv(r, 'dropout_economic_boys');
-                    row[22] = gv(r, 'dropout_economic_girls');
+                    row[21] = gv(r, 'dropout_economic_boys'); // Col V
+                    row[22] = gv(r, 'dropout_economic_girls'); // Col W
                     // Dropouts: OVC (Col X, Y)
-                    row[23] = gv(r, 'dropout_ovc_boys');
-                    row[24] = gv(r, 'dropout_ovc_girls');
+                    row[23] = gv(r, 'dropout_ovc_boys');   // Col X
+                    row[24] = gv(r, 'dropout_ovc_girls');  // Col Y
                     
                     // Absenteeism (Col Z, AA, AB)
-                    row[26] = gv(r, 'absenteeism_boys');
-                    row[27] = gv(r, 'absenteeism_girls');
-                    row[28] = gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls'); 
+                    row[26] = gv(r, 'absenteeism_boys');   // Col Z (Index 26)
+                    row[27] = gv(r, 'absenteeism_girls');  // Col AA (Index 27)
+                    row[28] = gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls'); // Col AB
                     
                     // Re-entry (Col AC, AD, AE)
-                    row[29] = gv(r, 'reentry_boys');
-                    row[30] = gv(r, 'reentry_girls');
-                    row[31] = gv(r, 'reentry_boys') + gv(r, 'reentry_girls'); 
+                    row[29] = gv(r, 'reentry_boys');       // Col AC
+                    row[30] = gv(r, 'reentry_girls');      // Col AD
+                    row[31] = gv(r, 'reentry_boys') + gv(r, 'reentry_girls'); // Col AE
                     
                     // Re-admission (Col AF, AG)
-                    row[32] = gv(r, 'readmission_boys');
-                    row[33] = gv(r, 'readmission_girls');
+                    row[32] = gv(r, 'readmission_boys');   // Col AF
+                    row[33] = gv(r, 'readmission_girls');  // Col AG
                     
                     // Defilement (Col AH, AI)
-                    row[34] = gv(r, 'defilement_boys');
-                    row[35] = gv(r, 'defilement_girls');
+                    row[34] = gv(r, 'defilement_boys');    // Col AH
+                    row[35] = gv(r, 'defilement_girls');   // Col AI
 
                     wsDataMOE.push(row);
                 });
@@ -864,7 +866,7 @@
 
                 // Totals for Dropouts
                 const sumFields = ['dropout_preg', 'dropout_marriage', 'dropout_death', 'dropout_illness', 'dropout_orphaned', 'dropout_economic', 'dropout_ovc'];
-                let colIdx = 11;
+                let colIdx = 11; // Start at Col L (Index 11)
                 sumFields.forEach(field => {
                     let b = 0, g = 0;
                     schoolRecords.forEach(r => { b += gv(r, field + '_boys'); g += gv(r, field + '_girls'); });
