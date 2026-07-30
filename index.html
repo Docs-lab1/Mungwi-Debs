@@ -806,16 +806,16 @@
             const allGrades = ['ECE', '1', '2', '3', '4', '5', '6', '7', 'FROM 1', 'FROM 2', '10', '11', '12'];
 
             // 2. Prepare the final flat array for the Excel sheet
-            let wsData = [];
+            let wsDataMOE = [];
 
             // --- ROW 1: Ministry Header (A5 in template) ---
             let row1 = Array(35).fill('');
             row1[4] = 'MINISTRY OF EDUCATION';
-            wsData.push(row1);
+            wsDataMOE.push(row1);
 
             // Rows 2-14 are empty spaces
             for(let i=0; i<13; i++) {
-                wsData.push(Array(35).fill(''));
+                wsDataMOE.push(Array(35).fill(''));
             }
 
             // --- ROW 15: Complex Headers (Name, Grade, etc.) ---
@@ -830,7 +830,7 @@
             row15[28] = 'NO OF RE-ENTRY CASES';
             row15[31] = 'RE-ADMISSION';
             row15[33] = 'DEFILEMENT';
-            wsData.push(row15);
+            wsDataMOE.push(row15);
 
             // --- ROW 16: Sub-Headers (Dropout reasons, etc.) ---
             let row16 = Array(35).fill('');
@@ -841,45 +841,46 @@
             row16[18] = 'ORPHANED';
             row16[20] = 'ECONOMIC';
             row16[22] = 'OVC';
-            wsData.push(row16);
+            wsDataMOE.push(row16);
 
             // Empty space row 17
-            wsData.push(Array(35).fill(''));
+            wsDataMOE.push(Array(35).fill(''));
 
             // --- ROW 18: Column Numeric Headers (Boys, Girls, Total) ---
             let row18 = Array(35).fill('');
-            row18[2] = 'Boys';
-            row18[3] = 'Girls';
-            row18[4] = 'Total';
-            row18[6] = 'Girls';
-            row18[7] = 'Boys';
-            row18[8] = 'Girls';
-            row18[9] = 'Total';
-            row18[10] = 'Boys';
-            row18[11] = 'Girls';
-            row18[12] = 'Boys';
-            row18[13] = 'Girls';
-            row18[14] = 'BOYS';
-            row18[15] = 'GIRLS';
-            row18[16] = 'BOYS';
-            row18[17] = 'GIRLS';
-            row18[18] = 'BOYS';
-            row18[19] = 'GIRLS';
-            row18[20] = 'BOYS';
-            row18[21] = 'GIRLS';
-            row18[22] = 'BOYS';
-            row18[23] = 'GIRLS';
-            row18[25] = 'Boys';
-            row18[26] = 'Girls';
-            row18[27] = 'Total';
-            row18[28] = 'Boys';
-            row18[29] = 'Girls';
-            row18[30] = 'Total';
-            row18[31] = 'BOYS';
-            row18[32] = 'GIRLS';
-            row18[33] = 'BOYS';
-            row18[34] = 'GIRLS';
-            wsData.push(row18);
+            row18[2] = 'Boys';      // Grade -> Boys
+            row18[3] = 'Girls';     // Grade -> Girls
+            row18[4] = 'Total';     // Grade -> Total
+            row18[5] = 'Age Range'; // Age Range column
+            row18[6] = 'Girls';     // Teen Preg
+            row18[7] = 'Boys';      // Early Marr Boys
+            row18[8] = 'Girls';     // Early Marr Girls
+            row18[9] = 'Total';     // Early Marr Total
+            row18[10] = 'Boys';     // Drop Preg B
+            row18[11] = 'Girls';    // Drop Preg G
+            row18[12] = 'Boys';     // Drop Marr B
+            row18[13] = 'Girls';    // Drop Marr G
+            row18[14] = 'BOYS';     // Drop Death B
+            row18[15] = 'GIRLS';    // Drop Death G
+            row18[16] = 'BOYS';     // Drop Ill B
+            row18[17] = 'GIRLS';    // Drop Ill G
+            row18[18] = 'BOYS';     // Drop Orph B
+            row18[19] = 'GIRLS';    // Drop Orph G
+            row18[20] = 'BOYS';     // Drop Econ B
+            row18[21] = 'GIRLS';    // Drop Econ G
+            row18[22] = 'BOYS';     // Drop OVC B
+            row18[23] = 'GIRLS';    // Drop OVC G
+            row18[25] = 'Boys';     // Abs B
+            row18[26] = 'Girls';    // Abs G
+            row18[27] = 'Total';    // Abs T
+            row18[28] = 'Boys';     // Re B
+            row18[29] = 'Girls';    // Re G
+            row18[30] = 'Total';    // Re T
+            row18[31] = 'BOYS';     // Read B
+            row18[32] = 'GIRLS';    // Read G
+            row18[33] = 'BOYS';     // Def B
+            row18[34] = 'GIRLS';    // Def G
+            wsDataMOE.push(row18);
 
             // --- LOOP THROUGH EACH SCHOOL ---
             schools.forEach(school => {
@@ -891,7 +892,7 @@
                 // 1. Write the School Name Row (Bold in the template)
                 let schoolNameRow = Array(35).fill('');
                 schoolNameRow[1] = school.name;
-                wsData.push(schoolNameRow);
+                wsDataMOE.push(schoolNameRow);
 
                 // 2. Loop through ALL grades and map data
                 allGrades.forEach(gradeName => {
@@ -901,7 +902,6 @@
                     row[2] = gradeName;
                     
                     // Enrolment
-                    row[2] = gradeName;
                     row[3] = gv(r, 'enrolment_boys');
                     row[4] = gv(r, 'enrolment_girls');
                     row[5] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Total
@@ -955,7 +955,7 @@
                     row[34] = gv(r, 'defilement_boys');
                     row[35] = gv(r, 'defilement_girls');
 
-                    wsData.push(row);
+                    wsDataMOE.push(row);
                 });
 
                 // 3. Calculate and add TOTAL row for this school
@@ -1010,7 +1010,7 @@
                 totalRow[34] = defBoys;
                 totalRow[35] = defGirls;
 
-                wsData.push(totalRow);
+                wsDataMOE.push(totalRow);
 
                 // 4. Calculate and add RATE (%) row for this school
                 let rateRow = Array(35).fill('');
@@ -1035,58 +1035,94 @@
                 let tRe = reBoys + reGirls;
                 rateRow[29] = tTotal > 0 ? ((tRe / tTotal) * 100).toFixed(1) : 0;
 
-                wsData.push(rateRow);
+                wsDataMOE.push(rateRow);
 
                 // Add a blank spacer row after every school to match the aesthetic of MOE forms
-                wsData.push(Array(35).fill(''));
+                wsDataMOE.push(Array(35).fill(''));
             });
 
-            // Create the workbook and worksheet
+            // ================================================================
+            //  2. NEW SHEET: DISTRICT SUMMARY (All Schools Combined Totals & Rates)
+            // ================================================================
+            let wsDataSummary = [];
+            
+            // Headers
+            let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY', 'DEFILEMENT', 'OVC'];
+            wsDataSummary.push(sumRow1);
+
+            let grandEnrol = 0, grandBoys = 0, grandGirls = 0, grandDrop = 0, grandAbs = 0, grandPreg = 0, grandRe = 0, grandDef = 0, grandOvc = 0;
+
+            schools.forEach(school => {
+                const schoolRecords = records.filter(r => r.school_id === school.id);
+                if (schoolRecords.length === 0) return;
+
+                let boys = 0, girls = 0, totalEnrol = 0;
+                let dropouts = 0, absent = 0, preg = 0, reentry = 0, defilement = 0, ovc = 0;
+
+                schoolRecords.forEach(r => {
+                    boys += gv(r, 'enrolment_boys'); girls += gv(r, 'enrolment_girls');
+                    totalEnrol += (gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'));
+                    dropouts += (gv(r, 'dropout_preg_boys') + gv(r, 'dropout_preg_girls') + gv(r, 'dropout_marriage_boys') + gv(r, 'dropout_marriage_girls') + gv(r, 'dropout_death_boys') + gv(r, 'dropout_death_girls') + gv(r, 'dropout_illness_boys') + gv(r, 'dropout_illness_girls') + gv(r, 'dropout_orphaned_boys') + gv(r, 'dropout_orphaned_girls') + gv(r, 'dropout_economic_boys') + gv(r, 'dropout_economic_girls') + gv(r, 'dropout_ovc_boys') + gv(r, 'dropout_ovc_girls'));
+                    absent += gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls');
+                    preg += gv(r, 'teen_preg');
+                    reentry += gv(r, 'reentry_boys') + gv(r, 'reentry_girls');
+                    defilement += gv(r, 'defilement_boys') + gv(r, 'defilement_girls');
+                    ovc += gv(r, 'ovc_boys') + gv(r, 'ovc_girls');
+                });
+
+                // Add to Grand Totals
+                grandEnrol += totalEnrol; grandBoys += boys; grandGirls += girls;
+                grandDrop += dropouts; grandAbs += absent; grandPreg += preg;
+                grandRe += reentry; grandDef += defilement; grandOvc += ovc;
+
+                let dropRate = totalEnrol > 0 ? ((dropouts / totalEnrol) * 100).toFixed(1) : 0;
+                let absRate = totalEnrol > 0 ? ((absent / totalEnrol) * 100).toFixed(1) : 0;
+                let pregRate = totalEnrol > 0 ? ((preg / totalEnrol) * 100).toFixed(1) : 0;
+
+                wsDataSummary.push([
+                    school.name, totalEnrol, boys, girls, dropouts, dropRate + '%', 
+                    absent, absRate + '%', preg, pregRate + '%', reentry, defilement, ovc
+                ]);
+            });
+
+            // Push Grand Totals Row
+            let gDropRate = grandEnrol > 0 ? ((grandDrop / grandEnrol) * 100).toFixed(1) : 0;
+            let gAbsRate = grandEnrol > 0 ? ((grandAbs / grandEnrol) * 100).toFixed(1) : 0;
+            let gPregRate = grandEnrol > 0 ? ((grandPreg / grandEnrol) * 100).toFixed(1) : 0;
+            
+            wsDataSummary.push([
+                'GRAND TOTAL', grandEnrol, grandBoys, grandGirls, grandDrop, gDropRate + '%', 
+                grandAbs, gAbsRate + '%', grandPreg, gPregRate + '%', grandRe, grandDef, grandOvc
+            ]);
+
+            // ================================================================
+            //  CREATE WORKBOOK
+            // ================================================================
             const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-            // Apply column widths
-            ws['!cols'] = [
-                { wch: 5 },  // A
-                { wch: 30 }, // B (School)
-                { wch: 8 },  // C (Grade)
-                { wch: 8 },  // D (Boys)
-                { wch: 8 },  // E (Girls)
-                { wch: 8 },  // F (Total)
-                { wch: 12 }, // G (Age)
-                { wch: 8 },  // H (Preg)
-                { wch: 8 },  // I (EM Boys)
-                { wch: 8 },  // J (EM Girls)
-                { wch: 8 },  // K (EM Total)
-                { wch: 10 }, // L (Drop Preg B)
-                { wch: 10 }, // M (Drop Preg G)
-                { wch: 10 }, // N (Drop Mar B)
-                { wch: 10 }, // O (Drop Mar G)
-                { wch: 10 }, // P (Drop Death B)
-                { wch: 10 }, // Q (Drop Death G)
-                { wch: 10 }, // R (Drop Ill B)
-                { wch: 10 }, // S (Drop Ill G)
-                { wch: 10 }, // T (Drop Orph B)
-                { wch: 10 }, // U (Drop Orph G)
-                { wch: 10 }, // V (Drop Econ B)
-                { wch: 10 }, // W (Drop Econ G)
-                { wch: 10 }, // X (Drop OVC B)
-                { wch: 10 }, // Y (Drop OVC G)
-                { wch: 10 }, // Z (Abs B)
-                { wch: 10 }, // AA (Abs G)
-                { wch: 10 }, // AB (Abs T)
-                { wch: 10 }, // AC (Re B)
-                { wch: 10 }, // AD (Re G)
-                { wch: 10 }, // AE (Re T)
-                { wch: 10 }, // AF (Read B)
-                { wch: 10 }, // AG (Read G)
-                { wch: 10 }, // AH (Def B)
-                { wch: 10 }  // AI (Def G)
+            // Add Sheet 1 (MOE Template)
+            const ws1 = XLSX.utils.aoa_to_sheet(wsDataMOE);
+            ws1['!cols'] = [
+                { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, 
+                { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, 
+                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
+                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
+                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
+                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }
             ];
+            XLSX.utils.book_append_sheet(wb, ws1, 'Termly Reporting Tool');
 
-            XLSX.utils.book_append_sheet(wb, ws, 'TERMLY REPORTING TOOL 2026');
+            // Add Sheet 2 (District Summary)
+            const ws2 = XLSX.utils.aoa_to_sheet(wsDataSummary);
+            ws2['!cols'] = [
+                { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, 
+                { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }
+            ];
+            XLSX.utils.book_append_sheet(wb, ws2, 'District Summary');
+
+            // Save the file
             XLSX.writeFile(wb, `TERMLY REPORTING TOOL, 2026.xlsx`);
-            showToast('✅ MOE Template Exported!', 'success');
+            showToast('✅ MOE Template + District Summary Exported!', 'success');
         }
 
         // ================================================================
