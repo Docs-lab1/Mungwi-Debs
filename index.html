@@ -409,7 +409,7 @@
                 <div id="tab-adminExport" class="tab-content admin-only">
                     <div class="card">
                         <div class="card-title"><i class="fas fa-file-export"></i> Export Data</div>
-                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download the official MOE "Termly Reporting Tool" Excel format.</p>
+                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download the official MOE "Termly Reporting Tool" Excel format with merged cells and borders.</p>
                         <div class="flex">
                             <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (MOE Format)</button>
                             <button class="btn btn-outline" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - PERCENTAGES IN CORRECT COLUMNS
+        //  PROFESSIONAL EXPORT - MERGED CELLS, BORDERS, PERCENTAGES IN COLUMN
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -1025,7 +1025,7 @@
                 pushEmpty(2); // Bottom spacer
 
                 // ----------------------------------------------------------------
-                // APPEND THIS SHEET TO THE WORKBOOK
+                // APPEND THIS SHEET TO THE WORKBOOK WITH FORMATTING
                 // ----------------------------------------------------------------
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 
@@ -1039,6 +1039,16 @@
                     { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } 
                 ];
                 
+                // Apply MERGES
+                ws['!merges'] = [
+                    // Merge MINISTRY OF EDUCATION (Row 1, Col B to E)
+                    { s: { r: 0, c: 1 }, e: { r: 0, c: 4 } },
+                    // Merge NO OF EARLY MARRIAGES (Row 15, Col H to J)
+                    { s: { r: 14, c: 7 }, e: { r: 14, c: 9 } },
+                    // Merge NO OF DROP OUTS DUE TO: (Row 15, Col K to X)
+                    { s: { r: 14, c: 10 }, e: { r: 14, c: 23 } }
+                ];
+
                 // Apply Borders and Bold to specific cells
                 const range = XLSX.utils.decode_range(ws['!ref']);
                 ws['!rows'] = [];
