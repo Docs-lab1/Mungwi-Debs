@@ -409,7 +409,7 @@
                 <div id="tab-adminExport" class="tab-content admin-only">
                     <div class="card">
                         <div class="card-title"><i class="fas fa-file-export"></i> Export Data</div>
-                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download the official MOE "Termly Reporting Tool" Excel format with merged cells and borders.</p>
+                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download the official MOE "Termly Reporting Tool" Excel format.</p>
                         <div class="flex">
                             <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (MOE Format)</button>
                             <button class="btn btn-outline" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
@@ -1094,20 +1094,23 @@
             });
 
             // ----------------------------------------------------------------
-            // CREATE FINAL "DISTRICT SUMMARY" SHEET
+            // CREATE FINAL "DISTRICT SUMMARY" SHEET (UPDATED WITH BOYS/GIRLS COLUMNS)
             // ----------------------------------------------------------------
             let wsDataSummary = [];
-            let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY', 'DEFILEMENT', 'OVC'];
+            // Updated headers to include Boys/Girls for Re-entry, Defilement, and OVC
+            let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY BOYS', 'RE-ENTRY GIRLS', 'DEFILEMENT BOYS', 'DEFILEMENT GIRLS', 'OVC BOYS', 'OVC GIRLS'];
             wsDataSummary.push(sumRow1);
 
-            let grandEnrol = 0, grandBoys = 0, grandGirls = 0, grandDrop = 0, grandAbs = 0, grandPreg = 0, grandRe = 0, grandDef = 0, grandOvc = 0;
+            let grandEnrol = 0, grandBoys = 0, grandGirls = 0, grandDrop = 0, grandAbs = 0, grandPreg = 0;
+            let grandReBoys = 0, grandReGirls = 0, grandDefBoys = 0, grandDefGirls = 0, grandOvcBoys = 0, grandOvcGirls = 0;
 
             schools.forEach(school => {
                 const schoolRecords = records.filter(r => r.school_id === school.id);
                 if (schoolRecords.length === 0) return;
 
                 let boys = 0, girls = 0, totalEnrol = 0;
-                let dropouts = 0, absent = 0, preg = 0, reentry = 0, defilement = 0, ovc = 0;
+                let dropouts = 0, absent = 0, preg = 0;
+                let reBoys = 0, reGirls = 0, defBoys = 0, defGirls = 0, ovcBoys = 0, ovcGirls = 0;
 
                 schoolRecords.forEach(r => {
                     boys += gv(r, 'enrolment_boys'); girls += gv(r, 'enrolment_girls');
@@ -1115,30 +1118,32 @@
                     dropouts += (gv(r, 'dropout_preg_boys') + gv(r, 'dropout_preg_girls') + gv(r, 'dropout_marriage_boys') + gv(r, 'dropout_marriage_girls') + gv(r, 'dropout_death_boys') + gv(r, 'dropout_death_girls') + gv(r, 'dropout_illness_boys') + gv(r, 'dropout_illness_girls') + gv(r, 'dropout_orphaned_boys') + gv(r, 'dropout_orphaned_girls') + gv(r, 'dropout_economic_boys') + gv(r, 'dropout_economic_girls') + gv(r, 'dropout_ovc_boys') + gv(r, 'dropout_ovc_girls'));
                     absent += gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls');
                     preg += gv(r, 'teen_preg');
-                    reentry += gv(r, 'reentry_boys') + gv(r, 'reentry_girls');
-                    defilement += gv(r, 'defilement_boys') + gv(r, 'defilement_girls');
-                    ovc += gv(r, 'ovc_boys') + gv(r, 'ovc_girls');
+                    reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls');
+                    defBoys += gv(r, 'defilement_boys'); defGirls += gv(r, 'defilement_girls');
+                    ovcBoys += gv(r, 'ovc_boys'); ovcGirls += gv(r, 'ovc_girls');
                 });
 
                 grandEnrol += totalEnrol; grandBoys += boys; grandGirls += girls;
                 grandDrop += dropouts; grandAbs += absent; grandPreg += preg;
-                grandRe += reentry; grandDef += defilement; grandOvc += ovc;
+                grandReBoys += reBoys; grandReGirls += reGirls;
+                grandDefBoys += defBoys; grandDefGirls += defGirls;
+                grandOvcBoys += ovcBoys; grandOvcGirls += ovcGirls;
 
                 let dropRate = totalEnrol > 0 ? ((dropouts / totalEnrol) * 100).toFixed(1) : 0;
                 let absRate = totalEnrol > 0 ? ((absent / totalEnrol) * 100).toFixed(1) : 0;
                 let pregRate = totalEnrol > 0 ? ((preg / totalEnrol) * 100).toFixed(1) : 0;
 
-                wsDataSummary.push([ school.name, totalEnrol, boys, girls, dropouts, dropRate + '%', absent, absRate + '%', preg, pregRate + '%', reentry, defilement, ovc ]);
+                wsDataSummary.push([ school.name, totalEnrol, boys, girls, dropouts, dropRate + '%', absent, absRate + '%', preg, pregRate + '%', reBoys, reGirls, defBoys, defGirls, ovcBoys, ovcGirls ]);
             });
 
             // Push Grand Totals Row
             let gDropRate = grandEnrol > 0 ? ((grandDrop / grandEnrol) * 100).toFixed(1) : 0;
             let gAbsRate = grandEnrol > 0 ? ((grandAbs / grandEnrol) * 100).toFixed(1) : 0;
             let gPregRate = grandEnrol > 0 ? ((grandPreg / grandEnrol) * 100).toFixed(1) : 0;
-            wsDataSummary.push([ 'GRAND TOTAL', grandEnrol, grandBoys, grandGirls, grandDrop, gDropRate + '%', grandAbs, gAbsRate + '%', grandPreg, gPregRate + '%', grandRe, grandDef, grandOvc ]);
+            wsDataSummary.push([ 'GRAND TOTAL', grandEnrol, grandBoys, grandGirls, grandDrop, gDropRate + '%', grandAbs, gAbsRate + '%', grandPreg, gPregRate + '%', grandReBoys, grandReGirls, grandDefBoys, grandDefGirls, grandOvcBoys, grandOvcGirls ]);
 
             const wsSum = XLSX.utils.aoa_to_sheet(wsDataSummary);
-            wsSum['!cols'] = [ { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
+            wsSum['!cols'] = [ { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 10 } ];
             XLSX.utils.book_append_sheet(wb, wsSum, 'DISTRICT SUMMARY');
 
             // Save the file
