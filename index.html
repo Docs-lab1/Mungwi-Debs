@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - PERCENTAGES UNDER TOTALS
+        //  PROFESSIONAL EXPORT - PERCENTAGES IN CORRECT COLUMNS
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -956,39 +956,17 @@
                 schoolRecords.forEach(r => { tBoys += gv(r, 'enrolment_boys'); tGirls += gv(r, 'enrolment_girls'); tTotal += gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); });
                 totalRow[2] = tBoys; totalRow[3] = tGirls; totalRow[4] = tTotal;
 
-                // Total Absenteeism
-                let aBoys = 0, aGirls = 0;
-                schoolRecords.forEach(r => { aBoys += gv(r, 'absenteeism_boys'); aGirls += gv(r, 'absenteeism_girls'); });
-                totalRow[25] = aBoys; totalRow[26] = aGirls; totalRow[27] = aBoys + aGirls;
+                // Teen Preg Total
+                let pregTotal = 0;
+                schoolRecords.forEach(r => { pregTotal += gv(r, 'teen_preg'); });
+                totalRow[6] = pregTotal; // Col G
 
-                // Total Re-Entry
-                let reBoys = 0, reGirls = 0;
-                schoolRecords.forEach(r => { reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls'); });
-                totalRow[28] = reBoys; totalRow[29] = reGirls; totalRow[30] = reBoys + reGirls;
-
-                // Total Defilement
-                let defBoys = 0, defGirls = 0;
-                schoolRecords.forEach(r => { defBoys += gv(r, 'defilement_boys'); defGirls += gv(r, 'defilement_girls'); });
-                totalRow[33] = defBoys; totalRow[34] = defGirls;
-
-                wsData.push(totalRow);
-
-                // ----------------------------------------------------------------
-                // CALCULATE PERCENTAGES (DIRECTLY UNDER TOTALS)
-                // ----------------------------------------------------------------
-                let pctRow = Array(35).fill('');
-                pctRow[1] = 'PERCENTAGE'; // Col B
-
-                // Only calculate percentages for specific columns
-                // Col G (Index 6): Teen Preg
-                pctRow[6] = tTotal > 0 ? ((gv(null, 'teen_preg') / tTotal) * 100).toFixed(1) + '%' : '0%';
-                
-                // Col J (Index 9): Early Marriage Total
+                // Early Marriage Total
                 let emTotal = 0;
                 schoolRecords.forEach(r => { emTotal += gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); });
-                pctRow[9] = tTotal > 0 ? ((emTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
+                totalRow[9] = emTotal; // Col J
 
-                // Col K (Index 10) to Col X (Index 23): Dropouts Combined
+                // Dropouts Total
                 let dropTotal = 0;
                 schoolRecords.forEach(r => {
                     dropTotal += gv(r, 'dropout_preg_boys') + gv(r, 'dropout_preg_girls');
@@ -999,17 +977,48 @@
                     dropTotal += gv(r, 'dropout_economic_boys') + gv(r, 'dropout_economic_girls');
                     dropTotal += gv(r, 'dropout_ovc_boys') + gv(r, 'dropout_ovc_girls');
                 });
-                pctRow[10] = tTotal > 0 ? ((dropTotal / tTotal) * 100).toFixed(1) + '%' : '0%'; // Place in 'Boys' column of Dropout Preg
+                totalRow[10] = dropTotal; // Col K (Boys of Preg Dropout)
 
-                // Col AB (Index 27): Absenteeism Total
+                // Absenteeism Total
+                let aBoys = 0, aGirls = 0;
+                schoolRecords.forEach(r => { aBoys += gv(r, 'absenteeism_boys'); aGirls += gv(r, 'absenteeism_girls'); });
+                totalRow[25] = aBoys; totalRow[26] = aGirls; totalRow[27] = aBoys + aGirls;
+
+                // Re-Entry Total
+                let reBoys = 0, reGirls = 0;
+                schoolRecords.forEach(r => { reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls'); });
+                totalRow[28] = reBoys; totalRow[29] = reGirls; totalRow[30] = reBoys + reGirls;
+
+                // Defilement Total
+                let defBoys = 0, defGirls = 0;
+                schoolRecords.forEach(r => { defBoys += gv(r, 'defilement_boys'); defGirls += gv(r, 'defilement_girls'); });
+                totalRow[33] = defBoys; totalRow[34] = defGirls;
+
+                wsData.push(totalRow);
+
+                // ----------------------------------------------------------------
+                // CALCULATE PERCENTAGES (DIRECTLY UNDER TOTALS, SAME COLUMNS)
+                // ----------------------------------------------------------------
+                let pctRow = Array(35).fill('');
+                pctRow[1] = 'PERCENTAGE'; // Col B
+
+                // Teen Preg % (Col G - Index 6)
+                pctRow[6] = tTotal > 0 ? ((pregTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
+
+                // Early Marriage % (Col J - Index 9)
+                pctRow[9] = tTotal > 0 ? ((emTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
+
+                // Dropouts Total % (Col K - Index 10)
+                pctRow[10] = tTotal > 0 ? ((dropTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
+
+                // Absenteeism Total % (Col AB - Index 27)
                 pctRow[27] = tTotal > 0 ? (((aBoys + aGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
 
-                // Col AE (Index 30): Re-entry Total
+                // Re-entry Total % (Col AE - Index 30)
                 pctRow[30] = tTotal > 0 ? (((reBoys + reGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
 
-                // Col AH (Index 33) to Col AI (Index 34): Defilement Combined
-                let defTotal = defBoys + defGirls;
-                pctRow[33] = tTotal > 0 ? ((defTotal / tTotal) * 100).toFixed(1) + '%' : '0%'; // Place in 'Boys' column of Defilement
+                // Defilement Total % (Col AH - Index 33)
+                pctRow[33] = tTotal > 0 ? (((defBoys + defGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
 
                 wsData.push(pctRow);
 
