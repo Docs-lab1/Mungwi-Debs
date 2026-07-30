@@ -15,63 +15,17 @@
     </script>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        :root {
-            --primary: #0f2b4c;
-            --primary-light: #1e3a5f;
-            --accent: #ffc107;
-            --accent-dark: #e6a800;
-            --bg: #f0f4f8;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --danger: #ef4444;
-        }
-        html, body {
-            height: 100%;
-            width: 100%;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            overflow-x: hidden;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        :root { --primary: #0f2b4c; --primary-light: #1e3a5f; --accent: #ffc107; --accent-dark: #e6a800; --bg: #f0f4f8; --card-bg: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --shadow: 0 4px 24px rgba(0, 0, 0, 0.04); --radius: 16px; --radius-sm: 10px; --danger: #ef4444; }
+        html, body { height: 100%; width: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-        /* Admin Login Modal Styles */
-        #adminLoginOverlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 43, 76, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
+        #adminLoginOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 43, 76, 0.6); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; }
         #adminLoginOverlay.show { display: flex; }
-        .login-box {
-            background: var(--card-bg);
-            padding: 40px 30px;
-            border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            width: 100%; max-width: 420px; text-align: center;
-        }
+        .login-box { background: var(--card-bg); padding: 40px 30px; border-radius: var(--radius); box-shadow: 0 20px 60px rgba(0,0,0,0.15); width: 100%; max-width: 420px; text-align: center; }
         .login-box .brand-lg { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
         .login-box .brand-lg i { color: var(--accent-dark); }
         .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 25px; }
-        .login-box input {
-            width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm); font-size: 15px; margin-bottom: 15px;
-            background: #f8fafc;
-        }
+        .login-box input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; margin-bottom: 15px; background: #f8fafc; }
         .login-box input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(15, 43, 76, 0.05); }
         .login-box .btn { width: 100%; padding: 14px; font-size: 15px; }
         .login-error { color: #ef4444; font-size: 13px; margin-bottom: 10px; display: none; }
@@ -82,13 +36,7 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 20px; border: none; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
-            text-decoration: none; min-height: 48px; min-width: 48px;
-            touch-action: manipulation;
-        }
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; min-height: 48px; min-width: 48px; touch-action: manipulation; }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-primary:hover { background: var(--primary-light); }
@@ -105,71 +53,28 @@
         .btn-login-admin { background: var(--accent); color: var(--primary); font-weight: bold; }
         .btn-logout { background: #ef4444; color: #fff; }
 
-        /* Header */
-        .app-header {
-            background: var(--primary); color: #fff; padding: 16px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px;
-        }
+        .app-header { background: var(--primary); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px; }
         .app-header .brand { font-weight: 700; font-size: 20px; letter-spacing: -0.3px; }
         .app-header .header-right { display: flex; align-items: center; gap: 12px; }
 
-        /* Floating Status Bar (Bottom Right) */
-        #statusFloat {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            border-radius: 30px;
-            padding: 8px 16px 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            z-index: 50;
-            font-size: 13px;
-            color: var(--text-light);
-        }
+        #statusFloat { position: fixed; bottom: 24px; right: 24px; background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 30px; padding: 8px 16px 8px 12px; display: flex; align-items: center; gap: 12px; z-index: 50; font-size: 13px; color: var(--text-light); }
         #statusFloat .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         #statusFloat .status-dot.online { background: #10b981; }
         #statusFloat .status-dot.offline { background: #ef4444; }
-        #statusFloat .role-tag {
-            background: var(--accent); color: var(--primary); font-weight: 700;
-            font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase;
-            margin-left: 4px;
-        }
-        /* Admin Toggle Button inside the floating bar */
-        #statusFloat .admin-toggle {
-            background: var(--accent);
-            color: var(--primary);
-            border: none;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        #statusFloat .admin-toggle:hover { background: var(--accent-dark); }
-        #statusFloat .admin-toggle.danger { background: var(--danger); color: #fff; }
+        #statusFloat .role-tag { background: var(--accent); color: var(--primary); font-weight: 700; font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase; margin-left: 4px; }
 
-        /* Layout */
         .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; width: 100%; }
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; transition: all 0.2s ease; }
         .card-title { font-size: 17px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .card-title i { font-size: 20px; color: var(--accent-dark); }
         .card-title .badge { background: #f1f5f9; color: var(--text-light); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 30px; margin-left: auto; }
 
-        /* Stats */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 4px; }
         .stat-box { background: #f8fafc; border-radius: var(--radius-sm); padding: 16px 12px; text-align: center; border: 1px solid var(--border); }
         .stat-box .num { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2; }
         .stat-box .label { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
         .stat-box .icon { font-size: 18px; color: var(--accent-dark); display: block; margin-bottom: 4px; }
 
-        /* Tabs */
         .tab-bar { display: flex; gap: 6px; background: #f1f5f9; border-radius: var(--radius-sm); padding: 6px; margin-bottom: 24px; overflow-x: auto; }
         .tab-bar .tab { flex: 1; padding: 10px 12px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
         .tab-bar .tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
@@ -178,16 +83,12 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Tables */
         .table-wrap { overflow-x: auto; margin-top: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
-        table thead tr { border-bottom: 2px solid var(--border); }
         table th { background: #f8fafc; color: var(--text-light); font-weight: 600; padding: 14px 16px; text-align: left; white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
         table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        table tbody tr:last-child td { border-bottom: none; }
         table tbody tr:hover { background: #f8fafc; }
 
-        /* Forms */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         .form-group { margin-bottom: 4px; }
@@ -215,7 +116,6 @@
         .text-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
         .text-muted { color: var(--text-light); }
         
-        .school-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .school-name { font-weight: 500; }
 
         .empty-state { text-align: center; padding: 40px 10px; color: var(--text-light); }
@@ -225,7 +125,6 @@
         .table-scroll { max-height: 420px; overflow-y: auto; }
         .table-scroll table thead { position: sticky; top: 0; z-index: 5; }
 
-        /* Toast */
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px; z-index: 9999; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); display: none; max-width: 90%; text-align: center; }
         .toast.show { display: block; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
@@ -793,7 +692,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - EXACT MOE TEMPLATE MATCH
+        //  PROFESSIONAL EXPORT - EXACT MOE TEMPLATE MATCH (COORDINATE LOCKED)
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -843,65 +742,62 @@
             row16[22] = 'OVC';
             wsDataMOE.push(row16);
 
-            // Empty space row 17
+            // --- ROW 17: Empty row to separate headers ---
             wsDataMOE.push(Array(35).fill(''));
 
-            // --- ROW 18: Column Numeric Headers (Boys, Girls, Total) ---
+            // --- ROW 18: PERFECTLY ALIGNED NUMERIC HEADERS ---
             let row18 = Array(35).fill('');
-            row18[2] = 'Boys';      // Column C: Boys Enrolment
-            row18[3] = 'Girls';     // Column D: Girls Enrolment
-            row18[4] = 'Total';     // Column E: Total Enrolment
-            row18[5] = 'Age Range'; // Column F: Age Range
-            row18[6] = 'Girls';     // Teen Preg
-            row18[7] = 'Boys';      // Early Marr Boys
-            row18[8] = 'Girls';     // Early Marr Girls
-            row18[9] = 'Total';     // Early Marr Total
-            row18[10] = 'Boys';     // Drop Preg B
-            row18[11] = 'Girls';    // Drop Preg G
-            row18[12] = 'Boys';     // Drop Marr B
-            row18[13] = 'Girls';    // Drop Marr G
-            row18[14] = 'BOYS';     // Drop Death B
-            row18[15] = 'GIRLS';    // Drop Death G
-            row18[16] = 'BOYS';     // Drop Ill B
-            row18[17] = 'GIRLS';    // Drop Ill G
-            row18[18] = 'BOYS';     // Drop Orph B
-            row18[19] = 'GIRLS';    // Drop Orph G
-            row18[20] = 'BOYS';     // Drop Econ B
-            row18[21] = 'GIRLS';    // Drop Econ G
-            row18[22] = 'BOYS';     // Drop OVC B
-            row18[23] = 'GIRLS';    // Drop OVC G
-            row18[25] = 'Boys';     // Abs B
-            row18[26] = 'Girls';    // Abs G
-            row18[27] = 'Total';    // Abs T
-            row18[28] = 'Boys';     // Re B
-            row18[29] = 'Girls';    // Re G
-            row18[30] = 'Total';    // Re T
-            row18[31] = 'BOYS';     // Read B
-            row18[32] = 'GIRLS';    // Read G
-            row18[33] = 'BOYS';     // Def B
-            row18[34] = 'GIRLS';    // Def G
+            row18[2] = 'Boys';      // Col C
+            row18[3] = 'Girls';     // Col D
+            row18[4] = 'Total';     // Col E
+            row18[5] = 'Age Range'; // Col F (Not "Totals" - keeping your screenshot's label)
+            row18[6] = 'Girls';     // Col G
+            row18[7] = 'Boys';      // Col H
+            row18[8] = 'Girls';     // Col I
+            row18[9] = 'Total';     // Col J
+            row18[10] = 'Boys';     // Col K
+            row18[11] = 'Girls';    // Col L
+            row18[12] = 'Boys';     // Col M
+            row18[13] = 'Girls';    // Col N
+            row18[14] = 'BOYS';     // Col O
+            row18[15] = 'GIRLS';    // Col P
+            row18[16] = 'BOYS';     // Col Q
+            row18[17] = 'GIRLS';    // Col R
+            row18[18] = 'BOYS';     // Col S
+            row18[19] = 'GIRLS';    // Col T
+            row18[20] = 'BOYS';     // Col U
+            row18[21] = 'GIRLS';    // Col V
+            row18[22] = 'BOYS';     // Col W
+            row18[23] = 'GIRLS';    // Col X
+            row18[25] = 'Boys';     // Col Z
+            row18[26] = 'Girls';    // Col AA
+            row18[27] = 'Total';    // Col AB
+            row18[28] = 'Boys';     // Col AC
+            row18[29] = 'Girls';    // Col AD
+            row18[30] = 'Total';    // Col AE
+            row18[31] = 'BOYS';     // Col AF
+            row18[32] = 'GIRLS';    // Col AG
+            row18[33] = 'BOYS';     // Col AH
+            row18[34] = 'GIRLS';    // Col AI
             wsDataMOE.push(row18);
 
             // --- LOOP THROUGH EACH SCHOOL ---
             schools.forEach(school => {
-                // Filter records for this school
                 const schoolRecords = records.filter(r => r.school_id === school.id);
-
                 if (schoolRecords.length === 0) return;
 
-                // 1. Write the School Name Row (Bold in the template)
+                // 1. School Name Row
                 let schoolNameRow = Array(35).fill('');
                 schoolNameRow[1] = school.name;
                 wsDataMOE.push(schoolNameRow);
 
-                // 2. Loop through ALL grades and map data
+                // 2. Loop through Grades
                 allGrades.forEach(gradeName => {
                     const r = schoolRecords.find(rec => rec.grade === gradeName);
-                    
                     let row = Array(35).fill('');
-                    row[2] = gradeName; // Column C
                     
-                    // Enrolment (Correctly placed in Col D, E, F)
+                    // Enrolment (Col C, D, E, F)
+                    row[2] = gradeName; // Col C
                     row[3] = gv(r, 'enrolment_boys'); // Col D
                     row[4] = gv(r, 'enrolment_girls'); // Col E
                     row[5] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Col F
@@ -958,80 +854,54 @@
                     wsDataMOE.push(row);
                 });
 
-                // 3. Calculate and add TOTAL row for this school
+                // 3. Calculate and add TOTAL row
                 let totalRow = Array(35).fill('');
                 totalRow[2] = 'TOTAL';
                 
-                // Aggregate all totals
                 let tBoys = 0, tGirls = 0, tTotal = 0;
-                schoolRecords.forEach(r => {
-                    tBoys += gv(r, 'enrolment_boys');
-                    tGirls += gv(r, 'enrolment_girls');
-                    tTotal += gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls');
-                });
-                totalRow[3] = tBoys;
-                totalRow[4] = tGirls;
-                totalRow[5] = tTotal;
+                schoolRecords.forEach(r => { tBoys += gv(r, 'enrolment_boys'); tGirls += gv(r, 'enrolment_girls'); tTotal += gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); });
+                totalRow[3] = tBoys; totalRow[4] = tGirls; totalRow[5] = tTotal;
 
-                // Totals for Dropouts (Preg, Marriage, Death, etc...)
+                // Totals for Dropouts
                 const sumFields = ['dropout_preg', 'dropout_marriage', 'dropout_death', 'dropout_illness', 'dropout_orphaned', 'dropout_economic', 'dropout_ovc'];
                 let colIdx = 11;
                 sumFields.forEach(field => {
                     let b = 0, g = 0;
                     schoolRecords.forEach(r => { b += gv(r, field + '_boys'); g += gv(r, field + '_girls'); });
-                    totalRow[colIdx] = b;
-                    totalRow[colIdx+1] = g;
-                    colIdx += 2;
+                    totalRow[colIdx] = b; totalRow[colIdx+1] = g; colIdx += 2;
                 });
 
-                // Absenteeism Totals
                 let aBoys = 0, aGirls = 0;
                 schoolRecords.forEach(r => { aBoys += gv(r, 'absenteeism_boys'); aGirls += gv(r, 'absenteeism_girls'); });
-                totalRow[26] = aBoys;
-                totalRow[27] = aGirls;
-                totalRow[28] = aBoys + aGirls;
+                totalRow[26] = aBoys; totalRow[27] = aGirls; totalRow[28] = aBoys + aGirls;
 
-                // Re-entry Totals
                 let reBoys = 0, reGirls = 0;
                 schoolRecords.forEach(r => { reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls'); });
-                totalRow[29] = reBoys;
-                totalRow[30] = reGirls;
-                totalRow[31] = reBoys + reGirls;
+                totalRow[29] = reBoys; totalRow[30] = reGirls; totalRow[31] = reBoys + reGirls;
 
-                // Re-admission
                 let radBoys = 0, radGirls = 0;
                 schoolRecords.forEach(r => { radBoys += gv(r, 'readmission_boys'); radGirls += gv(r, 'readmission_girls'); });
-                totalRow[32] = radBoys;
-                totalRow[33] = radGirls;
+                totalRow[32] = radBoys; totalRow[33] = radGirls;
 
-                // Defilement
                 let defBoys = 0, defGirls = 0;
                 schoolRecords.forEach(r => { defBoys += gv(r, 'defilement_boys'); defGirls += gv(r, 'defilement_girls'); });
-                totalRow[34] = defBoys;
-                totalRow[35] = defGirls;
+                totalRow[34] = defBoys; totalRow[35] = defGirls;
 
                 wsDataMOE.push(totalRow);
 
-                // 4. Calculate and add RATE (%) row for this school
+                // 4. Calculate and add RATE (%) row
                 let rateRow = Array(35).fill('');
                 rateRow[2] = 'RATE';
                 rateRow[3] = tTotal > 0 ? ((tBoys / tTotal) * 100).toFixed(1) : 0;
                 rateRow[4] = tTotal > 0 ? ((tGirls / tTotal) * 100).toFixed(1) : 0;
 
-                // Dropout Rates
                 let tDropouts = 0;
-                sumFields.forEach(field => {
-                    let b = 0, g = 0;
-                    schoolRecords.forEach(r => { b += gv(r, field + '_boys'); g += gv(r, field + '_girls'); });
-                    tDropouts += (b + g);
-                });
+                sumFields.forEach(field => { let b = 0, g = 0; schoolRecords.forEach(r => { b += gv(r, field + '_boys'); g += gv(r, field + '_girls'); }); tDropouts += (b + g); });
                 rateRow[11] = tTotal > 0 ? ((tDropouts / tTotal) * 100).toFixed(1) : 0;
 
-                // Absenteeism Rate
                 let tAbs = aBoys + aGirls;
                 rateRow[26] = tTotal > 0 ? ((tAbs / tTotal) * 100).toFixed(1) : 0;
 
-                // Re-entry Rate
                 let tRe = reBoys + reGirls;
                 rateRow[29] = tTotal > 0 ? ((tRe / tTotal) * 100).toFixed(1) : 0;
 
@@ -1042,7 +912,7 @@
             });
 
             // ================================================================
-            //  2. NEW SHEET: DISTRICT SUMMARY (All Schools Combined Totals & Rates)
+            //  2. DISTRICT SUMMARY (All Schools Combined Totals & Rates)
             // ================================================================
             let wsDataSummary = [];
             
@@ -1070,7 +940,6 @@
                     ovc += gv(r, 'ovc_boys') + gv(r, 'ovc_girls');
                 });
 
-                // Add to Grand Totals
                 grandEnrol += totalEnrol; grandBoys += boys; grandGirls += girls;
                 grandDrop += dropouts; grandAbs += absent; grandPreg += preg;
                 grandRe += reentry; grandDef += defilement; grandOvc += ovc;
@@ -1079,10 +948,7 @@
                 let absRate = totalEnrol > 0 ? ((absent / totalEnrol) * 100).toFixed(1) : 0;
                 let pregRate = totalEnrol > 0 ? ((preg / totalEnrol) * 100).toFixed(1) : 0;
 
-                wsDataSummary.push([
-                    school.name, totalEnrol, boys, girls, dropouts, dropRate + '%', 
-                    absent, absRate + '%', preg, pregRate + '%', reentry, defilement, ovc
-                ]);
+                wsDataSummary.push([ school.name, totalEnrol, boys, girls, dropouts, dropRate + '%', absent, absRate + '%', preg, pregRate + '%', reentry, defilement, ovc ]);
             });
 
             // Push Grand Totals Row
@@ -1090,10 +956,7 @@
             let gAbsRate = grandEnrol > 0 ? ((grandAbs / grandEnrol) * 100).toFixed(1) : 0;
             let gPregRate = grandEnrol > 0 ? ((grandPreg / grandEnrol) * 100).toFixed(1) : 0;
             
-            wsDataSummary.push([
-                'GRAND TOTAL', grandEnrol, grandBoys, grandGirls, grandDrop, gDropRate + '%', 
-                grandAbs, gAbsRate + '%', grandPreg, gPregRate + '%', grandRe, grandDef, grandOvc
-            ]);
+            wsDataSummary.push([ 'GRAND TOTAL', grandEnrol, grandBoys, grandGirls, grandDrop, gDropRate + '%', grandAbs, gAbsRate + '%', grandPreg, gPregRate + '%', grandRe, grandDef, grandOvc ]);
 
             // ================================================================
             //  CREATE WORKBOOK
@@ -1102,22 +965,12 @@
 
             // Add Sheet 1 (MOE Template)
             const ws1 = XLSX.utils.aoa_to_sheet(wsDataMOE);
-            ws1['!cols'] = [
-                { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, 
-                { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, 
-                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
-                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
-                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
-                { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }
-            ];
+            ws1['!cols'] = [ { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
             XLSX.utils.book_append_sheet(wb, ws1, 'Termly Reporting Tool');
 
             // Add Sheet 2 (District Summary)
             const ws2 = XLSX.utils.aoa_to_sheet(wsDataSummary);
-            ws2['!cols'] = [
-                { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, 
-                { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }
-            ];
+            ws2['!cols'] = [ { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
             XLSX.utils.book_append_sheet(wb, ws2, 'District Summary');
 
             // Save the file
