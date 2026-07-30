@@ -848,10 +848,10 @@
 
             // --- ROW 18: Column Numeric Headers (Boys, Girls, Total) ---
             let row18 = Array(35).fill('');
-            row18[2] = 'Boys';      // Grade -> Boys
-            row18[3] = 'Girls';     // Grade -> Girls
-            row18[4] = 'Total';     // Grade -> Total
-            row18[5] = 'Age Range'; // Age Range column
+            row18[2] = 'Boys';      // Column C: Boys Enrolment
+            row18[3] = 'Girls';     // Column D: Girls Enrolment
+            row18[4] = 'Total';     // Column E: Total Enrolment
+            row18[5] = 'Age Range'; // Column F: Age Range
             row18[6] = 'Girls';     // Teen Preg
             row18[7] = 'Boys';      // Early Marr Boys
             row18[8] = 'Girls';     // Early Marr Girls
@@ -899,59 +899,59 @@
                     const r = schoolRecords.find(rec => rec.grade === gradeName);
                     
                     let row = Array(35).fill('');
-                    row[2] = gradeName;
+                    row[2] = gradeName; // Column C
                     
-                    // Enrolment
-                    row[3] = gv(r, 'enrolment_boys');
-                    row[4] = gv(r, 'enrolment_girls');
-                    row[5] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Total
-                    row[6] = gv(r, 'age_range');
+                    // Enrolment (Correctly placed in Col D, E, F)
+                    row[3] = gv(r, 'enrolment_boys'); // Col D
+                    row[4] = gv(r, 'enrolment_girls'); // Col E
+                    row[5] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Col F
+                    row[6] = gv(r, 'age_range'); // Col G
                     
-                    // Teen Preg
+                    // Teen Preg (Col H)
                     row[7] = gv(r, 'teen_preg');
                     
-                    // Early Marriages
+                    // Early Marriages (Col I, J, K)
                     row[8] = gv(r, 'early_marriage_boys');
                     row[9] = gv(r, 'early_marriage_girls');
-                    row[10] = gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); // Total
+                    row[10] = gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); 
                     
-                    // Dropouts: Pregnancy
+                    // Dropouts: Pregnancy (Col L, M)
                     row[11] = gv(r, 'dropout_preg_boys');
                     row[12] = gv(r, 'dropout_preg_girls');
-                    // Dropouts: Marriage
+                    // Dropouts: Marriage (Col N, O)
                     row[13] = gv(r, 'dropout_marriage_boys');
                     row[14] = gv(r, 'dropout_marriage_girls');
-                    // Dropouts: Death
+                    // Dropouts: Death (Col P, Q)
                     row[15] = gv(r, 'dropout_death_boys');
                     row[16] = gv(r, 'dropout_death_girls');
-                    // Dropouts: Illness
+                    // Dropouts: Illness (Col R, S)
                     row[17] = gv(r, 'dropout_illness_boys');
                     row[18] = gv(r, 'dropout_illness_girls');
-                    // Dropouts: Orphaned
+                    // Dropouts: Orphaned (Col T, U)
                     row[19] = gv(r, 'dropout_orphaned_boys');
                     row[20] = gv(r, 'dropout_orphaned_girls');
-                    // Dropouts: Economic
+                    // Dropouts: Economic (Col V, W)
                     row[21] = gv(r, 'dropout_economic_boys');
                     row[22] = gv(r, 'dropout_economic_girls');
-                    // Dropouts: OVC
+                    // Dropouts: OVC (Col X, Y)
                     row[23] = gv(r, 'dropout_ovc_boys');
                     row[24] = gv(r, 'dropout_ovc_girls');
                     
-                    // Absenteeism
+                    // Absenteeism (Col Z, AA, AB)
                     row[26] = gv(r, 'absenteeism_boys');
                     row[27] = gv(r, 'absenteeism_girls');
-                    row[28] = gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls'); // Total
+                    row[28] = gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls'); 
                     
-                    // Re-entry
+                    // Re-entry (Col AC, AD, AE)
                     row[29] = gv(r, 'reentry_boys');
                     row[30] = gv(r, 'reentry_girls');
-                    row[31] = gv(r, 'reentry_boys') + gv(r, 'reentry_girls'); // Total
+                    row[31] = gv(r, 'reentry_boys') + gv(r, 'reentry_girls'); 
                     
-                    // Re-admission
+                    // Re-admission (Col AF, AG)
                     row[32] = gv(r, 'readmission_boys');
                     row[33] = gv(r, 'readmission_girls');
                     
-                    // Defilement
+                    // Defilement (Col AH, AI)
                     row[34] = gv(r, 'defilement_boys');
                     row[35] = gv(r, 'defilement_girls');
 
