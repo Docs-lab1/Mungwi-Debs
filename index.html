@@ -15,17 +15,63 @@
     </script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        :root { --primary: #0f2b4c; --primary-light: #1e3a5f; --accent: #ffc107; --accent-dark: #e6a800; --bg: #f0f4f8; --card-bg: #ffffff; --text: #1e293b; --text-light: #64748b; --border: #e2e8f0; --shadow: 0 4px 24px rgba(0, 0, 0, 0.04); --radius: 16px; --radius-sm: 10px; --danger: #ef4444; }
-        html, body { height: 100%; width: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        :root {
+            --primary: #0f2b4c;
+            --primary-light: #1e3a5f;
+            --accent: #ffc107;
+            --accent-dark: #e6a800;
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --danger: #ef4444;
+        }
+        html, body {
+            height: 100%;
+            width: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
 
-        #adminLoginOverlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 43, 76, 0.6); backdrop-filter: blur(4px); z-index: 9999; justify-content: center; align-items: center; }
+        /* Admin Login Modal Styles */
+        #adminLoginOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 43, 76, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
         #adminLoginOverlay.show { display: flex; }
-        .login-box { background: var(--card-bg); padding: 40px 30px; border-radius: var(--radius); box-shadow: 0 20px 60px rgba(0,0,0,0.15); width: 100%; max-width: 420px; text-align: center; }
+        .login-box {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: var(--radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            width: 100%; max-width: 420px; text-align: center;
+        }
         .login-box .brand-lg { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
         .login-box .brand-lg i { color: var(--accent-dark); }
         .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 25px; }
-        .login-box input { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 15px; margin-bottom: 15px; background: #f8fafc; }
+        .login-box input {
+            width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm); font-size: 15px; margin-bottom: 15px;
+            background: #f8fafc;
+        }
         .login-box input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(15, 43, 76, 0.05); }
         .login-box .btn { width: 100%; padding: 14px; font-size: 15px; }
         .login-error { color: #ef4444; font-size: 13px; margin-bottom: 10px; display: none; }
@@ -36,7 +82,13 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border: none; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; text-decoration: none; min-height: 48px; min-width: 48px; touch-action: manipulation; }
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 20px; border: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+            text-decoration: none; min-height: 48px; min-width: 48px;
+            touch-action: manipulation;
+        }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-primary:hover { background: var(--primary-light); }
@@ -53,28 +105,71 @@
         .btn-login-admin { background: var(--accent); color: var(--primary); font-weight: bold; }
         .btn-logout { background: #ef4444; color: #fff; }
 
-        .app-header { background: var(--primary); color: #fff; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px; }
+        /* Header */
+        .app-header {
+            background: var(--primary); color: #fff; padding: 16px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px;
+        }
         .app-header .brand { font-weight: 700; font-size: 20px; letter-spacing: -0.3px; }
         .app-header .header-right { display: flex; align-items: center; gap: 12px; }
 
-        #statusFloat { position: fixed; bottom: 24px; right: 24px; background: var(--card-bg); border: 1px solid var(--border); box-shadow: 0 4px 16px rgba(0,0,0,0.08); border-radius: 30px; padding: 8px 16px 8px 12px; display: flex; align-items: center; gap: 12px; z-index: 50; font-size: 13px; color: var(--text-light); }
+        /* Floating Status Bar (Bottom Right) */
+        #statusFloat {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            border-radius: 30px;
+            padding: 8px 16px 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 50;
+            font-size: 13px;
+            color: var(--text-light);
+        }
         #statusFloat .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         #statusFloat .status-dot.online { background: #10b981; }
         #statusFloat .status-dot.offline { background: #ef4444; }
-        #statusFloat .role-tag { background: var(--accent); color: var(--primary); font-weight: 700; font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase; margin-left: 4px; }
+        #statusFloat .role-tag {
+            background: var(--accent); color: var(--primary); font-weight: 700;
+            font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase;
+            margin-left: 4px;
+        }
+        /* Admin Toggle Button inside the floating bar */
+        #statusFloat .admin-toggle {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        #statusFloat .admin-toggle:hover { background: var(--accent-dark); }
+        #statusFloat .admin-toggle.danger { background: var(--danger); color: #fff; }
 
+        /* Layout */
         .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; width: 100%; }
         .card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; transition: all 0.2s ease; }
         .card-title { font-size: 17px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
         .card-title i { font-size: 20px; color: var(--accent-dark); }
         .card-title .badge { background: #f1f5f9; color: var(--text-light); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 30px; margin-left: auto; }
 
+        /* Stats */
         .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 4px; }
         .stat-box { background: #f8fafc; border-radius: var(--radius-sm); padding: 16px 12px; text-align: center; border: 1px solid var(--border); }
         .stat-box .num { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2; }
         .stat-box .label { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
         .stat-box .icon { font-size: 18px; color: var(--accent-dark); display: block; margin-bottom: 4px; }
 
+        /* Tabs */
         .tab-bar { display: flex; gap: 6px; background: #f1f5f9; border-radius: var(--radius-sm); padding: 6px; margin-bottom: 24px; overflow-x: auto; }
         .tab-bar .tab { flex: 1; padding: 10px 12px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
         .tab-bar .tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
@@ -83,12 +178,16 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* Tables */
         .table-wrap { overflow-x: auto; margin-top: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+        table thead tr { border-bottom: 2px solid var(--border); }
         table th { background: #f8fafc; color: var(--text-light); font-weight: 600; padding: 14px 16px; text-align: left; white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
         table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        table tbody tr:last-child td { border-bottom: none; }
         table tbody tr:hover { background: #f8fafc; }
 
+        /* Forms */
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
         .form-group { margin-bottom: 4px; }
@@ -116,6 +215,7 @@
         .text-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
         .text-muted { color: var(--text-light); }
         
+        .school-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .school-name { font-weight: 500; }
 
         .empty-state { text-align: center; padding: 40px 10px; color: var(--text-light); }
@@ -125,6 +225,7 @@
         .table-scroll { max-height: 420px; overflow-y: auto; }
         .table-scroll table thead { position: sticky; top: 0; z-index: 5; }
 
+        /* Toast */
         .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px; z-index: 9999; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); display: none; max-width: 90%; text-align: center; }
         .toast.show { display: block; animation: slideUp 0.3s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
@@ -308,9 +409,9 @@
                 <div id="tab-adminExport" class="tab-content admin-only">
                     <div class="card">
                         <div class="card-title"><i class="fas fa-file-export"></i> Export Data</div>
-                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download one sheet per school in the official MOE "Termly Reporting Tool" Excel format.</p>
+                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download the official MOE "Termly Reporting Tool" Excel format.</p>
                         <div class="flex">
-                            <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (Per-School Sheets)</button>
+                            <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (MOE Format)</button>
                             <button class="btn btn-outline" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
                         </div>
                     </div>
@@ -692,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - ONE SHEET PER SCHOOL
+        //  PROFESSIONAL EXPORT - PERFECT COLUMN ALIGNMENT
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -726,9 +827,9 @@
                 wsData.push(row7);
                 pushEmpty(3); // Rows 8-10
 
-                // Row 11: Headers (Col B -> Index 1)
+                // Row 11: The actual School Name (Col B -> Index 1)
                 let row11 = Array(35).fill('');
-                row11[1] = school.name; // The actual school name goes here!
+                row11[1] = school.name;
                 wsData.push(row11);
                 pushEmpty(3); // Rows 12-14
 
@@ -758,41 +859,41 @@
 
                 pushEmpty(1); // Row 17
 
-                // Row 18: Data Columns
+                // Row 18: Data Columns (Exact Layout)
                 let row18 = Array(35).fill('');
-                row18[1] = 'Grade';
-                row18[2] = 'Boys';
-                row18[3] = 'Girls';
-                row18[4] = 'Total';
-                row18[5] = 'Age Range';
-                row18[6] = 'Girls';
-                row18[7] = 'Boys';
-                row18[8] = 'Girls';
-                row18[9] = 'Total';
-                row18[10] = 'Boys';
-                row18[11] = 'Girls';
-                row18[12] = 'Boys';
-                row18[13] = 'Girls';
-                row18[14] = 'BOYS';
-                row18[15] = 'GIRLS';
-                row18[16] = 'BOYS';
-                row18[17] = 'GIRLS';
-                row18[18] = 'BOYS';
-                row18[19] = 'GIRLS';
-                row18[20] = 'BOYS';
-                row18[21] = 'GIRLS';
-                row18[22] = 'BOYS';
-                row18[23] = 'GIRLS';
-                row18[25] = 'Boys';
-                row18[26] = 'Girls';
-                row18[27] = 'Total';
-                row18[28] = 'Boys';
-                row18[29] = 'Girls';
-                row18[30] = 'Total';
-                row18[31] = 'BOYS';
-                row18[32] = 'GIRLS';
-                row18[33] = 'BOYS';
-                row18[34] = 'GIRLS';
+                row18[1] = 'Grade';     // Col B
+                row18[2] = 'Boys';      // Col C
+                row18[3] = 'Girls';     // Col D
+                row18[4] = 'Total';     // Col E
+                row18[5] = 'Age Range'; // Col F
+                row18[6] = 'Girls';     // Col G
+                row18[7] = 'Boys';      // Col H
+                row18[8] = 'Girls';     // Col I
+                row18[9] = 'Total';     // Col J
+                row18[10] = 'Boys';     // Col K
+                row18[11] = 'Girls';    // Col L
+                row18[12] = 'Boys';     // Col M
+                row18[13] = 'Girls';    // Col N
+                row18[14] = 'BOYS';     // Col O
+                row18[15] = 'GIRLS';    // Col P
+                row18[16] = 'BOYS';     // Col Q
+                row18[17] = 'GIRLS';    // Col R
+                row18[18] = 'BOYS';     // Col S
+                row18[19] = 'GIRLS';    // Col T
+                row18[20] = 'BOYS';     // Col U
+                row18[21] = 'GIRLS';    // Col V
+                row18[22] = 'BOYS';     // Col W
+                row18[23] = 'GIRLS';    // Col X
+                row18[25] = 'Boys';     // Col Z
+                row18[26] = 'Girls';    // Col AA
+                row18[27] = 'Total';    // Col AB
+                row18[28] = 'Boys';     // Col AC
+                row18[29] = 'Girls';    // Col AD
+                row18[30] = 'Total';    // Col AE
+                row18[31] = 'BOYS';     // Col AF
+                row18[32] = 'GIRLS';    // Col AG
+                row18[33] = 'BOYS';     // Col AH
+                row18[34] = 'GIRLS';    // Col AI
                 wsData.push(row18);
 
                 // ----------------------------------------------------------------
@@ -802,12 +903,12 @@
                     const r = schoolRecords.find(rec => rec.grade === gradeName);
                     let row = Array(35).fill('');
 
-                    row[1] = gradeName;                     // Col B
-                    row[2] = gv(r, 'enrolment_boys');       // Col C
-                    row[3] = gv(r, 'enrolment_girls');      // Col D
-                    row[4] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Col E
-                    row[5] = gv(r, 'age_range');            // Col F
-                    row[6] = gv(r, 'teen_preg');            // Col G
+                    row[1] = gradeName;                     // Col B (Grade)
+                    row[2] = gv(r, 'enrolment_boys');       // Col C (Boys)
+                    row[3] = gv(r, 'enrolment_girls');      // Col D (Girls)
+                    row[4] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Col E (Total)
+                    row[5] = gv(r, 'age_range');            // Col F (Age)
+                    row[6] = gv(r, 'teen_preg');            // Col G (Teen Preg)
                     
                     row[7] = gv(r, 'early_marriage_boys');  // Col H
                     row[8] = gv(r, 'early_marriage_girls'); // Col I
@@ -849,16 +950,18 @@
                 // CALCULATE TOTALS
                 // ----------------------------------------------------------------
                 let totalRow = Array(35).fill('');
-                totalRow[1] = 'TOTAL';
+                totalRow[1] = 'TOTAL'; // Col B
                 
                 let tBoys = 0, tGirls = 0, tTotal = 0;
                 schoolRecords.forEach(r => { tBoys += gv(r, 'enrolment_boys'); tGirls += gv(r, 'enrolment_girls'); tTotal += gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); });
                 totalRow[2] = tBoys; totalRow[3] = tGirls; totalRow[4] = tTotal;
 
+                // Total Absenteeism
                 let aBoys = 0, aGirls = 0;
                 schoolRecords.forEach(r => { aBoys += gv(r, 'absenteeism_boys'); aGirls += gv(r, 'absenteeism_girls'); });
                 totalRow[25] = aBoys; totalRow[26] = aGirls; totalRow[27] = aBoys + aGirls;
 
+                // Total Re-Entry
                 let reBoys = 0, reGirls = 0;
                 schoolRecords.forEach(r => { reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls'); });
                 totalRow[28] = reBoys; totalRow[29] = reGirls; totalRow[30] = reBoys + reGirls;
@@ -869,7 +972,7 @@
                 // CALCULATE RATES
                 // ----------------------------------------------------------------
                 let rateRow = Array(35).fill('');
-                rateRow[1] = 'RATE';
+                rateRow[1] = 'RATE'; // Col B
                 rateRow[2] = tTotal > 0 ? ((tBoys / tTotal) * 100).toFixed(1) : 0;
                 rateRow[3] = tTotal > 0 ? ((tGirls / tTotal) * 100).toFixed(1) : 0;
                 rateRow[25] = tTotal > 0 ? (((aBoys + aGirls) / tTotal) * 100).toFixed(1) : 0;
