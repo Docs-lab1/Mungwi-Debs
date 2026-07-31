@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - CENTERED TOP HEADERS
+        //  PROFESSIONAL EXPORT - COMPLETELY CLEAN, NO YELLOW GAPS
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -803,6 +803,9 @@
             const gv = (r, key) => { return r && r[key] !== undefined && r[key] !== null ? r[key] : 0; };
             const allGrades = ['ECE', '1', '2', '3', '4', '5', '6', '7', 'FROM 1', 'FROM 2', '10', '11', '12'];
 
+            // Helper to push empty rows
+            const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
+
             // ----------------------------------------------------------------
             // LOOP THROUGH EACH SCHOOL AND CREATE A SEPARATE SHEET
             // ----------------------------------------------------------------
@@ -811,9 +814,6 @@
                 if (schoolRecords.length === 0) return;
 
                 let wsData = [];
-
-                // Helper to push empty rows with correct length
-                const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
 
                 // --- NEW TOP HEADERS (Rows 0 to 3) ---
                 let rowHeader1 = Array(35).fill('');
@@ -832,28 +832,35 @@
                 rowHeader4[2] = 'Guidance and Counselling Report term 2, 2026';
                 wsData.push(rowHeader4);
 
-                pushEmpty(1); // Spacer row
-
-                // --- ORIGINAL MOE HEADERS (Shifted down by 5 rows) ---
-                // Row 1: Ministry Header (Col E -> Index 4)
+                // --- ORIGINAL MOE HEADERS (Starts right here, NO empty gaps) ---
+                // Row 5: Ministry Header (Col E -> Index 4)
                 let row1 = Array(35).fill('');
                 row1[4] = 'MINISTRY OF EDUCATION';
                 wsData.push(row1);
-                pushEmpty(5); // Rows 2-6
+
+                // Row 6: Empty spacer (Kept minimal to separate Ministry block from labels)
+                let spacer = Array(35).fill('');
+                wsData.push(spacer);
 
                 // Row 7: NAME OF SCHOOL (Col B -> Index 1)
                 let row7 = Array(35).fill('');
                 row7[1] = 'NAME OF SCHOOL';
                 wsData.push(row7);
-                pushEmpty(3); // Rows 8-10
 
-                // Row 11: The actual School Name (Col B -> Index 1)
+                // Row 8: Empty spacer
+                let spacer2 = Array(35).fill('');
+                wsData.push(spacer2);
+
+                // Row 9: The actual School Name (Col B -> Index 1)
                 let row11 = Array(35).fill('');
                 row11[1] = school.name;
                 wsData.push(row11);
-                pushEmpty(3); // Rows 12-14
 
-                // Row 15: Main Headers
+                // Row 10: Empty spacer
+                let spacer3 = Array(35).fill('');
+                wsData.push(spacer3);
+
+                // Row 11: Main Headers
                 let row15 = Array(35).fill('');
                 row15[1] = 'NAME OF SCHOOL';
                 row15[5] = 'AGE RANGE';
@@ -866,7 +873,7 @@
                 row15[33] = 'DEFILEMENT';
                 wsData.push(row15);
 
-                // Row 16: Sub-Headers
+                // Row 12: Sub-Headers
                 let row16 = Array(35).fill('');
                 row16[10] = 'Pregnancy';
                 row16[12] = 'Marriage';
@@ -877,9 +884,11 @@
                 row16[22] = 'OVC';
                 wsData.push(row16);
 
-                pushEmpty(1); // Row 17
+                // Row 13: Empty spacer
+                let spacer4 = Array(35).fill('');
+                wsData.push(spacer4);
 
-                // Row 18: Data Columns (Exact Layout)
+                // Row 14: Data Columns (Exact Layout)
                 let row18 = Array(35).fill('');
                 row18[1] = 'Grade';     // Col B
                 row18[2] = 'Boys';      // Col C
@@ -1049,7 +1058,7 @@
                 // ----------------------------------------------------------------
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 
-                // Apply Professional Styling
+                // Apply Professional Column Widths
                 ws['!cols'] = [ 
                     { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, 
                     { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, 
@@ -1061,12 +1070,12 @@
                 
                 // Apply MERGES
                 ws['!merges'] = [
-                    // Merge MINISTRY OF EDUCATION (Row 6, Col B to E) - Adjusted row index due to new headers
+                    // Merge MINISTRY OF EDUCATION (Row 5, Col B to E)
                     { s: { r: 5, c: 1 }, e: { r: 5, c: 4 } },
-                    // Merge NO OF EARLY MARRIAGES (Row 20, Col H to J) - Adjusted row index
-                    { s: { r: 19, c: 7 }, e: { r: 19, c: 9 } },
-                    // Merge NO OF DROP OUTS DUE TO: (Row 20, Col K to X) - Adjusted row index
-                    { s: { r: 19, c: 10 }, e: { r: 19, c: 23 } },
+                    // Merge NO OF EARLY MARRIAGES (Row 11, Col H to J)
+                    { s: { r: 11, c: 7 }, e: { r: 11, c: 9 } },
+                    // Merge NO OF DROP OUTS DUE TO: (Row 11, Col K to X)
+                    { s: { r: 11, c: 10 }, e: { r: 11, c: 23 } },
                     // Custom Top Headers Merges (Rows 0 to 3, Columns C to H)
                     { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } },
                     { s: { r: 1, c: 2 }, e: { r: 1, c: 7 } },
@@ -1092,23 +1101,23 @@
                     }
                 }
 
-                // Bold the other headers and school row
+                // Bold the other headers and school rows
                 for(let c = range.s.c; c <= range.e.c; c++) {
-                    // Row 6 (Ministry)
+                    // Row 5 (Ministry)
                     const cell6 = XLSX.utils.encode_cell({r:5, c:c});
                     if(ws[cell6]) ws[cell6].s = { bold: true, alignment: { horizontal: "left" } };
-                    // Row 12 (Label)
-                    const cell12 = XLSX.utils.encode_cell({r:11, c:c});
+                    // Row 7 (Label)
+                    const cell12 = XLSX.utils.encode_cell({r:7, c:c});
                     if(ws[cell12]) ws[cell12].s = { bold: true, alignment: { horizontal: "left" } };
-                    // Row 16 (School Name)
-                    const cell16 = XLSX.utils.encode_cell({r:15, c:c});
+                    // Row 9 (School Name)
+                    const cell16 = XLSX.utils.encode_cell({r:9, c:c});
                     if(ws[cell16]) ws[cell16].s = { bold: true, alignment: { horizontal: "left" } };
                 }
 
                 // Bold the data headers, Totals, and Percentages
                 let lastDataRow = wsData.length - 3; // Total row
                 let secondLastDataRow = wsData.length - 2; // Percentage row
-                for(let r = 22; r < wsData.length - 1; r++) {
+                for(let r = 14; r < wsData.length - 1; r++) {
                     for(let c = 1; c < 35; c++) { // Start at Col B
                         const cell = XLSX.utils.encode_cell({r:r, c:c});
                         if(ws[cell]) {
