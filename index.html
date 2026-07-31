@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - MERGED CELLS, BORDERS, PERCENTAGES
+        //  PROFESSIONAL EXPORT - CUSTOM TOP HEADERS FOR INDIVIDUAL SCHOOLS
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -815,6 +815,26 @@
                 // Helper to push empty rows with correct length
                 const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
 
+                // --- NEW TOP HEADERS (Rows 0 to 3) ---
+                let rowHeader1 = Array(35).fill('');
+                rowHeader1[4] = 'Republic of Zambia';
+                wsData.push(rowHeader1);
+
+                let rowHeader2 = Array(35).fill('');
+                rowHeader2[4] = 'Ministry of Education';
+                wsData.push(rowHeader2);
+
+                let rowHeader3 = Array(35).fill('');
+                rowHeader3[4] = school.name;
+                wsData.push(rowHeader3);
+
+                let rowHeader4 = Array(35).fill('');
+                rowHeader4[4] = 'Guidance and Counselling Report term 2, 2026';
+                wsData.push(rowHeader4);
+
+                pushEmpty(1); // Spacer row
+
+                // --- ORIGINAL MOE HEADERS (Shifted down by 5 rows) ---
                 // Row 1: Ministry Header (Col E -> Index 4)
                 let row1 = Array(35).fill('');
                 row1[4] = 'MINISTRY OF EDUCATION';
@@ -1041,12 +1061,12 @@
                 
                 // Apply MERGES
                 ws['!merges'] = [
-                    // Merge MINISTRY OF EDUCATION (Row 1, Col B to E)
-                    { s: { r: 0, c: 1 }, e: { r: 0, c: 4 } },
-                    // Merge NO OF EARLY MARRIAGES (Row 15, Col H to J)
-                    { s: { r: 14, c: 7 }, e: { r: 14, c: 9 } },
-                    // Merge NO OF DROP OUTS DUE TO: (Row 15, Col K to X)
-                    { s: { r: 14, c: 10 }, e: { r: 14, c: 23 } }
+                    // Merge MINISTRY OF EDUCATION (Row 6, Col B to E) - Adjusted row index due to new headers
+                    { s: { r: 5, c: 1 }, e: { r: 5, c: 4 } },
+                    // Merge NO OF EARLY MARRIAGES (Row 20, Col H to J) - Adjusted row index
+                    { s: { r: 19, c: 7 }, e: { r: 19, c: 9 } },
+                    // Merge NO OF DROP OUTS DUE TO: (Row 20, Col K to X) - Adjusted row index
+                    { s: { r: 19, c: 10 }, e: { r: 19, c: 23 } }
                 ];
 
                 // Apply Borders and Bold to specific cells
@@ -1056,19 +1076,26 @@
 
                 // Bold the headers and school row
                 for(let c = range.s.c; c <= range.e.c; c++) {
-                    // Row 1 (Ministry), Row 7 (Label), Row 11 (School Name)
-                    const cell1 = XLSX.utils.encode_cell({r:0, c:c});
-                    const cell7 = XLSX.utils.encode_cell({r:6, c:c});
-                    const cell11 = XLSX.utils.encode_cell({r:10, c:c});
-                    if(ws[cell1]) ws[cell1].s = { bold: true };
-                    if(ws[cell7]) ws[cell7].s = { bold: true };
-                    if(ws[cell11]) ws[cell11].s = { bold: true };
+                    // Row 0 to 3 (New Headers)
+                    for(let r=0; r<=3; r++) {
+                        const cell = XLSX.utils.encode_cell({r:r, c:c});
+                        if(ws[cell]) ws[cell].s = { bold: true };
+                    }
+                    // Row 6 (Ministry)
+                    const cell6 = XLSX.utils.encode_cell({r:5, c:c});
+                    if(ws[cell6]) ws[cell6].s = { bold: true };
+                    // Row 12 (Label)
+                    const cell12 = XLSX.utils.encode_cell({r:11, c:c});
+                    if(ws[cell12]) ws[cell12].s = { bold: true };
+                    // Row 16 (School Name)
+                    const cell16 = XLSX.utils.encode_cell({r:15, c:c});
+                    if(ws[cell16]) ws[cell16].s = { bold: true };
                 }
 
-                // Bold the data headers (Row 17), Totals, and Percentages
+                // Bold the data headers, Totals, and Percentages
                 let lastDataRow = wsData.length - 3; // Total row
                 let secondLastDataRow = wsData.length - 2; // Percentage row
-                for(let r = 17; r < wsData.length - 1; r++) {
+                for(let r = 22; r < wsData.length - 1; r++) {
                     for(let c = 1; c < 35; c++) { // Start at Col B
                         const cell = XLSX.utils.encode_cell({r:r, c:c});
                         if(ws[cell]) {
@@ -1094,10 +1121,9 @@
             });
 
             // ----------------------------------------------------------------
-            // CREATE FINAL "DISTRICT SUMMARY" SHEET (UPDATED WITH TOTALS COLUMNS)
+            // CREATE FINAL "DISTRICT SUMMARY" SHEET (KEPT ORIGINAL CLEAN HEADER)
             // ----------------------------------------------------------------
             let wsDataSummary = [];
-            // Updated headers to include Totals for Re-entry, Defilement, and OVC
             let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY BOYS', 'RE-ENTRY GIRLS', 'RE-ENTRY TOTAL', 'DEFILEMENT BOYS', 'DEFILEMENT GIRLS', 'DEFILEMENT TOTAL', 'OVC BOYS', 'OVC GIRLS', 'OVC TOTAL'];
             wsDataSummary.push(sumRow1);
 
