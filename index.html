@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - CLEANEST VERSION, REMOVED ROWS 5 TO 11
+        //  PROFESSIONAL EXPORT - CENTERED TOP HEADERS
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -802,9 +802,6 @@
             const wb = XLSX.utils.book_new();
             const gv = (r, key) => { return r && r[key] !== undefined && r[key] !== null ? r[key] : 0; };
             const allGrades = ['ECE', '1', '2', '3', '4', '5', '6', '7', 'FROM 1', 'FROM 2', '10', '11', '12'];
-
-            // Helper to push empty rows
-            const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
 
             // ----------------------------------------------------------------
             // LOOP THROUGH EACH SCHOOL AND CREATE A SEPARATE SHEET
@@ -815,7 +812,10 @@
 
                 let wsData = [];
 
-                // --- 1. CENTERED CUSTOM HEADERS (Rows 0 to 3) ---
+                // Helper to push empty rows with correct length
+                const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
+
+                // --- NEW TOP HEADERS (Rows 0 to 3) ---
                 let rowHeader1 = Array(35).fill('');
                 rowHeader1[2] = 'Republic of Zambia';
                 wsData.push(rowHeader1);
@@ -832,85 +832,89 @@
                 rowHeader4[2] = 'Guidance and Counselling Report term 2, 2026';
                 wsData.push(rowHeader4);
 
-                // --- 2. THE DATA TABLE STARTS HERE ---
-                
-                // Row 5: Top header spacer
-                let spacer1 = Array(35).fill('');
-                wsData.push(spacer1);
+                pushEmpty(1); // Spacer row
 
-                // Row 6: "NAME OF SCHOOL" Label
+                // --- ORIGINAL MOE HEADERS (Shifted down by 5 rows) ---
+                // Row 1: Ministry Header (Col E -> Index 4)
                 let row1 = Array(35).fill('');
-                row1[1] = 'NAME OF SCHOOL';
+                row1[4] = 'MINISTRY OF EDUCATION';
                 wsData.push(row1);
+                pushEmpty(5); // Rows 2-6
 
-                // Row 7: Spacer
-                let spacer2 = Array(35).fill('');
-                wsData.push(spacer2);
+                // Row 7: NAME OF SCHOOL (Col B -> Index 1)
+                let row7 = Array(35).fill('');
+                row7[1] = 'NAME OF SCHOOL';
+                wsData.push(row7);
+                pushEmpty(3); // Rows 8-10
 
-                // Row 8: "NO OF DROP OUTS DUE TO:" & Other main headers
-                let row2 = Array(35).fill('');
-                row2[1] = 'NAME OF SCHOOL';
-                row2[5] = 'AGE RANGE';
-                row2[6] = 'TEEN PREG';
-                row2[7] = 'NO OF EARLY MARRIAGES';
-                row2[10] = 'NO OF DROP OUTS  DUE TO:';
-                row2[25] = 'ABSENTEEISM CASES';
-                row2[28] = 'NO OF RE-ENTRY CASES';
-                row2[31] = 'RE-ADMISSION';
-                row2[33] = 'DEFILEMENT';
-                wsData.push(row2);
+                // Row 11: The actual School Name (Col B -> Index 1)
+                let row11 = Array(35).fill('');
+                row11[1] = school.name;
+                wsData.push(row11);
+                pushEmpty(3); // Rows 12-14
 
-                // Row 9: Sub-headers (Pregnancy, Marriage, etc.)
-                let row3 = Array(35).fill('');
-                row3[10] = 'Pregnancy';
-                row3[12] = 'Marriage';
-                row3[14] = 'DEATH';
-                row3[16] = 'ILLNESS';
-                row3[18] = 'ORPHANED';
-                row3[20] = 'ECONOMIC';
-                row3[22] = 'OVC';
-                wsData.push(row3);
+                // Row 15: Main Headers
+                let row15 = Array(35).fill('');
+                row15[1] = 'NAME OF SCHOOL';
+                row15[5] = 'AGE RANGE';
+                row15[6] = 'TEEN PREG';
+                row15[7] = 'NO OF EARLY MARRIAGES';
+                row15[10] = 'NO OF DROP OUTS  DUE TO:';
+                row15[25] = 'ABSENTEEISM CASES';
+                row15[28] = 'NO OF RE-ENTRY CASES';
+                row15[31] = 'RE-ADMISSION';
+                row15[33] = 'DEFILEMENT';
+                wsData.push(row15);
 
-                // Row 10: Spacer
-                let spacer3 = Array(35).fill('');
-                wsData.push(spacer3);
+                // Row 16: Sub-Headers
+                let row16 = Array(35).fill('');
+                row16[10] = 'Pregnancy';
+                row16[12] = 'Marriage';
+                row16[14] = 'DEATH';
+                row16[16] = 'ILLNESS';
+                row16[18] = 'ORPHANED';
+                row16[20] = 'ECONOMIC';
+                row16[22] = 'OVC';
+                wsData.push(row16);
 
-                // Row 11: Data Columns (Grade, Boys, Girls, etc.)
-                let row4 = Array(35).fill('');
-                row4[1] = 'Grade';     // Col B
-                row4[2] = 'Boys';      // Col C
-                row4[3] = 'Girls';     // Col D
-                row4[4] = 'Total';     // Col E
-                row4[5] = 'Age Range'; // Col F
-                row4[6] = 'Girls';     // Col G
-                row4[7] = 'Boys';      // Col H
-                row4[8] = 'Girls';     // Col I
-                row4[9] = 'Total';     // Col J
-                row4[10] = 'Boys';     // Col K
-                row4[11] = 'Girls';    // Col L
-                row4[12] = 'Boys';     // Col M
-                row4[13] = 'Girls';    // Col N
-                row4[14] = 'BOYS';     // Col O
-                row4[15] = 'GIRLS';    // Col P
-                row4[16] = 'BOYS';     // Col Q
-                row4[17] = 'GIRLS';    // Col R
-                row4[18] = 'BOYS';     // Col S
-                row4[19] = 'GIRLS';    // Col T
-                row4[20] = 'BOYS';     // Col U
-                row4[21] = 'GIRLS';    // Col V
-                row4[22] = 'BOYS';     // Col W
-                row4[23] = 'GIRLS';    // Col X
-                row4[25] = 'Boys';     // Col Z
-                row4[26] = 'Girls';    // Col AA
-                row4[27] = 'Total';    // Col AB
-                row4[28] = 'Boys';     // Col AC
-                row4[29] = 'Girls';    // Col AD
-                row4[30] = 'Total';    // Col AE
-                row4[31] = 'BOYS';     // Col AF
-                row4[32] = 'GIRLS';    // Col AG
-                row4[33] = 'BOYS';     // Col AH
-                row4[34] = 'GIRLS';    // Col AI
-                wsData.push(row4);
+                pushEmpty(1); // Row 17
+
+                // Row 18: Data Columns (Exact Layout)
+                let row18 = Array(35).fill('');
+                row18[1] = 'Grade';     // Col B
+                row18[2] = 'Boys';      // Col C
+                row18[3] = 'Girls';     // Col D
+                row18[4] = 'Total';     // Col E
+                row18[5] = 'Age Range'; // Col F
+                row18[6] = 'Girls';     // Col G
+                row18[7] = 'Boys';      // Col H
+                row18[8] = 'Girls';     // Col I
+                row18[9] = 'Total';     // Col J
+                row18[10] = 'Boys';     // Col K
+                row18[11] = 'Girls';    // Col L
+                row18[12] = 'Boys';     // Col M
+                row18[13] = 'Girls';    // Col N
+                row18[14] = 'BOYS';     // Col O
+                row18[15] = 'GIRLS';    // Col P
+                row18[16] = 'BOYS';     // Col Q
+                row18[17] = 'GIRLS';    // Col R
+                row18[18] = 'BOYS';     // Col S
+                row18[19] = 'GIRLS';    // Col T
+                row18[20] = 'BOYS';     // Col U
+                row18[21] = 'GIRLS';    // Col V
+                row18[22] = 'BOYS';     // Col W
+                row18[23] = 'GIRLS';    // Col X
+                row18[25] = 'Boys';     // Col Z
+                row18[26] = 'Girls';    // Col AA
+                row18[27] = 'Total';    // Col AB
+                row18[28] = 'Boys';     // Col AC
+                row18[29] = 'Girls';    // Col AD
+                row18[30] = 'Total';    // Col AE
+                row18[31] = 'BOYS';     // Col AF
+                row18[32] = 'GIRLS';    // Col AG
+                row18[33] = 'BOYS';     // Col AH
+                row18[34] = 'GIRLS';    // Col AI
+                wsData.push(row18);
 
                 // ----------------------------------------------------------------
                 // LOOP GRADES FOR THIS SCHOOL
@@ -993,7 +997,7 @@
                     dropTotal += gv(r, 'dropout_economic_boys') + gv(r, 'dropout_economic_girls');
                     dropTotal += gv(r, 'dropout_ovc_boys') + gv(r, 'dropout_ovc_girls');
                 });
-                totalRow[10] = dropTotal; // Col K
+                totalRow[10] = dropTotal; // Col K (Boys of Preg Dropout)
 
                 // Absenteeism Total
                 let aBoys = 0, aGirls = 0;
@@ -1045,7 +1049,7 @@
                 // ----------------------------------------------------------------
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 
-                // Apply Professional Column Widths
+                // Apply Professional Styling
                 ws['!cols'] = [ 
                     { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, 
                     { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, 
@@ -1057,10 +1061,12 @@
                 
                 // Apply MERGES
                 ws['!merges'] = [
-                    // Merge NO OF EARLY MARRIAGES (Row 8, Col H to J) - Adjusted index
-                    { s: { r: 8, c: 7 }, e: { r: 8, c: 9 } },
-                    // Merge NO OF DROP OUTS DUE TO: (Row 8, Col K to X) - Adjusted index
-                    { s: { r: 8, c: 10 }, e: { r: 8, c: 23 } },
+                    // Merge MINISTRY OF EDUCATION (Row 6, Col B to E) - Adjusted row index due to new headers
+                    { s: { r: 5, c: 1 }, e: { r: 5, c: 4 } },
+                    // Merge NO OF EARLY MARRIAGES (Row 20, Col H to J) - Adjusted row index
+                    { s: { r: 19, c: 7 }, e: { r: 19, c: 9 } },
+                    // Merge NO OF DROP OUTS DUE TO: (Row 20, Col K to X) - Adjusted row index
+                    { s: { r: 19, c: 10 }, e: { r: 19, c: 23 } },
                     // Custom Top Headers Merges (Rows 0 to 3, Columns C to H)
                     { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } },
                     { s: { r: 1, c: 2 }, e: { r: 1, c: 7 } },
@@ -1071,6 +1077,7 @@
                 // Apply Borders and Bold to specific cells
                 const range = XLSX.utils.decode_range(ws['!ref']);
                 ws['!rows'] = [];
+                ws['!rows'][6] = { hpx: 20 }; // Row height for school name
 
                 // Bold & Center the headers (Rows 0 to 3)
                 for(let r=0; r<=3; r++) {
@@ -1085,17 +1092,23 @@
                     }
                 }
 
-                // Bold the other headers and "NAME OF SCHOOL"
+                // Bold the other headers and school row
                 for(let c = range.s.c; c <= range.e.c; c++) {
-                    // Row 6 (NAME OF SCHOOL)
-                    const cell6 = XLSX.utils.encode_cell({r:6, c:c});
+                    // Row 6 (Ministry)
+                    const cell6 = XLSX.utils.encode_cell({r:5, c:c});
                     if(ws[cell6]) ws[cell6].s = { bold: true, alignment: { horizontal: "left" } };
+                    // Row 12 (Label)
+                    const cell12 = XLSX.utils.encode_cell({r:11, c:c});
+                    if(ws[cell12]) ws[cell12].s = { bold: true, alignment: { horizontal: "left" } };
+                    // Row 16 (School Name)
+                    const cell16 = XLSX.utils.encode_cell({r:15, c:c});
+                    if(ws[cell16]) ws[cell16].s = { bold: true, alignment: { horizontal: "left" } };
                 }
 
                 // Bold the data headers, Totals, and Percentages
                 let lastDataRow = wsData.length - 3; // Total row
                 let secondLastDataRow = wsData.length - 2; // Percentage row
-                for(let r = 11; r < wsData.length - 1; r++) {
+                for(let r = 22; r < wsData.length - 1; r++) {
                     for(let c = 1; c < 35; c++) { // Start at Col B
                         const cell = XLSX.utils.encode_cell({r:r, c:c});
                         if(ws[cell]) {
@@ -1121,7 +1134,7 @@
             });
 
             // ----------------------------------------------------------------
-            // CREATE FINAL "DISTRICT SUMMARY" SHEET
+            // CREATE FINAL "DISTRICT SUMMARY" SHEET (KEPT ORIGINAL CLEAN HEADER)
             // ----------------------------------------------------------------
             let wsDataSummary = [];
             let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY BOYS', 'RE-ENTRY GIRLS', 'RE-ENTRY TOTAL', 'DEFILEMENT BOYS', 'DEFILEMENT GIRLS', 'DEFILEMENT TOTAL', 'OVC BOYS', 'OVC GIRLS', 'OVC TOTAL'];
@@ -1174,7 +1187,7 @@
 
             // Save the file
             XLSX.writeFile(wb, `TERMLY REPORTING TOOL, 2026.xlsx`);
-            showToast('✅ Perfectly Clean Export Completed!', 'success');
+            showToast('✅ Professional, Clean Export Completed!', 'success');
         }
 
         // ================================================================
