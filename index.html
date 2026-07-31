@@ -803,6 +803,9 @@
             const gv = (r, key) => { return r && r[key] !== undefined && r[key] !== null ? r[key] : 0; };
             const allGrades = ['ECE', '1', '2', '3', '4', '5', '6', '7', 'FROM 1', 'FROM 2', '10', '11', '12'];
 
+            // Helper to push empty rows
+            const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
+
             // ----------------------------------------------------------------
             // LOOP THROUGH EACH SCHOOL AND CREATE A SEPARATE SHEET
             // ----------------------------------------------------------------
@@ -857,7 +860,7 @@
                 let spacer3 = Array(35).fill('');
                 wsData.push(spacer3);
 
-                // Row 11: Main Headers (Index numbers start from 0, Row 15 in previous code was 14)
+                // Row 11: Main Headers
                 let row15 = Array(35).fill('');
                 row15[1] = 'NAME OF SCHOOL';
                 row15[5] = 'AGE RANGE';
