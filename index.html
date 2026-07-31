@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - CUSTOM TOP HEADERS FOR INDIVIDUAL SCHOOLS
+        //  PROFESSIONAL EXPORT - MERGED & CENTERED HEADERS FOR SCHOOLS
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -817,19 +817,19 @@
 
                 // --- NEW TOP HEADERS (Rows 0 to 3) ---
                 let rowHeader1 = Array(35).fill('');
-                rowHeader1[4] = 'Republic of Zambia';
+                rowHeader1[2] = 'Republic of Zambia';
                 wsData.push(rowHeader1);
 
                 let rowHeader2 = Array(35).fill('');
-                rowHeader2[4] = 'Ministry of Education';
+                rowHeader2[2] = 'Ministry of Education';
                 wsData.push(rowHeader2);
 
                 let rowHeader3 = Array(35).fill('');
-                rowHeader3[4] = school.name;
+                rowHeader3[2] = school.name;
                 wsData.push(rowHeader3);
 
                 let rowHeader4 = Array(35).fill('');
-                rowHeader4[4] = 'Guidance and Counselling Report term 2, 2026';
+                rowHeader4[2] = 'Guidance and Counselling Report term 2, 2026';
                 wsData.push(rowHeader4);
 
                 pushEmpty(1); // Spacer row
@@ -1066,7 +1066,12 @@
                     // Merge NO OF EARLY MARRIAGES (Row 20, Col H to J) - Adjusted row index
                     { s: { r: 19, c: 7 }, e: { r: 19, c: 9 } },
                     // Merge NO OF DROP OUTS DUE TO: (Row 20, Col K to X) - Adjusted row index
-                    { s: { r: 19, c: 10 }, e: { r: 19, c: 23 } }
+                    { s: { r: 19, c: 10 }, e: { r: 19, c: 23 } },
+                    // Custom Top Headers Merges (Rows 0 to 3, Columns C to H)
+                    { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } },
+                    { s: { r: 1, c: 2 }, e: { r: 1, c: 7 } },
+                    { s: { r: 2, c: 2 }, e: { r: 2, c: 7 } },
+                    { s: { r: 3, c: 2 }, e: { r: 3, c: 7 } }
                 ];
 
                 // Apply Borders and Bold to specific cells
@@ -1074,22 +1079,30 @@
                 ws['!rows'] = [];
                 ws['!rows'][6] = { hpx: 20 }; // Row height for school name
 
-                // Bold the headers and school row
-                for(let c = range.s.c; c <= range.e.c; c++) {
-                    // Row 0 to 3 (New Headers)
-                    for(let r=0; r<=3; r++) {
+                // Bold & Center the headers (Rows 0 to 3)
+                for(let r=0; r<=3; r++) {
+                    for(let c = range.s.c; c <= range.e.c; c++) {
                         const cell = XLSX.utils.encode_cell({r:r, c:c});
-                        if(ws[cell]) ws[cell].s = { bold: true };
+                        if(ws[cell]) {
+                            ws[cell].s = { 
+                                bold: true,
+                                alignment: { horizontal: "center", vertical: "center" }
+                            };
+                        }
                     }
+                }
+
+                // Bold the other headers and school row
+                for(let c = range.s.c; c <= range.e.c; c++) {
                     // Row 6 (Ministry)
                     const cell6 = XLSX.utils.encode_cell({r:5, c:c});
-                    if(ws[cell6]) ws[cell6].s = { bold: true };
+                    if(ws[cell6]) ws[cell6].s = { bold: true, alignment: { horizontal: "left" } };
                     // Row 12 (Label)
                     const cell12 = XLSX.utils.encode_cell({r:11, c:c});
-                    if(ws[cell12]) ws[cell12].s = { bold: true };
+                    if(ws[cell12]) ws[cell12].s = { bold: true, alignment: { horizontal: "left" } };
                     // Row 16 (School Name)
                     const cell16 = XLSX.utils.encode_cell({r:15, c:c});
-                    if(ws[cell16]) ws[cell16].s = { bold: true };
+                    if(ws[cell16]) ws[cell16].s = { bold: true, alignment: { horizontal: "left" } };
                 }
 
                 // Bold the data headers, Totals, and Percentages
