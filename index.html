@@ -12,9 +12,6 @@
     </script>
 
     <style>
-        /* ============================================================
-           CSS RESET & BASE
-           ============================================================ */
         *,
         *::before,
         *::after {
@@ -37,7 +34,7 @@
             --text: #1a2a3a;
             --text-light: #6b7280;
             --border: #d1d5db;
-            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
             --radius: 12px;
             --radius-sm: 6px;
@@ -50,9 +47,6 @@
             min-height: 100vh;
             padding: 16px;
         }
-        /* ============================================================
-           SCROLLBAR
-           ============================================================ */
         ::-webkit-scrollbar {
             width: 5px;
             height: 5px;
@@ -65,12 +59,6 @@
             background: var(--primary-light);
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
-        /* ============================================================
-           CONTAINER
-           ============================================================ */
         .app-container {
             max-width: 1440px;
             margin: 0 auto;
@@ -80,9 +68,6 @@
             overflow: hidden;
             border: 1px solid var(--border);
         }
-        /* ============================================================
-           HEADER / RIBBON
-           ============================================================ */
         .app-header {
             background: var(--primary);
             padding: 10px 20px;
@@ -100,7 +85,6 @@
             color: #fff;
             font-weight: 700;
             font-size: 18px;
-            letter-spacing: -0.3px;
         }
         .app-header .brand i {
             font-size: 24px;
@@ -108,6 +92,12 @@
         }
         .app-header .brand span {
             color: var(--accent);
+        }
+        .app-header .brand small {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.6);
+            margin-left: 4px;
         }
         .app-header .header-actions {
             display: flex;
@@ -150,6 +140,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            font-family: inherit;
         }
         .app-header .header-btn:hover {
             background: rgba(255, 204, 0, 0.15);
@@ -169,9 +160,6 @@
         .app-header .header-btn.btn-primary:hover {
             background: #2563eb;
         }
-        /* ============================================================
-           WORKSHEET TABS
-           ============================================================ */
         .worksheet-tabs {
             background: #f8f9fa;
             border-bottom: 2px solid var(--border);
@@ -217,9 +205,6 @@
             border-radius: 12px;
             margin-left: 4px;
         }
-        /* ============================================================
-           WORKSHEET CONTENT
-           ============================================================ */
         .worksheet-content {
             padding: 16px 20px 24px;
             background: #fff;
@@ -242,9 +227,6 @@
                 transform: translateY(0);
             }
         }
-        /* ============================================================
-           STATS CARDS
-           ============================================================ */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -338,9 +320,6 @@
         .stat-card.info .icon {
             color: #fff;
         }
-        /* ============================================================
-           EXCEL TABLE
-           ============================================================ */
         .table-container {
             overflow-x: auto;
             border: 1px solid var(--border);
@@ -361,7 +340,6 @@
             text-align: center;
             vertical-align: middle;
         }
-        /* Header styles */
         .table-container .header-main {
             background: var(--primary);
             color: #fff;
@@ -404,7 +382,6 @@
             text-align: center;
             padding: 4px 8px;
         }
-        /* Row styles */
         .table-container .row-school {
             background: #fff;
         }
@@ -440,9 +417,6 @@
         .table-container .row-percentage td {
             border-color: var(--border);
         }
-        /* ============================================================
-           TOAST
-           ============================================================ */
         .toast-container {
             position: fixed;
             bottom: 24px;
@@ -506,9 +480,6 @@
                 transform: translateX(-50%) translateY(0);
             }
         }
-        /* ============================================================
-           UTILITY
-           ============================================================ */
         .flex-between {
             display: flex;
             justify-content: space-between;
@@ -622,9 +593,6 @@
         .empty-state p {
             font-size: 14px;
         }
-        /* ============================================================
-           RESPONSIVE
-           ============================================================ */
         @media (max-width: 768px) {
             body {
                 padding: 8px;
@@ -707,7 +675,7 @@
             .stat-card .icon {
                 font-size: 16px;
             }
-            .app-header .header-actions .status-indicator span {
+            .app-header .header-actions .status-indicator span:last-child {
                 display: none;
             }
             .worksheet-tabs .sheet-tab {
@@ -728,9 +696,6 @@
 </head>
 <body>
 
-    <!-- ============================================================
-    TOAST
-    ============================================================ -->
     <div class="toast-container" id="toastContainer">
         <div class="toast" id="toast">
             <span class="toast-icon" id="toastIcon">ℹ️</span>
@@ -739,17 +704,13 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    APP
-    ============================================================ -->
     <div class="app-container">
 
-        <!-- ===== HEADER ===== -->
         <header class="app-header">
             <div class="brand">
                 <i class="fas fa-graduation-cap"></i>
                 Mungwi <span>DEB</span>
-                <span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.6);margin-left:4px;">Term 2, 2025</span>
+                <small>Term 2, 2025</small>
             </div>
             <div class="header-actions">
                 <div class="status-indicator">
@@ -768,7 +729,6 @@
             </div>
         </header>
 
-        <!-- ===== WORKSHEET TABS ===== -->
         <div class="worksheet-tabs" id="worksheetTabs">
             <button class="sheet-tab active" data-sheet="summary">
                 <i class="fas fa-chart-pie"></i> District Summary
@@ -786,15 +746,11 @@
             </button>
         </div>
 
-        <!-- ===== WORKSHEET CONTENT ===== -->
         <div class="worksheet-content">
 
-            <!-- ==========================================================
-            SHEET 1: DISTRICT SUMMARY
-            ========================================================== -->
+            <!-- SHEET 1: DISTRICT SUMMARY -->
             <div class="worksheet active" id="sheet-summary">
 
-                <!-- Stats Cards -->
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-card primary">
                         <span class="icon"><i class="fas fa-school"></i></span>
@@ -828,7 +784,6 @@
                     </div>
                 </div>
 
-                <!-- Excel Table -->
                 <div class="table-container">
                     <table>
                         <thead>
@@ -930,9 +885,7 @@
                 </div>
             </div>
 
-            <!-- ==========================================================
-            SHEET 2: SCHOOLS
-            ========================================================== -->
+            <!-- SHEET 2: SCHOOLS -->
             <div class="worksheet" id="sheet-schools">
                 <div class="flex-between">
                     <div class="flex">
@@ -970,9 +923,7 @@
                 </div>
             </div>
 
-            <!-- ==========================================================
-            SHEET 3: ALL RECORDS
-            ========================================================== -->
+            <!-- SHEET 3: ALL RECORDS -->
             <div class="worksheet" id="sheet-records">
                 <div class="flex-between">
                     <div class="flex">
@@ -1015,16 +966,13 @@
                 </div>
             </div>
 
-            <!-- ==========================================================
-            SHEET 4: EXPORT
-            ========================================================== -->
+            <!-- SHEET 4: EXPORT -->
             <div class="worksheet" id="sheet-export">
                 <div style="max-width:600px;margin:20px auto;text-align:center;padding:30px 20px;">
                     <i class="fas fa-file-export" style="font-size:48px;color:var(--accent-dark);margin-bottom:16px;display:block;"></i>
                     <h2 style="color:var(--primary);margin-bottom:8px;">Export Data</h2>
                     <p style="color:var(--text-light);margin-bottom:20px;font-size:14px;">
-                        Download all records as Excel or CSV format. Includes all fields: enrolment, dropouts,
-                        absenteeism, re-entry, re-admission, and OVC.
+                        Download all records as Excel or CSV format.
                     </p>
                     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
                         <button class="btn btn-success" onclick="exportToExcel()" style="padding:12px 32px;font-size:15px;">
@@ -1034,21 +982,14 @@
                             <i class="fas fa-file-csv"></i> Export to CSV
                         </button>
                     </div>
-                    <div style="margin-top:24px;padding:16px;background:#f8fafc;border-radius:var(--radius-sm);border:1px solid var(--border);text-align:left;font-size:12px;color:var(--text-light);">
-                        <i class="fas fa-info-circle"></i> 
-                        <strong style="color:var(--text);">Included fields:</strong>
-                        School, Grade, Enrolment (Boys/Girls/Total), Age Range, Teen Pregnancy,
-                        Early Marriages, Dropouts (Pregnancy, Marriage, Death, Illness, Orphaned, Economic, OVC),
-                        Absenteeism, Re-entry, Re-admission, OVC.
-                    </div>
-                    <div style="margin-top:12px;font-size:12px;color:var(--text-light);">
+                    <div style="margin-top:20px;font-size:12px;color:var(--text-light);">
                         <span id="exportCount">0</span> records will be exported.
                     </div>
                 </div>
             </div>
 
-        </div><!-- /worksheet-content -->
-    </div><!-- /app-container -->
+        </div>
+    </div>
 
     <script>
         // ================================================================
@@ -1062,6 +1003,7 @@
         let records = [];
         let filteredRecords = [];
         let isSupabaseConnected = false;
+        let dataLoaded = false;
 
         // ================================================================
         //  DOM REFS
@@ -1069,7 +1011,7 @@
         const $ = id => document.getElementById(id);
 
         // ================================================================
-        //  TOAST SYSTEM
+        //  TOAST
         // ================================================================
         let toastTimeout = null;
 
@@ -1080,12 +1022,7 @@
 
             if (toastTimeout) clearTimeout(toastTimeout);
 
-            const icons = {
-                success: '✅',
-                error: '❌',
-                info: 'ℹ️',
-                warning: '⚠️'
-            };
+            const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
             icon.textContent = icons[type] || 'ℹ️';
             msg.textContent = message;
             toast.className = 'toast ' + type;
@@ -1118,95 +1055,10 @@
         }
 
         // ================================================================
-        //  INIT SUPABASE
+        //  SAMPLE DATA (built-in fallback)
         // ================================================================
-        async function initSupabase() {
-            try {
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                console.log('✅ Supabase client created');
-
-                const { error } = await supabase.from('schools').select('count', { count: 'exact', head: true });
-
-                if (error && error.message && error.message.includes('relation "schools" does not exist')) {
-                    isSupabaseConnected = false;
-                    updateStatusDot(false);
-                    showToast('⚠️ Tables not found. Using local storage.', 'warning');
-                    return false;
-                }
-
-                isSupabaseConnected = true;
-                updateStatusDot(true);
-                showToast('✅ Connected to Supabase', 'success');
-                return true;
-
-            } catch (e) {
-                isSupabaseConnected = false;
-                updateStatusDot(false);
-                showToast('⚠️ Using local storage only', 'info');
-                return false;
-            }
-        }
-
-        // ================================================================
-        //  LOAD DATA
-        // ================================================================
-        async function loadData() {
-            try {
-                let schoolsData = [];
-                let recordsData = [];
-
-                if (isSupabaseConnected && supabase) {
-                    try {
-                        const { data: sData, error: sErr } = await supabase.from('schools').select('*').order('name');
-                        if (!sErr && sData && sData.length > 0) schoolsData = sData;
-                        else schoolsData = JSON.parse(localStorage.getItem('schools') || '[]');
-
-                        const { data: rData, error: rErr } = await supabase.from('records').select('*').order(
-                            'created_at', { ascending: false });
-                        if (!rErr && rData && rData.length > 0) recordsData = rData;
-                        else recordsData = JSON.parse(localStorage.getItem('records') || '[]');
-
-                    } catch (e) {
-                        schoolsData = JSON.parse(localStorage.getItem('schools') || '[]');
-                        recordsData = JSON.parse(localStorage.getItem('records') || '[]');
-                    }
-                } else {
-                    schoolsData = JSON.parse(localStorage.getItem('schools') || '[]');
-                    recordsData = JSON.parse(localStorage.getItem('records') || '[]');
-                }
-
-                // If no data, seed sample
-                if (schoolsData.length === 0 && recordsData.length === 0) {
-                    await seedSampleData();
-                    return;
-                }
-
-                schools = schoolsData;
-                records = recordsData;
-                filteredRecords = records;
-
-                renderSummary();
-                renderSchools();
-                renderRecords();
-                updateStats();
-                populateFilter();
-                updateBadges();
-
-                showToast('📊 Loaded ' + records.length + ' records', 'success');
-
-            } catch (err) {
-                console.error('Load error:', err);
-                showToast('Error loading data: ' + err.message, 'error');
-            }
-        }
-
-        // ================================================================
-        //  SEED SAMPLE DATA
-        // ================================================================
-        async function seedSampleData() {
-            showToast('📦 Seeding sample data...', 'info');
-
-            const sampleSchools = [
+        function getSampleSchools() {
+            return [
                 { id: 's1', name: 'CHAMFUBU PRIMARY' },
                 { id: 's2', name: 'CHANUNDU PRIMARY' },
                 { id: 's3', name: 'CHEWE PRIMARY' },
@@ -1218,8 +1070,10 @@
                 { id: 's9', name: 'KAMENA PRIMARY' },
                 { id: 's10', name: 'MILANDO PRIMARY' },
             ];
+        }
 
-            const sampleRecords = [
+        function getSampleRecords() {
+            return [
                 { id: 'r1', school_id: 's1', grade: '1', enrolment_boys: 154, enrolment_girls: 153, age_range: '6-11',
                     teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0,
                     dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0,
@@ -1265,29 +1119,122 @@
                     dropout_ovc_boys: 0, dropout_ovc_girls: 0,
                     absenteeism_boys: 40, absenteeism_girls: 31, reentry_boys: 0, reentry_girls: 0,
                     readmission_boys: 0, readmission_girls: 0, ovc_boys: 7, ovc_girls: 3 },
+                { id: 'r6', school_id: 's5', grade: '2', enrolment_boys: 184, enrolment_girls: 132, age_range: '8–11',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 1,
+                    dropout_preg_boys: 0, dropout_preg_girls: 1, dropout_marriage_boys: 1, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 28, dropout_orphaned_girls: 37, dropout_economic_boys: 15,
+                    dropout_economic_girls: 16,
+                    dropout_ovc_boys: 0, dropout_ovc_girls: 0,
+                    absenteeism_boys: 36, absenteeism_girls: 29, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 3, readmission_girls: 2, ovc_boys: 14, ovc_girls: 17 },
+                { id: 'r7', school_id: 's6', grade: '4', enrolment_boys: 224, enrolment_girls: 212, age_range: '10–14',
+                    teen_preg: 1, early_marriage_boys: 0, early_marriage_girls: 1,
+                    dropout_preg_boys: 0, dropout_preg_girls: 1, dropout_marriage_boys: 0, dropout_marriage_girls: 1,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 1, dropout_illness_girls: 1,
+                    dropout_orphaned_boys: 2, dropout_orphaned_girls: 5, dropout_economic_boys: 0,
+                    dropout_economic_girls: 2,
+                    dropout_ovc_boys: 2, dropout_ovc_girls: 0,
+                    absenteeism_boys: 13, absenteeism_girls: 11, reentry_boys: 4, reentry_girls: 1,
+                    readmission_boys: 4, readmission_girls: 1, ovc_boys: 10, ovc_girls: 17 },
             ];
+        }
 
-            localStorage.setItem('schools', JSON.stringify(sampleSchools));
-            localStorage.setItem('records', JSON.stringify(sampleRecords));
+        // ================================================================
+        //  LOAD DATA
+        // ================================================================
+        async function loadData() {
+            showToast('📊 Loading data...', 'info');
 
-            if (isSupabaseConnected && supabase) {
-                try {
-                    for (const s of sampleSchools) {
-                        await supabase.from('schools').upsert(s, { onConflict: 'id' });
-                    }
-                    for (const r of sampleRecords) {
-                        await supabase.from('records').upsert(r, { onConflict: 'id' });
-                    }
-                    showToast('✅ Sample data saved to Supabase!', 'success');
-                } catch (e) {
-                    console.warn('Supabase seed error:', e);
-                    showToast('📦 Sample data saved locally.', 'info');
+            try {
+                // Try to load from localStorage first (fastest)
+                let schoolsData = JSON.parse(localStorage.getItem('schools') || 'null');
+                let recordsData = JSON.parse(localStorage.getItem('records') || 'null');
+
+                // If localStorage has data, use it immediately
+                if (schoolsData && recordsData && schoolsData.length > 0) {
+                    schools = schoolsData;
+                    records = recordsData;
+                    filteredRecords = records;
+                    renderAll();
+                    showToast('📊 Loaded ' + records.length + ' records from local storage', 'success');
+                    dataLoaded = true;
                 }
-            } else {
-                showToast('📦 Sample data saved locally.', 'info');
+
+                // Then try Supabase for latest data
+                if (supabase) {
+                    try {
+                        const { data: sData, error: sErr } = await supabase.from('schools').select('*').order('name');
+                        if (!sErr && sData && sData.length > 0) {
+                            schools = sData;
+                            localStorage.setItem('schools', JSON.stringify(schools));
+                        }
+
+                        const { data: rData, error: rErr } = await supabase.from('records').select('*').order(
+                            'created_at', { ascending: false });
+                        if (!rErr && rData && rData.length > 0) {
+                            records = rData;
+                            localStorage.setItem('records', JSON.stringify(records));
+                            filteredRecords = records;
+                            renderAll();
+                            showToast('✅ Loaded ' + records.length + ' records from Supabase', 'success');
+                            dataLoaded = true;
+                        }
+                    } catch (e) {
+                        console.warn('Supabase load error:', e);
+                    }
+                }
+
+                // If still no data, seed sample
+                if (!dataLoaded || (schools.length === 0 && records.length === 0)) {
+                    schools = getSampleSchools();
+                    records = getSampleRecords();
+                    localStorage.setItem('schools', JSON.stringify(schools));
+                    localStorage.setItem('records', JSON.stringify(records));
+                    filteredRecords = records;
+                    renderAll();
+                    showToast('📦 Sample data loaded', 'info');
+                    dataLoaded = true;
+                }
+
+                // Try to sync to Supabase if connected
+                if (isSupabaseConnected && supabase && dataLoaded) {
+                    try {
+                        for (const s of schools) {
+                            await supabase.from('schools').upsert(s, { onConflict: 'id' });
+                        }
+                        for (const r of records) {
+                            await supabase.from('records').upsert(r, { onConflict: 'id' });
+                        }
+                    } catch (e) {
+                        console.warn('Supabase sync error:', e);
+                    }
+                }
+
+            } catch (err) {
+                console.error('Load error:', err);
+                // Last resort - use sample data
+                schools = getSampleSchools();
+                records = getSampleRecords();
+                filteredRecords = records;
+                renderAll();
+                showToast('⚠️ Using sample data', 'warning');
+                dataLoaded = true;
             }
 
-            await loadData();
+            updateBadges();
+        }
+
+        // ================================================================
+        //  RENDER ALL
+        // ================================================================
+        function renderAll() {
+            renderSummary();
+            renderSchools();
+            renderRecords();
+            updateStats();
+            populateFilter();
+            updateBadges();
         }
 
         // ================================================================
@@ -1306,7 +1253,6 @@
             const schoolMap = {};
             schools.forEach(s => schoolMap[s.id] = s.name);
 
-            // Calculate totals
             let totals = {
                 boys: 0,
                 girls: 0,
@@ -1351,7 +1297,6 @@
                 const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
                 const schoolName = schoolMap[r.school_id] || r.school_id;
 
-                // Accumulate
                 totals.boys += (r.enrolment_boys || 0);
                 totals.girls += (r.enrolment_girls || 0);
                 totals.total += total;
@@ -1425,7 +1370,6 @@
                         </tr>`;
             });
 
-            // Totals row
             const grandTotal = totals.total;
             html += `<tr class="row-total">
                         <td colspan="3" style="text-align:left;padding-left:12px;">TOTAL</td>
@@ -1464,7 +1408,6 @@
                         <td>${totals.ovc_total}</td>
                     </tr>`;
 
-            // Percentage row
             const pct = (val) => grandTotal > 0 ? ((val / grandTotal) * 100).toFixed(1) + '%' : '0.0%';
             html += `<tr class="row-percentage">
                         <td colspan="6" style="text-align:left;padding-left:12px;">PERCENTAGE TOTALS</td>
@@ -1683,7 +1626,7 @@
 
                 input.value = '';
                 toggleAddSchool();
-                await loadData();
+                renderAll();
                 showToast('✅ School added!', 'success');
             } catch (err) {
                 showToast('❌ Failed to add: ' + err.message, 'error');
@@ -1704,7 +1647,7 @@
                 records = records.filter(r => r.school_id !== id);
                 localStorage.setItem('schools', JSON.stringify(schools));
                 localStorage.setItem('records', JSON.stringify(records));
-                await loadData();
+                renderAll();
                 showToast('✅ School deleted!', 'success');
             } catch (err) {
                 showToast('❌ Failed to delete: ' + err.message, 'error');
@@ -1723,7 +1666,7 @@
                 }
                 records = records.filter(r => r.id !== id);
                 localStorage.setItem('records', JSON.stringify(records));
-                await loadData();
+                renderAll();
                 showToast('✅ Record deleted!', 'success');
             } catch (err) {
                 showToast('❌ Failed to delete: ' + err.message, 'error');
@@ -1876,6 +1819,37 @@
         });
 
         // ================================================================
+        //  INIT SUPABASE
+        // ================================================================
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase client created');
+
+                // Test connection
+                const { error } = await supabase.from('schools').select('count', { count: 'exact', head: true });
+
+                if (error && error.message && error.message.includes('relation "schools" does not exist')) {
+                    isSupabaseConnected = false;
+                    updateStatusDot(false);
+                    showToast('⚠️ Tables not found. Using local storage.', 'warning');
+                    return false;
+                }
+
+                isSupabaseConnected = true;
+                updateStatusDot(true);
+                showToast('✅ Connected to Supabase', 'success');
+                return true;
+
+            } catch (e) {
+                isSupabaseConnected = false;
+                updateStatusDot(false);
+                showToast('⚠️ Using local storage only', 'info');
+                return false;
+            }
+        }
+
+        // ================================================================
         //  BOOT
         // ================================================================
         async function init() {
@@ -1883,6 +1857,8 @@
             await loadData();
             console.log('📊 Mungwi Termly Reporting Tool 2026 loaded.');
             console.log('📡 Connection:', isSupabaseConnected ? 'Online' : 'Offline');
+            console.log('📚 Records:', records.length);
+            console.log('🏫 Schools:', schools.length);
         }
 
         document.addEventListener('DOMContentLoaded', init);
