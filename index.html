@@ -5,373 +5,496 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Mungwi District - Termly Reporting Tool 2026</title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- Supabase JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
-    <!-- SheetJS for Excel export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
 
     <style>
-        * {
+        /* ============================================================
+           CSS RESET & BASE
+           ============================================================ */
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+        :root {
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --primary-dark: #061a2e;
+            --accent: #ffcc00;
+            --accent-dark: #e6b800;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #1a2a3a;
+            --text-light: #6b7280;
+            --border: #d1d5db;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --radius-sm: 6px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e9ecef;
-            padding: 20px;
-            color: #1a1a2e;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 16px;
         }
-
-        /* ===== EXCEL-LIKE CONTAINER ===== */
-        .excel-container {
-            max-width: 1400px;
+        /* ============================================================
+           SCROLLBAR
+           ============================================================ */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+        /* ============================================================
+           CONTAINER
+           ============================================================ */
+        .app-container {
+            max-width: 1440px;
             margin: 0 auto;
-            background: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
-            border: 1px solid #d0d7de;
+            border: 1px solid var(--border);
         }
-
-        /* ===== EXCEL RIBBON ===== */
-        .excel-ribbon {
-            background: #f8f9fa;
-            border-bottom: 2px solid #d0d7de;
-            padding: 6px 16px;
+        /* ============================================================
+           HEADER / RIBBON
+           ============================================================ */
+        .app-header {
+            background: var(--primary);
+            padding: 10px 20px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
-            align-items: center;
-            gap: 4px;
-            min-height: 48px;
+            gap: 8px;
+            border-bottom: 3px solid var(--accent);
         }
-        .excel-ribbon .ribbon-tabs {
+        .app-header .brand {
             display: flex;
-            gap: 2px;
             align-items: center;
+            gap: 10px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.3px;
         }
-        .excel-ribbon .ribbon-tab {
+        .app-header .brand i {
+            font-size: 24px;
+            color: var(--accent);
+        }
+        .app-header .brand span {
+            color: var(--accent);
+        }
+        .app-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .app-header .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 12px 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #fff;
+        }
+        .app-header .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .app-header .status-dot.online {
+            background: var(--success);
+        }
+        .app-header .status-dot.offline {
+            background: var(--danger);
+        }
+        .app-header .header-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
             padding: 6px 14px;
+            border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            color: #444;
             cursor: pointer;
-            border-radius: 4px 4px 0 0;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid transparent;
-            transition: 0.2s;
-        }
-        .excel-ribbon .ribbon-tab:hover {
-            background: #e9ecef;
-        }
-        .excel-ribbon .ribbon-tab.active {
-            color: #1a73e8;
-            border-bottom-color: #1a73e8;
-            background: #fff;
-        }
-        .excel-ribbon .ribbon-separator {
-            width: 1px;
-            height: 28px;
-            background: #d0d7de;
-            margin: 0 6px;
-        }
-        .excel-ribbon .ribbon-actions {
+            transition: all 0.2s;
             display: flex;
+            align-items: center;
             gap: 6px;
-            align-items: center;
-            margin-left: auto;
         }
-        .excel-ribbon .ribbon-btn {
-            padding: 4px 12px;
-            font-size: 11px;
-            font-weight: 600;
-            border: 1px solid #d0d7de;
-            border-radius: 4px;
-            background: #fff;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .app-header .header-btn:hover {
+            background: rgba(255, 204, 0, 0.15);
+            border-color: var(--accent);
         }
-        .excel-ribbon .ribbon-btn:hover {
-            background: #f0f4f8;
-            border-color: #b0b8c4;
+        .app-header .header-btn.btn-success {
+            background: var(--success);
+            border-color: var(--success);
         }
-        .excel-ribbon .ribbon-btn i {
-            font-size: 13px;
-        }
-        .excel-ribbon .ribbon-btn.btn-primary {
-            background: #1a73e8;
-            color: #fff;
-            border-color: #1a73e8;
-        }
-        .excel-ribbon .ribbon-btn.btn-primary:hover {
-            background: #1557b0;
-        }
-        .excel-ribbon .ribbon-btn.btn-success {
-            background: #10b981;
-            color: #fff;
-            border-color: #10b981;
-        }
-        .excel-ribbon .ribbon-btn.btn-success:hover {
+        .app-header .header-btn.btn-success:hover {
             background: #059669;
         }
-
-        /* ===== WORKSHEET TABS ===== */
+        .app-header .header-btn.btn-primary {
+            background: var(--info);
+            border-color: var(--info);
+        }
+        .app-header .header-btn.btn-primary:hover {
+            background: #2563eb;
+        }
+        /* ============================================================
+           WORKSHEET TABS
+           ============================================================ */
         .worksheet-tabs {
             background: #f8f9fa;
-            border-bottom: 1px solid #d0d7de;
-            padding: 4px 16px 0;
+            border-bottom: 2px solid var(--border);
+            padding: 0 16px;
             display: flex;
-            gap: 2px;
+            gap: 0;
+            overflow-x: auto;
         }
         .worksheet-tabs .sheet-tab {
-            padding: 6px 18px 8px;
-            font-size: 12px;
+            padding: 10px 20px 12px;
+            font-size: 13px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-light);
             cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            border-radius: 4px 4px 0 0;
+            border: none;
             background: transparent;
-            transition: 0.2s;
-            position: relative;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
         }
         .worksheet-tabs .sheet-tab:hover {
-            background: #e9ecef;
+            color: var(--primary);
+            background: #f0f2f5;
         }
         .worksheet-tabs .sheet-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
             background: #fff;
-            border-color: #d0d7de;
-            color: #1a1a2e;
         }
         .worksheet-tabs .sheet-tab i {
-            font-size: 11px;
-            margin-right: 4px;
-            color: #10b981;
+            font-size: 14px;
+            color: var(--accent-dark);
         }
-
-        /* ===== WORKSHEET CONTENT ===== */
+        .worksheet-tabs .sheet-tab .badge {
+            background: var(--primary-light);
+            color: #fff;
+            font-size: 10px;
+            padding: 1px 8px;
+            border-radius: 12px;
+            margin-left: 4px;
+        }
+        /* ============================================================
+           WORKSHEET CONTENT
+           ============================================================ */
         .worksheet-content {
-            padding: 0;
-            overflow-x: auto;
+            padding: 16px 20px 24px;
             background: #fff;
             min-height: 500px;
         }
         .worksheet {
             display: none;
-            padding: 16px 20px 20px;
+            animation: fadeIn 0.3s ease;
         }
         .worksheet.active {
             display: block;
         }
-
-        /* ===== EXCEL TABLE ===== */
-        .excel-table-wrap {
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        /* ============================================================
+           STATS CARDS
+           ============================================================ */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+        .stat-card .icon {
+            font-size: 20px;
+            color: var(--accent-dark);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .stat-card .number {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .stat-card .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .stat-card.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .stat-card.primary .number,
+        .stat-card.primary .label {
+            color: #fff;
+        }
+        .stat-card.primary .icon {
+            color: var(--accent);
+        }
+        .stat-card.success {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        .stat-card.success .number,
+        .stat-card.success .label {
+            color: #fff;
+        }
+        .stat-card.success .icon {
+            color: #fff;
+        }
+        .stat-card.danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        .stat-card.danger .number,
+        .stat-card.danger .label {
+            color: #fff;
+        }
+        .stat-card.danger .icon {
+            color: #fff;
+        }
+        .stat-card.warning {
+            background: var(--warning);
+            border-color: var(--warning);
+        }
+        .stat-card.warning .number,
+        .stat-card.warning .label {
+            color: #fff;
+        }
+        .stat-card.warning .icon {
+            color: #fff;
+        }
+        .stat-card.info {
+            background: var(--info);
+            border-color: var(--info);
+        }
+        .stat-card.info .number,
+        .stat-card.info .label {
+            color: #fff;
+        }
+        .stat-card.info .icon {
+            color: #fff;
+        }
+        /* ============================================================
+           EXCEL TABLE
+           ============================================================ */
+        .table-container {
             overflow-x: auto;
-            border: 1px solid #d0d7de;
-            border-radius: 4px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             background: #fff;
         }
-        .excel-table-wrap table {
+        .table-container table {
             width: 100%;
             border-collapse: collapse;
             font-size: 11px;
-            min-width: 800px;
-            font-family: 'Segoe UI', Arial, sans-serif;
+            min-width: 700px;
+            font-family: var(--font);
         }
-        .excel-table-wrap table th,
-        .excel-table-wrap table td {
-            border: 1px solid #d0d7de;
+        .table-container table th,
+        .table-container table td {
+            border: 1px solid var(--border);
             padding: 4px 8px;
             text-align: center;
             vertical-align: middle;
         }
-
-        /* ===== HEADER STYLES ===== */
-        .excel-table-wrap .header-main {
-            background: #1a3a5c;
-            color: #ffffff;
+        /* Header styles */
+        .table-container .header-main {
+            background: var(--primary);
+            color: #fff;
             font-weight: 700;
-            font-size: 13px;
-            letter-spacing: 0.5px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
             padding: 6px 8px;
         }
-        .excel-table-wrap .header-sub {
-            background: #e9ecef;
-            color: #1a1a2e;
-            font-weight: 600;
-            font-size: 10px;
+        .table-container .header-sub {
+            background: #e5e7eb;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 9px;
             text-transform: uppercase;
             padding: 4px 6px;
         }
-        .excel-table-wrap .header-sub-alt {
-            background: #f1f3f5;
-            color: #333;
+        .table-container .header-sub-alt {
+            background: #f3f4f6;
+            color: var(--text-light);
             font-weight: 600;
-            font-size: 9px;
+            font-size: 8px;
             text-transform: uppercase;
             padding: 3px 5px;
         }
-        .excel-table-wrap .header-ministry {
-            background: #0a2540;
-            color: #ffffff;
+        .table-container .header-ministry {
+            background: var(--primary-dark);
+            color: #fff;
             font-weight: 700;
-            font-size: 14px;
+            font-size: 16px;
             text-align: center;
             padding: 10px 8px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
-        .excel-table-wrap .header-ministry-sub {
-            background: #0a2540;
-            color: #ffcc00;
+        .table-container .header-ministry-sub {
+            background: var(--primary-dark);
+            color: var(--accent);
             font-weight: 600;
-            font-size: 12px;
+            font-size: 13px;
             text-align: center;
             padding: 4px 8px;
         }
-
-        /* ===== DATA ROWS ===== */
-        .excel-table-wrap .row-total {
-            background: #1a3a5c !important;
-            color: #ffffff !important;
-            font-weight: 700;
+        /* Row styles */
+        .table-container .row-school {
+            background: #fff;
         }
-        .excel-table-wrap .row-total td {
-            border-color: #1a3a5c;
-            color: #ffffff;
-        }
-        .excel-table-wrap .row-percentage {
-            background: #f8f9fa !important;
-            color: #555 !important;
-            font-weight: 600;
-            font-size: 10px;
-        }
-        .excel-table-wrap .row-percentage td {
-            border-color: #d0d7de;
-        }
-        .excel-table-wrap .row-school {
-            background: #ffffff;
-        }
-        .excel-table-wrap .row-school:hover {
+        .table-container .row-school:hover {
             background: #f0f7ff;
         }
-        .excel-table-wrap .row-school td:first-child {
+        .table-container .row-school .sn {
             font-weight: 600;
-            color: #1a3a5c;
+            color: #9ca3af;
+            font-size: 10px;
+        }
+        .table-container .row-school .school-name {
             text-align: left;
             padding-left: 12px;
-        }
-        .excel-table-wrap .row-school .sn {
             font-weight: 600;
-            color: #888;
-            font-size: 10px;
+            color: var(--primary);
         }
-
-        /* ===== STATUS BADGE ===== */
-        .status-badge {
-            padding: 2px 10px;
-            border-radius: 12px;
-            font-size: 9px;
+        .table-container .row-total {
+            background: var(--primary-light) !important;
+            color: #fff !important;
             font-weight: 700;
-            display: inline-block;
         }
-        .status-badge.pending {
-            background: #fff3cd;
-            color: #856404;
+        .table-container .row-total td {
+            border-color: var(--primary-light);
+            color: #fff !important;
         }
-        .status-badge.approved {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-badge.rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        /* ===== STATS CARDS ===== */
-        .stats-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .stats-cards .stat-card {
-            background: #f8f9fa;
-            border: 1px solid #d0d7de;
-            border-radius: 6px;
-            padding: 12px 14px;
-            text-align: center;
-        }
-        .stats-cards .stat-card .num {
-            font-size: 24px;
-            font-weight: 800;
-            color: #1a3a5c;
-        }
-        .stats-cards .stat-card .label {
-            font-size: 10px;
-            color: #666;
-            text-transform: uppercase;
+        .table-container .row-percentage {
+            background: #f3f4f6 !important;
+            color: var(--text-light) !important;
             font-weight: 600;
-            letter-spacing: 0.3px;
-            margin-top: 2px;
+            font-size: 9px;
         }
-        .stats-cards .stat-card .icon {
-            font-size: 18px;
-            display: block;
-            margin-bottom: 2px;
-            color: #ffcc00;
+        .table-container .row-percentage td {
+            border-color: var(--border);
         }
-        .stats-cards .stat-card.highlight {
-            background: #1a3a5c;
-            border-color: #1a3a5c;
-        }
-        .stats-cards .stat-card.highlight .num {
-            color: #fff;
-        }
-        .stats-cards .stat-card.highlight .label {
-            color: #ffcc00;
-        }
-        .stats-cards .stat-card.highlight .icon {
-            color: #ffcc00;
-        }
-
-        /* ===== TOAST ===== */
-        .toast {
+        /* ============================================================
+           TOAST
+           ============================================================ */
+        .toast-container {
             position: fixed;
             bottom: 24px;
             left: 50%;
             transform: translateX(-50%);
-            background: #1a3a5c;
+            z-index: 9999;
+            width: 100%;
+            max-width: 480px;
+            padding: 0 16px;
+        }
+        .toast {
+            background: var(--primary);
             color: #fff;
-            padding: 12px 28px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
             font-size: 14px;
-            z-index: 999;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
             display: none;
-            max-width: 90%;
-            text-align: center;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--accent);
         }
         .toast.show {
-            display: block;
+            display: flex;
             animation: slideUp 0.3s ease;
         }
         .toast.success {
-            background: #10b981;
+            border-left-color: var(--success);
         }
         .toast.error {
-            background: #ef4444;
+            border-left-color: var(--danger);
         }
         .toast.info {
-            background: #1a73e8;
+            border-left-color: var(--info);
+        }
+        .toast .toast-icon {
+            font-size: 18px;
+        }
+        .toast .toast-msg {
+            flex: 1;
+        }
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 4px;
+        }
+        .toast .toast-close:hover {
+            color: #fff;
         }
         @keyframes slideUp {
             from {
@@ -383,155 +506,332 @@
                 transform: translateX(-50%) translateY(0);
             }
         }
-
-        /* ===== STATUS DOT ===== */
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 4px;
+        /* ============================================================
+           UTILITY
+           ============================================================ */
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
         }
-        .status-dot.online {
-            background: #10b981;
+        .flex {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
         }
-        .status-dot.offline {
-            background: #ef4444;
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-decoration: none;
         }
-
-        /* ===== RESPONSIVE ===== */
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--info);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: #f3f4f6;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+        .text-muted {
+            color: var(--text-light);
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mb-12 {
+            margin-bottom: 12px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        input[type="text"],
+        select {
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: inherit;
+            background: #fff;
+            transition: 0.2s;
+            min-width: 160px;
+        }
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.06);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        .empty-state i {
+            font-size: 40px;
+            color: var(--border);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
         @media (max-width: 768px) {
             body {
-                padding: 10px;
+                padding: 8px;
             }
-            .excel-ribbon {
-                padding: 4px 10px;
-                gap: 2px;
+            .app-header {
+                padding: 8px 12px;
             }
-            .excel-ribbon .ribbon-tab {
-                font-size: 10px;
-                padding: 4px 8px;
+            .app-header .brand {
+                font-size: 14px;
             }
-            .excel-ribbon .ribbon-btn {
-                font-size: 10px;
-                padding: 3px 8px;
-            }
-            .worksheet-tabs .sheet-tab {
-                font-size: 10px;
-                padding: 4px 10px;
-            }
-            .worksheet {
-                padding: 10px 12px;
-            }
-            .stats-cards {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
-            }
-            .stats-cards .stat-card .num {
+            .app-header .brand i {
                 font-size: 18px;
             }
-            .excel-table-wrap table {
-                font-size: 9px;
-                min-width: 600px;
+            .app-header .header-btn {
+                font-size: 10px;
+                padding: 4px 10px;
             }
-            .excel-table-wrap table th,
-            .excel-table-wrap table td {
+            .worksheet-tabs {
+                padding: 0 8px;
+            }
+            .worksheet-tabs .sheet-tab {
+                padding: 8px 12px 10px;
+                font-size: 11px;
+            }
+            .worksheet-content {
+                padding: 12px 12px 16px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .stat-card .number {
+                font-size: 20px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+            }
+            .table-container table {
+                font-size: 9px;
+                min-width: 500px;
+            }
+            .table-container table th,
+            .table-container table td {
                 padding: 3px 5px;
             }
-            .excel-table-wrap .header-main {
-                font-size: 10px;
+            .table-container .header-main {
+                font-size: 9px;
+            }
+            .table-container .header-ministry {
+                font-size: 13px;
+            }
+            .table-container .header-ministry-sub {
+                font-size: 11px;
+            }
+            .flex-between {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toast-container {
+                max-width: 100%;
+                padding: 0 12px;
+                bottom: 12px;
+            }
+            .toast {
+                font-size: 13px;
+                padding: 10px 16px;
             }
         }
         @media (max-width: 480px) {
-            .stats-cards {
+            .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
             }
-            .excel-ribbon .ribbon-actions {
-                flex-wrap: wrap;
+            .stat-card .number {
+                font-size: 17px;
             }
-            .excel-ribbon .ribbon-btn {
-                font-size: 9px;
-                padding: 2px 6px;
+            .stat-card .label {
+                font-size: 8px;
+            }
+            .stat-card .icon {
+                font-size: 16px;
+            }
+            .app-header .header-actions .status-indicator span {
+                display: none;
+            }
+            .worksheet-tabs .sheet-tab {
+                font-size: 10px;
+                padding: 6px 10px 8px;
+            }
+            .worksheet-tabs .sheet-tab i {
+                font-size: 11px;
+            }
+            input[type="text"],
+            select {
+                font-size: 12px;
+                padding: 6px 10px;
+                min-width: 120px;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="toast" class="toast"></div>
+    <!-- ============================================================
+    TOAST
+    ============================================================ -->
+    <div class="toast-container" id="toastContainer">
+        <div class="toast" id="toast">
+            <span class="toast-icon" id="toastIcon">ℹ️</span>
+            <span class="toast-msg" id="toastMsg">Message</span>
+            <button class="toast-close" onclick="hideToast()">✕</button>
+        </div>
+    </div>
 
-    <div class="excel-container">
-        <!-- ===== EXCEL RIBBON ===== -->
-        <div class="excel-ribbon">
-            <div class="ribbon-tabs">
-                <button class="ribbon-tab active"><i class="fas fa-file"></i> File</button>
-                <button class="ribbon-tab"><i class="fas fa-home"></i> Home</button>
-                <button class="ribbon-tab"><i class="fas fa-table"></i> Data</button>
-                <button class="ribbon-tab"><i class="fas fa-eye"></i> View</button>
+    <!-- ============================================================
+    APP
+    ============================================================ -->
+    <div class="app-container">
+
+        <!-- ===== HEADER ===== -->
+        <header class="app-header">
+            <div class="brand">
+                <i class="fas fa-graduation-cap"></i>
+                Mungwi <span>DEB</span>
+                <span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.6);margin-left:4px;">Term 2, 2025</span>
             </div>
-            <div class="ribbon-separator"></div>
-            <div class="ribbon-actions">
-                <span id="dbStatus" style="font-size:11px;display:flex;align-items:center;gap:4px;">
+            <div class="header-actions">
+                <div class="status-indicator">
                     <span class="status-dot offline" id="statusDot"></span>
                     <span id="statusText">Offline</span>
-                </span>
-                <button class="ribbon-btn" onclick="loadData()"><i class="fas fa-sync"></i> Refresh</button>
-                <button class="ribbon-btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Export</button>
-                <button class="ribbon-btn btn-primary" onclick="syncToSupabase()"><i class="fas fa-cloud-upload-alt"></i> Sync</button>
+                </div>
+                <button class="header-btn" onclick="loadData()" title="Refresh Data">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <button class="header-btn btn-success" onclick="exportToExcel()" title="Export to Excel">
+                    <i class="fas fa-file-excel"></i> Export
+                </button>
+                <button class="header-btn btn-primary" onclick="syncToSupabase()" title="Sync to Supabase">
+                    <i class="fas fa-cloud-upload-alt"></i> Sync
+                </button>
             </div>
-        </div>
+        </header>
 
         <!-- ===== WORKSHEET TABS ===== -->
-        <div class="worksheet-tabs">
-            <button class="sheet-tab active" data-sheet="summary"><i class="fas fa-chart-pie"></i> District Summary</button>
-            <button class="sheet-tab" data-sheet="schools"><i class="fas fa-school"></i> Schools</button>
-            <button class="sheet-tab" data-sheet="records"><i class="fas fa-table"></i> All Records</button>
-            <button class="sheet-tab" data-sheet="export"><i class="fas fa-file-export"></i> Export</button>
+        <div class="worksheet-tabs" id="worksheetTabs">
+            <button class="sheet-tab active" data-sheet="summary">
+                <i class="fas fa-chart-pie"></i> District Summary
+            </button>
+            <button class="sheet-tab" data-sheet="schools">
+                <i class="fas fa-school"></i> Schools
+                <span class="badge" id="schoolBadge">0</span>
+            </button>
+            <button class="sheet-tab" data-sheet="records">
+                <i class="fas fa-table"></i> All Records
+                <span class="badge" id="recordBadge">0</span>
+            </button>
+            <button class="sheet-tab" data-sheet="export">
+                <i class="fas fa-file-export"></i> Export
+            </button>
         </div>
 
-        <!-- ===== WORKSHEET: DISTRICT SUMMARY ===== -->
+        <!-- ===== WORKSHEET CONTENT ===== -->
         <div class="worksheet-content">
-            <!-- Sheet 1: District Summary -->
+
+            <!-- ==========================================================
+            SHEET 1: DISTRICT SUMMARY
+            ========================================================== -->
             <div class="worksheet active" id="sheet-summary">
+
                 <!-- Stats Cards -->
-                <div class="stats-cards">
-                    <div class="stat-card highlight">
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card primary">
                         <span class="icon"><i class="fas fa-school"></i></span>
-                        <div class="num" id="statSchools">0</div>
+                        <div class="number" id="statSchools">0</div>
                         <div class="label">Schools</div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card success">
                         <span class="icon"><i class="fas fa-users"></i></span>
-                        <div class="num" id="statEnrolment">0</div>
+                        <div class="number" id="statEnrolment">0</div>
                         <div class="label">Total Enrolment</div>
                     </div>
-                    <div class="stat-card" style="background:#e74c3c;border-color:#e74c3c;">
-                        <span class="icon" style="color:#fff;"><i class="fas fa-baby"></i></span>
-                        <div class="num" style="color:#fff;" id="statTeenPreg">0</div>
-                        <div class="label" style="color:#fff;">Teen Pregnancy</div>
+                    <div class="stat-card danger">
+                        <span class="icon"><i class="fas fa-baby"></i></span>
+                        <div class="number" id="statTeenPreg">0</div>
+                        <div class="label">Teen Pregnancy</div>
                     </div>
-                    <div class="stat-card" style="background:#e67e22;border-color:#e67e22;">
-                        <span class="icon" style="color:#fff;"><i class="fas fa-user-slash"></i></span>
-                        <div class="num" style="color:#fff;" id="statDropouts">0</div>
-                        <div class="label" style="color:#fff;">Dropouts</div>
+                    <div class="stat-card warning">
+                        <span class="icon"><i class="fas fa-user-slash"></i></span>
+                        <div class="number" id="statDropouts">0</div>
+                        <div class="label">Dropouts</div>
                     </div>
-                    <div class="stat-card" style="background:#3498db;border-color:#3498db;">
-                        <span class="icon" style="color:#fff;"><i class="fas fa-clock"></i></span>
-                        <div class="num" style="color:#fff;" id="statAbsenteeism">0</div>
-                        <div class="label" style="color:#fff;">Absenteeism</div>
+                    <div class="stat-card info">
+                        <span class="icon"><i class="fas fa-clock"></i></span>
+                        <div class="number" id="statAbsenteeism">0</div>
+                        <div class="label">Absenteeism</div>
                     </div>
-                    <div class="stat-card" style="background:#9b59b6;border-color:#9b59b6;">
+                    <div class="stat-card" style="background:#8b5cf6;border-color:#8b5cf6;">
                         <span class="icon" style="color:#fff;"><i class="fas fa-heart"></i></span>
-                        <div class="num" style="color:#fff;" id="statOvc">0</div>
+                        <div class="number" style="color:#fff;" id="statOvc">0</div>
                         <div class="label" style="color:#fff;">OVC</div>
                     </div>
                 </div>
 
-                <!-- Full Excel Table -->
-                <div class="excel-table-wrap">
+                <!-- Excel Table -->
+                <div class="table-container">
                     <table>
                         <thead>
-                            <!-- Row 1: Ministry Header -->
                             <tr>
                                 <td colspan="37" class="header-ministry">MINISTRY OF EDUCATION</td>
                             </tr>
@@ -539,28 +839,24 @@
                                 <td colspan="37" class="header-ministry-sub">MUNGWI DISTRICT EDUCATION BOARD</td>
                             </tr>
                             <tr>
-                                <td colspan="37" class="header-ministry-sub" style="background:#1a3a5c;color:#fff;font-size:13px;">
+                                <td colspan="37" class="header-ministry-sub" style="background:#1a3a5c;color:#fff;font-size:14px;padding:6px;">
                                     TERM TWO 2025
                                 </td>
                             </tr>
-
-                            <!-- Row 2: Main Headers -->
                             <tr>
                                 <th rowspan="3" class="header-main" style="min-width:30px;">S/N</th>
-                                <th rowspan="3" class="header-main" style="min-width:120px;">NAME OF SCHOOL</th>
+                                <th rowspan="3" class="header-main" style="min-width:140px;text-align:left;padding-left:12px;">NAME OF SCHOOL</th>
                                 <th rowspan="3" class="header-main" style="min-width:40px;">GRADE</th>
                                 <th colspan="3" class="header-main">ENROLMENT</th>
                                 <th rowspan="3" class="header-main" style="min-width:50px;">AGE RANGE</th>
                                 <th rowspan="3" class="header-main" style="min-width:40px;">TEEN PREG</th>
-                                <th colspan="3" class="header-main">NO OF EARLY MARRIAGES</th>
+                                <th colspan="3" class="header-main">EARLY MARRIAGES</th>
                                 <th colspan="22" class="header-main">NO OF DROP OUTS DUE TO:</th>
-                                <th colspan="3" class="header-main">ABSENTEEISM CASES</th>
-                                <th colspan="3" class="header-main">NO OF RE-ENTRY CASES</th>
+                                <th colspan="3" class="header-main">ABSENTEEISM</th>
+                                <th colspan="3" class="header-main">RE-ENTRY</th>
                                 <th colspan="2" class="header-main">RE-ADMISSION</th>
-                                <th colspan="3" class="header-main">NUMBER OF ORPHANS AND VULNERABLE CHILDREN (OVC)</th>
+                                <th colspan="3" class="header-main">OVC</th>
                             </tr>
-
-                            <!-- Row 3: Sub Headers -->
                             <tr>
                                 <th class="header-sub">Boys</th>
                                 <th class="header-sub">Girls</th>
@@ -571,10 +867,10 @@
                                 <th class="header-sub">Total</th>
                                 <th colspan="2" class="header-sub">Pregnancy</th>
                                 <th colspan="2" class="header-sub">Marriage</th>
-                                <th colspan="2" class="header-sub">DEATH</th>
-                                <th colspan="2" class="header-sub">ILLNESS</th>
-                                <th colspan="2" class="header-sub">ORPHANED</th>
-                                <th colspan="2" class="header-sub">ECONOMIC</th>
+                                <th colspan="2" class="header-sub">Death</th>
+                                <th colspan="2" class="header-sub">Illness</th>
+                                <th colspan="2" class="header-sub">Orphaned</th>
+                                <th colspan="2" class="header-sub">Economic</th>
                                 <th colspan="2" class="header-sub">OVC</th>
                                 <th class="header-sub">Boys</th>
                                 <th class="header-sub">Girls</th>
@@ -582,14 +878,12 @@
                                 <th class="header-sub">Boys</th>
                                 <th class="header-sub">Girls</th>
                                 <th class="header-sub">Total</th>
-                                <th class="header-sub">BOYS</th>
-                                <th class="header-sub">GIRLS</th>
-                                <th class="header-sub">BOYS</th>
-                                <th class="header-sub">GIRLS</th>
-                                <th class="header-sub">TOTAL</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Total</th>
                             </tr>
-
-                            <!-- Row 4: Sub-sub Headers -->
                             <tr>
                                 <th class="header-sub-alt"></th>
                                 <th class="header-sub-alt"></th>
@@ -601,16 +895,16 @@
                                 <th class="header-sub-alt">Girls</th>
                                 <th class="header-sub-alt">Boys</th>
                                 <th class="header-sub-alt">Girls</th>
-                                <th class="header-sub-alt">BOYS</th>
-                                <th class="header-sub-alt">GIRLS</th>
-                                <th class="header-sub-alt">BOYS</th>
-                                <th class="header-sub-alt">GIRLS</th>
-                                <th class="header-sub-alt">BOYS</th>
-                                <th class="header-sub-alt">GIRLS</th>
-                                <th class="header-sub-alt">BOYS</th>
-                                <th class="header-sub-alt">GIRLS</th>
-                                <th class="header-sub-alt">BOYS</th>
-                                <th class="header-sub-alt">GIRLS</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
                                 <th class="header-sub-alt"></th>
                                 <th class="header-sub-alt"></th>
                                 <th class="header-sub-alt"></th>
@@ -624,10 +918,10 @@
                                 <th class="header-sub-alt"></th>
                             </tr>
                         </thead>
-                        <tbody id="summaryTableBody">
+                        <tbody id="summaryBody">
                             <tr>
-                                <td colspan="37" style="text-align:center;padding:40px;color:#888;">
-                                    <i class="fas fa-spinner fa-spin" style="font-size:24px;display:block;margin-bottom:8px;"></i>
+                                <td colspan="37" style="text-align:center;padding:40px;color:#9ca3af;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size:28px;display:block;margin-bottom:10px;"></i>
                                     Loading data...
                                 </td>
                             </tr>
@@ -636,17 +930,26 @@
                 </div>
             </div>
 
-            <!-- Sheet 2: Schools -->
+            <!-- ==========================================================
+            SHEET 2: SCHOOLS
+            ========================================================== -->
             <div class="worksheet" id="sheet-schools">
-                <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                    <button class="ribbon-btn btn-success" onclick="showAddSchoolForm()"><i class="fas fa-plus"></i> Add School</button>
-                    <div id="addSchoolForm" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;">
-                        <input type="text" id="newSchoolName" placeholder="Enter school name..." style="padding:6px 12px;border:1px solid #d0d7de;border-radius:4px;font-size:13px;min-width:200px;" />
-                        <button class="ribbon-btn btn-primary" onclick="addSchool()"><i class="fas fa-save"></i> Save</button>
-                        <button class="ribbon-btn" onclick="document.getElementById('addSchoolForm').style.display='none'">Cancel</button>
+                <div class="flex-between">
+                    <div class="flex">
+                        <button class="btn btn-success" onclick="toggleAddSchool()">
+                            <i class="fas fa-plus"></i> Add School
+                        </button>
+                        <div id="addSchoolForm" class="hidden" style="display:inline-flex;gap:8px;align-items:center;">
+                            <input type="text" id="newSchoolName" placeholder="Enter school name..." />
+                            <button class="btn btn-primary btn-sm" onclick="addSchool()">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="toggleAddSchool()">Cancel</button>
+                        </div>
                     </div>
+                    <span class="text-muted" style="font-size:12px;" id="schoolCount">0 schools</span>
                 </div>
-                <div class="excel-table-wrap">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
@@ -655,24 +958,38 @@
                                 <th class="header-main" style="width:100px;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="schoolsTableBody"></tbody>
+                        <tbody id="schoolsBody">
+                            <tr>
+                                <td colspan="3" class="empty-state">
+                                    <i class="fas fa-school"></i>
+                                    <p>No schools added yet.</p>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Sheet 3: All Records -->
+            <!-- ==========================================================
+            SHEET 3: ALL RECORDS
+            ========================================================== -->
             <div class="worksheet" id="sheet-records">
-                <div style="margin-bottom:16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-                    <select id="filterSchool" onchange="loadData()" style="padding:6px 12px;border:1px solid #d0d7de;border-radius:4px;font-size:13px;">
-                        <option value="">All Schools</option>
-                    </select>
-                    <button class="ribbon-btn" onclick="loadData()"><i class="fas fa-sync"></i> Refresh</button>
+                <div class="flex-between">
+                    <div class="flex">
+                        <select id="filterSchool" onchange="applyFilter()">
+                            <option value="">All Schools</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" onclick="loadData()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <span class="text-muted" style="font-size:12px;" id="recordCount">0 records</span>
                 </div>
-                <div class="excel-table-wrap">
+                <div class="table-container">
                     <table>
                         <thead>
                             <tr>
-                                <th class="header-main">School</th>
+                                <th class="header-main" style="text-align:left;padding-left:12px;">School</th>
                                 <th class="header-main">Grade</th>
                                 <th class="header-main">Boys</th>
                                 <th class="header-main">Girls</th>
@@ -683,34 +1000,55 @@
                                 <th class="header-main">Abs</th>
                                 <th class="header-main">Re</th>
                                 <th class="header-main">OVC</th>
-                                <th class="header-main" style="width:80px;">Action</th>
+                                <th class="header-main" style="width:70px;">Action</th>
                             </tr>
                         </thead>
-                        <tbody id="recordsTableBody"></tbody>
+                        <tbody id="recordsBody">
+                            <tr>
+                                <td colspan="12" class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No records found.</p>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- Sheet 4: Export -->
+            <!-- ==========================================================
+            SHEET 4: EXPORT
+            ========================================================== -->
             <div class="worksheet" id="sheet-export">
-                <div style="padding:20px;text-align:center;">
-                    <h2 style="color:#1a3a5c;margin-bottom:12px;"><i class="fas fa-file-export"></i> Export Data</h2>
-                    <p style="color:#666;margin-bottom:20px;">Download all records as Excel or CSV format.</p>
+                <div style="max-width:600px;margin:20px auto;text-align:center;padding:30px 20px;">
+                    <i class="fas fa-file-export" style="font-size:48px;color:var(--accent-dark);margin-bottom:16px;display:block;"></i>
+                    <h2 style="color:var(--primary);margin-bottom:8px;">Export Data</h2>
+                    <p style="color:var(--text-light);margin-bottom:20px;font-size:14px;">
+                        Download all records as Excel or CSV format. Includes all fields: enrolment, dropouts,
+                        absenteeism, re-entry, re-admission, and OVC.
+                    </p>
                     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-                        <button class="ribbon-btn btn-success" onclick="exportToExcel()" style="padding:12px 32px;font-size:16px;">
+                        <button class="btn btn-success" onclick="exportToExcel()" style="padding:12px 32px;font-size:15px;">
                             <i class="fas fa-file-excel"></i> Export to Excel
                         </button>
-                        <button class="ribbon-btn" onclick="exportToCSV()" style="padding:12px 32px;font-size:16px;">
+                        <button class="btn btn-outline" onclick="exportToCSV()" style="padding:12px 32px;font-size:15px;">
                             <i class="fas fa-file-csv"></i> Export to CSV
                         </button>
                     </div>
-                    <div style="margin-top:20px;padding:16px;background:#f8f9fa;border-radius:6px;text-align:left;font-size:12px;color:#666;">
-                        <i class="fas fa-info-circle"></i> Includes all fields: enrolment, dropouts (pregnancy, marriage, death, illness, orphaned, economic, OVC), absenteeism, re-entry, re-admission, and OVC.
+                    <div style="margin-top:24px;padding:16px;background:#f8fafc;border-radius:var(--radius-sm);border:1px solid var(--border);text-align:left;font-size:12px;color:var(--text-light);">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong style="color:var(--text);">Included fields:</strong>
+                        School, Grade, Enrolment (Boys/Girls/Total), Age Range, Teen Pregnancy,
+                        Early Marriages, Dropouts (Pregnancy, Marriage, Death, Illness, Orphaned, Economic, OVC),
+                        Absenteeism, Re-entry, Re-admission, OVC.
+                    </div>
+                    <div style="margin-top:12px;font-size:12px;color:var(--text-light);">
+                        <span id="exportCount">0</span> records will be exported.
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+
+        </div><!-- /worksheet-content -->
+    </div><!-- /app-container -->
 
     <script>
         // ================================================================
@@ -722,7 +1060,7 @@
         let supabase = null;
         let schools = [];
         let records = [];
-        let adminDataCache = [];
+        let filteredRecords = [];
         let isSupabaseConnected = false;
 
         // ================================================================
@@ -731,16 +1069,37 @@
         const $ = id => document.getElementById(id);
 
         // ================================================================
-        //  TOAST
+        //  TOAST SYSTEM
         // ================================================================
+        let toastTimeout = null;
+
         function showToast(message, type = 'info') {
             const toast = $('toast');
-            toast.textContent = message;
+            const icon = $('toastIcon');
+            const msg = $('toastMsg');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️',
+                warning: '⚠️'
+            };
+            icon.textContent = icons[type] || 'ℹ️';
+            msg.textContent = message;
             toast.className = 'toast ' + type;
             toast.classList.add('show');
-            setTimeout(() => {
+
+            toastTimeout = setTimeout(() => {
                 toast.classList.remove('show');
             }, 4000);
+        }
+
+        function hideToast() {
+            const toast = $('toast');
+            toast.classList.remove('show');
+            if (toastTimeout) clearTimeout(toastTimeout);
         }
 
         // ================================================================
@@ -766,13 +1125,12 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Supabase client created');
 
-                // Test connection
                 const { error } = await supabase.from('schools').select('count', { count: 'exact', head: true });
 
                 if (error && error.message && error.message.includes('relation "schools" does not exist')) {
                     isSupabaseConnected = false;
                     updateStatusDot(false);
-                    showToast('⚠️ Tables not found. Using local storage.', 'error');
+                    showToast('⚠️ Tables not found. Using local storage.', 'warning');
                     return false;
                 }
 
@@ -804,7 +1162,7 @@
                         else schoolsData = JSON.parse(localStorage.getItem('schools') || '[]');
 
                         const { data: rData, error: rErr } = await supabase.from('records').select('*').order(
-                        'created_at', { ascending: false });
+                            'created_at', { ascending: false });
                         if (!rErr && rData && rData.length > 0) recordsData = rData;
                         else recordsData = JSON.parse(localStorage.getItem('records') || '[]');
 
@@ -825,15 +1183,16 @@
 
                 schools = schoolsData;
                 records = recordsData;
-                adminDataCache = records;
+                filteredRecords = records;
 
-                renderSummaryTable();
-                renderSchoolsTable();
-                renderRecordsTable();
+                renderSummary();
+                renderSchools();
+                renderRecords();
                 updateStats();
-                populateSchoolFilter();
+                populateFilter();
+                updateBadges();
 
-                $('lastUpdated').textContent = new Date().toLocaleTimeString();
+                showToast('📊 Loaded ' + records.length + ' records', 'success');
 
             } catch (err) {
                 console.error('Load error:', err);
@@ -906,22 +1265,11 @@
                     dropout_ovc_boys: 0, dropout_ovc_girls: 0,
                     absenteeism_boys: 40, absenteeism_girls: 31, reentry_boys: 0, reentry_girls: 0,
                     readmission_boys: 0, readmission_girls: 0, ovc_boys: 7, ovc_girls: 3 },
-                { id: 'r6', school_id: 's5', grade: '2', enrolment_boys: 184, enrolment_girls: 132, age_range: '8–11',
-                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 1,
-                    dropout_preg_boys: 0, dropout_preg_girls: 1, dropout_marriage_boys: 1, dropout_marriage_girls: 0,
-                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
-                    dropout_orphaned_boys: 28, dropout_orphaned_girls: 37, dropout_economic_boys: 15,
-                    dropout_economic_girls: 16,
-                    dropout_ovc_boys: 0, dropout_ovc_girls: 0,
-                    absenteeism_boys: 36, absenteeism_girls: 29, reentry_boys: 0, reentry_girls: 0,
-                    readmission_boys: 3, readmission_girls: 2, ovc_boys: 14, ovc_girls: 17 },
             ];
 
-            // Save to localStorage
             localStorage.setItem('schools', JSON.stringify(sampleSchools));
             localStorage.setItem('records', JSON.stringify(sampleRecords));
 
-            // Save to Supabase if connected
             if (isSupabaseConnected && supabase) {
                 try {
                     for (const s of sampleSchools) {
@@ -943,15 +1291,15 @@
         }
 
         // ================================================================
-        //  RENDER SUMMARY TABLE
+        //  RENDER SUMMARY
         // ================================================================
-        function renderSummaryTable() {
-            const tbody = $('summaryTableBody');
+        function renderSummary() {
+            const tbody = $('summaryBody');
             if (!tbody) return;
 
             if (records.length === 0) {
                 tbody.innerHTML =
-                    `<tr><td colspan="37" style="text-align:center;padding:40px;color:#888;">No records found. Add some data!</td></tr>`;
+                    `<tr><td colspan="37" class="empty-state"><i class="fas fa-inbox"></i><p>No records found.</p></td></tr>`;
                 return;
             }
 
@@ -998,19 +1346,12 @@
             records.forEach((r, i) => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
-                const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) +
-                    (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) +
-                    (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) +
-                    (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) +
-                    (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) +
-                    (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) +
-                    (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
                 const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
                 const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
                 const schoolName = schoolMap[r.school_id] || r.school_id;
 
-                // Accumulate totals
+                // Accumulate
                 totals.boys += (r.enrolment_boys || 0);
                 totals.girls += (r.enrolment_girls || 0);
                 totals.total += total;
@@ -1046,7 +1387,7 @@
 
                 html += `<tr class="row-school">
                             <td class="sn">${i+1}</td>
-                            <td style="text-align:left;padding-left:12px;font-weight:600;">${schoolName}</td>
+                            <td class="school-name">${schoolName}</td>
                             <td>${r.grade || '-'}</td>
                             <td>${r.enrolment_boys || 0}</td>
                             <td>${r.enrolment_girls || 0}</td>
@@ -1084,10 +1425,10 @@
                         </tr>`;
             });
 
-            // Add Total row
+            // Totals row
             const grandTotal = totals.total;
             html += `<tr class="row-total">
-                        <td colspan="3" style="text-align:left;padding-left:12px;font-weight:700;">TOTAL</td>
+                        <td colspan="3" style="text-align:left;padding-left:12px;">TOTAL</td>
                         <td>${totals.boys}</td>
                         <td>${totals.girls}</td>
                         <td>${grandTotal}</td>
@@ -1123,10 +1464,10 @@
                         <td>${totals.ovc_total}</td>
                     </tr>`;
 
-            // Add Percentage row
+            // Percentage row
             const pct = (val) => grandTotal > 0 ? ((val / grandTotal) * 100).toFixed(1) + '%' : '0.0%';
             html += `<tr class="row-percentage">
-                        <td colspan="6" style="text-align:left;padding-left:12px;font-weight:700;">PERCENTAGE TOTALS</td>
+                        <td colspan="6" style="text-align:left;padding-left:12px;">PERCENTAGE TOTALS</td>
                         <td></td>
                         <td>${pct(totals.teen_preg)}</td>
                         <td>${pct(totals.early_marriage_boys)}</td>
@@ -1163,15 +1504,15 @@
         }
 
         // ================================================================
-        //  RENDER SCHOOLS TABLE
+        //  RENDER SCHOOLS
         // ================================================================
-        function renderSchoolsTable() {
-            const tbody = $('schoolsTableBody');
+        function renderSchools() {
+            const tbody = $('schoolsBody');
             if (!tbody) return;
 
             if (schools.length === 0) {
                 tbody.innerHTML =
-                    `<tr><td colspan="3" style="text-align:center;padding:30px;color:#888;">No schools added yet.</td></tr>`;
+                    `<tr><td colspan="3" class="empty-state"><i class="fas fa-school"></i><p>No schools added yet.</p></td></tr>`;
                 return;
             }
 
@@ -1179,30 +1520,36 @@
                 `<tr>
                             <td>${i+1}</td>
                             <td style="text-align:left;padding-left:16px;font-weight:600;">${s.name}</td>
-                            <td><button class="ribbon-btn btn-danger" onclick="deleteSchool('${s.id}')" style="background:#ef4444;color:#fff;border-color:#ef4444;padding:2px 12px;"><i class="fas fa-trash"></i></button></td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteSchool('${s.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
                         </tr>`
             ).join('');
+
+            $('schoolCount').textContent = schools.length + ' schools';
         }
 
         // ================================================================
-        //  RENDER RECORDS TABLE
+        //  RENDER RECORDS
         // ================================================================
-        function renderRecordsTable() {
-            const tbody = $('recordsTableBody');
+        function renderRecords() {
+            const tbody = $('recordsBody');
             if (!tbody) return;
 
             const schoolMap = {};
             schools.forEach(s => schoolMap[s.id] = s.name);
 
-            const filtered = adminDataCache;
+            const data = filteredRecords;
 
-            if (filtered.length === 0) {
+            if (data.length === 0) {
                 tbody.innerHTML =
-                    `<tr><td colspan="12" style="text-align:center;padding:30px;color:#888;">No records found.</td></tr>`;
+                    `<tr><td colspan="12" class="empty-state"><i class="fas fa-inbox"></i><p>No records found.</p></td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(r => {
+            tbody.innerHTML = data.map(r => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) +
                     (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) +
@@ -1227,9 +1574,16 @@
                             <td>${absent}</td>
                             <td>${reentry}</td>
                             <td>${ovc}</td>
-                            <td><button class="ribbon-btn btn-danger" onclick="deleteRecord('${r.id}')" style="background:#ef4444;color:#fff;border-color:#ef4444;padding:2px 10px;font-size:10px;"><i class="fas fa-trash"></i></button></td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
                         </tr>`;
             }).join('');
+
+            $('recordCount').textContent = data.length + ' records';
+            $('exportCount').textContent = data.length;
         }
 
         // ================================================================
@@ -1264,39 +1618,58 @@
         }
 
         // ================================================================
-        //  POPULATE SCHOOL FILTER
+        //  POPULATE FILTER
         // ================================================================
-        function populateSchoolFilter() {
+        function populateFilter() {
             const sel = $('filterSchool');
             if (!sel) return;
             const currentVal = sel.value;
             sel.innerHTML = `<option value="">All Schools</option>` +
                 schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
             sel.value = currentVal;
+            applyFilter();
+        }
 
-            // Apply filter
-            const filterVal = sel.value;
-            if (filterVal) {
-                adminDataCache = records.filter(r => r.school_id === filterVal);
+        function applyFilter() {
+            const sel = $('filterSchool');
+            const val = sel ? sel.value : '';
+            if (val) {
+                filteredRecords = records.filter(r => r.school_id === val);
             } else {
-                adminDataCache = records;
+                filteredRecords = records;
             }
-            renderRecordsTable();
+            renderRecords();
         }
 
         // ================================================================
-        //  SCHOOL MANAGEMENT
+        //  UPDATE BADGES
         // ================================================================
-        function showAddSchoolForm() {
+        function updateBadges() {
+            $('schoolBadge').textContent = schools.length;
+            $('recordBadge').textContent = records.length;
+        }
+
+        // ================================================================
+        //  TOGGLE ADD SCHOOL
+        // ================================================================
+        function toggleAddSchool() {
             const form = $('addSchoolForm');
-            form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-            if (form.style.display === 'flex') $('newSchoolName').focus();
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) {
+                $('newSchoolName').focus();
+            }
         }
 
+        // ================================================================
+        //  ADD SCHOOL
+        // ================================================================
         async function addSchool() {
             const input = $('newSchoolName');
             const name = input.value.trim();
-            if (!name) { showToast('Please enter a school name.', 'error'); return; }
+            if (!name) {
+                showToast('Please enter a school name.', 'error');
+                return;
+            }
 
             const newSchool = { id: 's' + Date.now(), name: name };
 
@@ -1309,7 +1682,7 @@
                 localStorage.setItem('schools', JSON.stringify(schools));
 
                 input.value = '';
-                $('addSchoolForm').style.display = 'none';
+                toggleAddSchool();
                 await loadData();
                 showToast('✅ School added!', 'success');
             } catch (err) {
@@ -1317,6 +1690,9 @@
             }
         }
 
+        // ================================================================
+        //  DELETE SCHOOL
+        // ================================================================
         async function deleteSchool(id) {
             if (!confirm('Delete this school? All associated data will be removed.')) return;
             try {
@@ -1336,7 +1712,7 @@
         }
 
         // ================================================================
-        //  RECORD MANAGEMENT
+        //  DELETE RECORD
         // ================================================================
         async function deleteRecord(id) {
             if (!confirm('Delete this record?')) return;
@@ -1380,7 +1756,7 @@
         }
 
         // ================================================================
-        //  EXPORT FUNCTIONS
+        //  EXPORT TO EXCEL
         // ================================================================
         function exportToExcel() {
             if (records.length === 0) {
@@ -1394,13 +1770,6 @@
             const rows = records.map((r, i) => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
-                const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) +
-                    (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) +
-                    (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) +
-                    (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) +
-                    (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) +
-                    (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) +
-                    (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
                 const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
                 const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
@@ -1451,6 +1820,9 @@
             showToast('✅ Excel exported successfully!', 'success');
         }
 
+        // ================================================================
+        //  EXPORT TO CSV
+        // ================================================================
         function exportToCSV() {
             if (records.length === 0) {
                 showToast('No data to export.', 'error');
@@ -1472,13 +1844,6 @@
             records.forEach((r, i) => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
-                const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) +
-                    (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) +
-                    (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) +
-                    (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) +
-                    (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) +
-                    (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) +
-                    (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
                 const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
                 const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
@@ -1517,8 +1882,7 @@
             await initSupabase();
             await loadData();
             console.log('📊 Mungwi Termly Reporting Tool 2026 loaded.');
-            console.log('🔗 Supabase URL:', SUPABASE_URL);
-            console.log('📡 Connection status:', isSupabaseConnected ? 'Online' : 'Offline (Local)');
+            console.log('📡 Connection:', isSupabaseConnected ? 'Online' : 'Offline');
         }
 
         document.addEventListener('DOMContentLoaded', init);
