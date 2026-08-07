@@ -793,7 +793,7 @@
         }
 
         // ================================================================
-        //  CLEAN EXPORT FUNCTION (BLANK ROWS REMOVED)
+        //  FINAL CLEAN EXPORT - ALL BLANK ROWS REMOVED
         // ================================================================
         function exportToExcel() {
             if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
@@ -809,31 +809,27 @@
 
                 let wsData = [];
                 
-                // 1. Custom Headers (No blank rows between headers and data)
-                let rowHeader1 = Array(35).fill(''); rowHeader1[2] = 'Republic of Zambia'; wsData.push(rowHeader1);
-                let rowHeader2 = Array(35).fill(''); rowHeader2[2] = 'Ministry of Education'; wsData.push(rowHeader2);
-                let rowHeader3 = Array(35).fill(''); rowHeader3[2] = school.name; wsData.push(rowHeader3);
-                let rowHeader4 = Array(35).fill(''); rowHeader4[2] = 'Guidance and Counselling Report term 2, 2026'; wsData.push(rowHeader4);
+                // ----- COMPACT & CLEAN HEADERS (Rows 0 to 5) -----
+                let row0 = Array(35).fill(''); row0[2] = 'Republic of Zambia'; wsData.push(row0);
+                let row1 = Array(35).fill(''); row1[2] = 'Ministry of Education'; wsData.push(row1);
+                let row2 = Array(35).fill(''); row2[2] = school.name; wsData.push(row2);
+                let row3 = Array(35).fill(''); row3[2] = 'Guidance and Counselling Report term 2, 2026'; wsData.push(row3);
+                let row4 = Array(35).fill(''); row4[4] = 'MINISTRY OF EDUCATION'; wsData.push(row4);
+                
+                // ----- MAIN TABLE HEADERS (Rows 5 to 7) -----
+                let row5 = Array(35).fill('');
+                row5[1] = 'NAME OF SCHOOL'; row5[5] = 'AGE RANGE'; row5[6] = 'TEEN PREG'; row5[7] = 'NO OF EARLY MARRIAGES'; row5[10] = 'NO OF DROP OUTS  DUE TO:'; row5[25] = 'ABSENTEEISM CASES'; row5[28] = 'NO OF RE-ENTRY CASES'; row5[31] = 'RE-ADMISSION'; row5[33] = 'DEFILEMENT';
+                wsData.push(row5);
 
-                // 2. Ministry Headers (Shifted down by 1 instead of 5)
-                let row5 = Array(35).fill(''); row5[4] = 'MINISTRY OF EDUCATION'; wsData.push(row5); // Row 5
-                let row6 = Array(35).fill(''); row6[1] = 'NAME OF SCHOOL'; wsData.push(row6); // Row 6
-                let row7 = Array(35).fill(''); row7[1] = school.name; wsData.push(row7); // Row 7
+                let row6 = Array(35).fill('');
+                row6[10] = 'Pregnancy'; row6[12] = 'Marriage'; row6[14] = 'DEATH'; row6[16] = 'ILLNESS'; row6[18] = 'ORPHANED'; row6[20] = 'ECONOMIC'; row6[22] = 'OVC';
+                wsData.push(row6);
 
-                // 3. Table Headers
-                let row8 = Array(35).fill('');
-                row8[1] = 'NAME OF SCHOOL'; row8[5] = 'AGE RANGE'; row8[6] = 'TEEN PREG'; row8[7] = 'NO OF EARLY MARRIAGES'; row8[10] = 'NO OF DROP OUTS  DUE TO:'; row8[25] = 'ABSENTEEISM CASES'; row8[28] = 'NO OF RE-ENTRY CASES'; row8[31] = 'RE-ADMISSION'; row8[33] = 'DEFILEMENT';
-                wsData.push(row8); // Row 8
+                let row7 = Array(35).fill('');
+                row7[1] = 'Grade'; row7[2] = 'Boys'; row7[3] = 'Girls'; row7[4] = 'Total'; row7[5] = 'Age Range'; row7[6] = 'Girls'; row7[7] = 'Boys'; row7[8] = 'Girls'; row7[9] = 'Total'; row7[10] = 'Boys'; row7[11] = 'Girls'; row7[12] = 'Boys'; row7[13] = 'Girls'; row7[14] = 'BOYS'; row7[15] = 'GIRLS'; row7[16] = 'BOYS'; row7[17] = 'GIRLS'; row7[18] = 'BOYS'; row7[19] = 'GIRLS'; row7[20] = 'BOYS'; row7[21] = 'GIRLS'; row7[22] = 'BOYS'; row7[23] = 'GIRLS'; row7[25] = 'Boys'; row7[26] = 'Girls'; row7[27] = 'Total'; row7[28] = 'Boys'; row7[29] = 'Girls'; row7[30] = 'Total'; row7[31] = 'BOYS'; row7[32] = 'GIRLS'; row7[33] = 'BOYS'; row7[34] = 'GIRLS';
+                wsData.push(row7);
 
-                let row9 = Array(35).fill('');
-                row9[10] = 'Pregnancy'; row9[12] = 'Marriage'; row9[14] = 'DEATH'; row9[16] = 'ILLNESS'; row9[18] = 'ORPHANED'; row9[20] = 'ECONOMIC'; row9[22] = 'OVC';
-                wsData.push(row9); // Row 9
-
-                let row10 = Array(35).fill('');
-                row10[1] = 'Grade'; row10[2] = 'Boys'; row10[3] = 'Girls'; row10[4] = 'Total'; row10[5] = 'Age Range'; row10[6] = 'Girls'; row10[7] = 'Boys'; row10[8] = 'Girls'; row10[9] = 'Total'; row10[10] = 'Boys'; row10[11] = 'Girls'; row10[12] = 'Boys'; row10[13] = 'Girls'; row10[14] = 'BOYS'; row10[15] = 'GIRLS'; row10[16] = 'BOYS'; row10[17] = 'GIRLS'; row10[18] = 'BOYS'; row10[19] = 'GIRLS'; row10[20] = 'BOYS'; row10[21] = 'GIRLS'; row10[22] = 'BOYS'; row10[23] = 'GIRLS'; row10[25] = 'Boys'; row10[26] = 'Girls'; row10[27] = 'Total'; row10[28] = 'Boys'; row10[29] = 'Girls'; row10[30] = 'Total'; row10[31] = 'BOYS'; row10[32] = 'GIRLS'; row10[33] = 'BOYS'; row10[34] = 'GIRLS';
-                wsData.push(row10); // Row 10
-
-                // 4. Data Rows
+                // ----- DATA ROWS -----
                 allGrades.forEach(gradeName => {
                     const r = schoolRecords.find(rec => rec.grade === gradeName);
                     let row = Array(35).fill('');
@@ -847,7 +843,7 @@
                     wsData.push(row);
                 });
 
-                // 5. Totals
+                // ----- TOTALS ROW -----
                 let totalRow = Array(35).fill(''); totalRow[1] = 'TOTAL';
                 let tBoys = 0, tGirls = 0, tTotal = 0;
                 schoolRecords.forEach(r => { tBoys += gv(r, 'enrolment_boys'); tGirls += gv(r, 'enrolment_girls'); tTotal += gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); });
@@ -856,7 +852,6 @@
                 let pregTotal = 0; schoolRecords.forEach(r => { pregTotal += gv(r, 'teen_preg'); }); totalRow[6] = pregTotal;
                 let emTotal = 0; schoolRecords.forEach(r => { emTotal += gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); }); totalRow[9] = emTotal;
                 
-                // Specific Dropout columns
                 let dropPregBoysTotal = 0; schoolRecords.forEach(r => { dropPregBoysTotal += gv(r, 'dropout_preg_boys'); }); totalRow[10] = dropPregBoysTotal;
                 let dropPregGirlsTotal = 0; schoolRecords.forEach(r => { dropPregGirlsTotal += gv(r, 'dropout_preg_girls'); }); totalRow[11] = dropPregGirlsTotal;
                 let dropMarriageBoysTotal = 0; schoolRecords.forEach(r => { dropMarriageBoysTotal += gv(r, 'dropout_marriage_boys'); }); totalRow[12] = dropMarriageBoysTotal;
@@ -880,7 +875,7 @@
                 totalRow[33] = defBoys; totalRow[34] = defGirls;
                 wsData.push(totalRow);
 
-                // 6. Percentages
+                // ----- PERCENTAGES ROW -----
                 let pctRow = Array(35).fill(''); pctRow[1] = 'PERCENTAGE';
                 pctRow[6] = tTotal > 0 ? ((pregTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
                 pctRow[9] = tTotal > 0 ? ((emTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
@@ -903,14 +898,21 @@
                 pctRow[33] = tTotal > 0 ? (((defBoys + defGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
                 wsData.push(pctRow);
 
-                // Formatting
+                // ----- EXCEL FORMATTING & MERGING -----
                 const ws = XLSX.utils.aoa_to_sheet(wsData);
                 ws['!cols'] = [ { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
-                ws['!merges'] = [ { s: { r: 4, c: 1 }, e: { r: 4, c: 4 } }, { s: { r: 8, c: 7 }, e: { r: 8, c: 9 } }, { s: { r: 8, c: 10 }, e: { r: 8, c: 23 } }, { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } }, { s: { r: 1, c: 2 }, e: { r: 1, c: 7 } }, { s: { r: 2, c: 2 }, e: { r: 2, c: 7 } }, { s: { r: 3, c: 2 }, e: { r: 3, c: 7 } } ];
-                ws['!rows'] = []; ws['!rows'][5] = { hpx: 20 };
+                ws['!merges'] = [ 
+                    { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } }, 
+                    { s: { r: 1, c: 2 }, e: { r: 1, c: 7 } }, 
+                    { s: { r: 2, c: 2 }, e: { r: 2, c: 7 } }, 
+                    { s: { r: 3, c: 2 }, e: { r: 3, c: 7 } }, 
+                    { s: { r: 4, c: 1 }, e: { r: 4, c: 4 } }, 
+                    { s: { r: 5, c: 7 }, e: { r: 5, c: 9 } }, 
+                    { s: { r: 5, c: 10 }, e: { r: 5, c: 23 } } 
+                ];
                 
                 let lastDataRow = wsData.length - 3; let secondLastDataRow = wsData.length - 2;
-                for(let r = 10; r < wsData.length - 1; r++) { // Start from data row
+                for(let r = 7; r < wsData.length - 1; r++) { 
                     for(let c = 1; c < 35; c++) {
                         const cell = XLSX.utils.encode_cell({r:r, c:c});
                         if(ws[cell]) {
@@ -923,7 +925,7 @@
                 XLSX.utils.book_append_sheet(wb, ws, sheetName);
             });
 
-            // DISTRICT SUMMARY SHEET
+            // ----- DISTRICT SUMMARY SHEET (KEPT FOR REFERENCE) -----
             let wsDataSummary = [];
             let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY BOYS', 'RE-ENTRY GIRLS', 'RE-ENTRY TOTAL', 'DEFILEMENT BOYS', 'DEFILEMENT GIRLS', 'DEFILEMENT TOTAL', 'OVC BOYS', 'OVC GIRLS', 'OVC TOTAL'];
             wsDataSummary.push(sumRow1);
