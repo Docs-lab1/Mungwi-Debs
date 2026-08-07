@@ -3,1212 +3,1892 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
-    <title>Mungwi District School Data</title>
+    <title>Mungwi District - Termly Reporting Tool 2026</title>
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <!-- Supabase JS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
     </script>
-    <!-- SheetJS for Excel export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
     </script>
 
     <style>
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
+
         :root {
-            --primary: #0f2b4c;   
-            --primary-light: #1e3a5f;
-            --accent: #ffc107;
-            --accent-dark: #e6a800;
-            --bg: #f0f4f8;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --border: #e2e8f0;
-            --shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
-            --radius: 16px;
-            --radius-sm: 10px;
+            --primary: #0a2540;
+            --primary-light: #1a3a5c;
+            --primary-dark: #061a2e;
+            --accent: #ffcc00;
+            --accent-dark: #e6b800;
+            --success: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text: #1a2a3a;
+            --text-light: #6b7280;
+            --border: #d1d5db;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --radius: 12px;
+            --radius-sm: 6px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        html, body {
-            height: 100%;
-            width: 100%;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+        body {
+            font-family: var(--font);
             background: var(--bg);
             color: var(--text);
-            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 16px;
         }
 
-        /* Admin Login Modal Styles */
-        #adminLoginOverlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 43, 76, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
         }
-        #adminLoginOverlay.show { display: flex; }
-        .login-box {
+        ::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-light);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        .app-container {
+            max-width: 1440px;
+            margin: 0 auto;
             background: var(--card-bg);
-            padding: 40px 30px;
             border-radius: var(--radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            width: 100%; max-width: 420px; text-align: center;
-        }
-        .login-box .brand-lg { font-size: 22px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
-        .login-box .brand-lg i { color: var(--accent-dark); }
-        .login-box p { color: var(--text-light); font-size: 14px; margin-bottom: 25px; }
-        .login-box input {
-            width: 100%; padding: 14px 16px; border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm); font-size: 15px; margin-bottom: 15px;
-            background: #f8fafc;
-        }
-        .login-box input:focus { border-color: var(--primary); outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(15, 43, 76, 0.05); }
-        .login-box .btn { width: 100%; padding: 14px; font-size: 15px; }
-        .login-error { color: #ef4444; font-size: 13px; margin-bottom: 10px; display: none; }
-        .hidden { display: none !important; }
-
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #eef2f6; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .btn {
-            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            padding: 12px 20px; border: none; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
-            text-decoration: none; min-height: 48px; min-width: 48px;
-            touch-action: manipulation;
-        }
-        .btn:active { transform: scale(0.96); }
-        .btn-primary { background: var(--primary); color: #fff; }
-        .btn-primary:hover { background: var(--primary-light); }
-        .btn-accent { background: var(--accent); color: var(--primary); }
-        .btn-accent:hover { background: var(--accent-dark); }
-        .btn-success { background: #10b981; color: #fff; }
-        .btn-success:hover { background: #059669; }
-        .btn-danger { background: #ef4444; color: #fff; }
-        .btn-danger:hover { background: #dc2626; }
-        .btn-outline { background: transparent; color: var(--text); border: 1.5px solid var(--border); }
-        .btn-outline:hover { background: #f1f5f9; }
-        .btn-sm { padding: 8px 12px; font-size: 13px; min-height: 36px; min-width: 36px; }
-        .btn-xs { padding: 4px 8px; font-size: 12px; min-height: 28px; min-width: 28px; border-radius: 6px; }
-        .btn-login-admin { background: var(--accent); color: var(--primary); font-weight: bold; }
-        .btn-logout { background: #ef4444; color: #fff; }
-
-        /* Header */
-        .app-header {
-            background: var(--primary); color: #fff; padding: 16px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); min-height: 64px;
-        }
-        .app-header .brand { font-weight: 700; font-size: 20px; letter-spacing: -0.3px; }
-        .app-header .header-right { display: flex; align-items: center; gap: 12px; }
-
-        /* Floating Status Bar (Bottom Right) */
-        #statusFloat {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--card-bg);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-            border-radius: 30px;
-            padding: 8px 16px 8px 12px;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            background: var(--primary);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            border-bottom: 3px solid var(--accent);
+        }
+        .app-header .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
-            z-index: 50;
-            font-size: 13px;
-            color: var(--text-light);
+            gap: 10px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 18px;
         }
-        #statusFloat .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-        #statusFloat .status-dot.online { background: #10b981; }
-        #statusFloat .status-dot.offline { background: #ef4444; }
-        #statusFloat .role-tag {
-            background: var(--accent); color: var(--primary); font-weight: 700;
-            font-size: 10px; padding: 2px 10px; border-radius: 20px; text-transform: uppercase;
+        .app-header .brand i {
+            font-size: 24px;
+            color: var(--accent);
+        }
+        .app-header .brand span {
+            color: var(--accent);
+        }
+        .app-header .brand small {
+            font-size: 12px;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.6);
             margin-left: 4px;
         }
-        /* Admin Toggle Button inside the floating bar */
-        #statusFloat .admin-toggle {
-            background: var(--accent);
-            color: var(--primary);
-            border: none;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
+        .app-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
         }
-        #statusFloat .admin-toggle:hover { background: var(--accent-dark); }
-        #statusFloat .admin-toggle.danger { background: var(--danger); color: #fff; }
+        .app-header .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 4px 12px 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #fff;
+        }
+        .app-header .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .app-header .status-dot.online {
+            background: var(--success);
+        }
+        .app-header .status-dot.offline {
+            background: var(--danger);
+        }
+        .app-header .header-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .app-header .header-btn:hover {
+            background: rgba(255, 204, 0, 0.15);
+            border-color: var(--accent);
+        }
+        .app-header .header-btn.btn-success {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        .app-header .header-btn.btn-success:hover {
+            background: #059669;
+        }
+        .app-header .header-btn.btn-primary {
+            background: var(--info);
+            border-color: var(--info);
+        }
+        .app-header .header-btn.btn-primary:hover {
+            background: #2563eb;
+        }
 
-        /* Layout */
-        .container { max-width: 1200px; margin: 0 auto; padding: 24px 16px 80px; width: 100%; }
-        .card { background: var(--card-bg); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 20px; transition: all 0.2s ease; }
-        .card-title { font-size: 17px; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
-        .card-title i { font-size: 20px; color: var(--accent-dark); }
-        .card-title .badge { background: #f1f5f9; color: var(--text-light); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 30px; margin-left: auto; }
+        /* ===== WORKSHEET TABS ===== */
+        .worksheet-tabs {
+            background: #f8f9fa;
+            border-bottom: 2px solid var(--border);
+            padding: 0 16px;
+            display: flex;
+            gap: 0;
+            overflow-x: auto;
+        }
+        .worksheet-tabs .sheet-tab {
+            padding: 10px 20px 12px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+        .worksheet-tabs .sheet-tab:hover {
+            color: var(--primary);
+            background: #f0f2f5;
+        }
+        .worksheet-tabs .sheet-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--accent);
+            background: #fff;
+        }
+        .worksheet-tabs .sheet-tab i {
+            font-size: 14px;
+            color: var(--accent-dark);
+        }
+        .worksheet-tabs .sheet-tab .badge {
+            background: var(--primary-light);
+            color: #fff;
+            font-size: 10px;
+            padding: 1px 8px;
+            border-radius: 12px;
+            margin-left: 4px;
+        }
 
-        /* Stats */
-        .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 4px; }
-        .stat-box { background: #f8fafc; border-radius: var(--radius-sm); padding: 16px 12px; text-align: center; border: 1px solid var(--border); }
-        .stat-box .num { font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2; }
-        .stat-box .label { font-size: 11px; font-weight: 600; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
-        .stat-box .icon { font-size: 18px; color: var(--accent-dark); display: block; margin-bottom: 4px; }
+        /* ===== WORKSHEET CONTENT ===== */
+        .worksheet-content {
+            padding: 16px 20px 24px;
+            background: #fff;
+            min-height: 500px;
+        }
+        .worksheet {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .worksheet.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-        /* Tabs */
-        .tab-bar { display: flex; gap: 6px; background: #f1f5f9; border-radius: var(--radius-sm); padding: 6px; margin-bottom: 24px; overflow-x: auto; }
-        .tab-bar .tab { flex: 1; padding: 10px 12px; border: none; background: transparent; font-size: 13px; font-weight: 600; color: var(--text-light); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; }
-        .tab-bar .tab.active { background: #fff; color: var(--primary); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04); }
-        .tab-bar .tab i { font-size: 14px; }
-        .tab-bar .tab.admin-only.hidden-tab { display: none; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-1px);
+        }
+        .stat-card .icon {
+            font-size: 20px;
+            color: var(--accent-dark);
+            display: block;
+            margin-bottom: 2px;
+        }
+        .stat-card .number {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+        .stat-card .label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        .stat-card.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        .stat-card.primary .number,
+        .stat-card.primary .label {
+            color: #fff;
+        }
+        .stat-card.primary .icon {
+            color: var(--accent);
+        }
+        .stat-card.success {
+            background: var(--success);
+            border-color: var(--success);
+        }
+        .stat-card.success .number,
+        .stat-card.success .label {
+            color: #fff;
+        }
+        .stat-card.success .icon {
+            color: #fff;
+        }
+        .stat-card.danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+        .stat-card.danger .number,
+        .stat-card.danger .label {
+            color: #fff;
+        }
+        .stat-card.danger .icon {
+            color: #fff;
+        }
+        .stat-card.warning {
+            background: var(--warning);
+            border-color: var(--warning);
+        }
+        .stat-card.warning .number,
+        .stat-card.warning .label {
+            color: #fff;
+        }
+        .stat-card.warning .icon {
+            color: #fff;
+        }
+        .stat-card.info {
+            background: var(--info);
+            border-color: var(--info);
+        }
+        .stat-card.info .number,
+        .stat-card.info .label {
+            color: #fff;
+        }
+        .stat-card.info .icon {
+            color: #fff;
+        }
 
-        /* Tables */
-        .table-wrap { overflow-x: auto; margin-top: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: #fff; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
-        table thead tr { border-bottom: 2px solid var(--border); }
-        table th { background: #f8fafc; color: var(--text-light); font-weight: 600; padding: 14px 16px; text-align: left; white-space: nowrap; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-        table td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        table tbody tr:last-child td { border-bottom: none; }
-        table tbody tr:hover { background: #f8fafc; }
+        /* ===== EXCEL TABLE ===== */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: #fff;
+        }
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            min-width: 700px;
+            font-family: var(--font);
+        }
+        .table-container table th,
+        .table-container table td {
+            border: 1px solid var(--border);
+            padding: 4px 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .table-container .header-main {
+            background: var(--primary);
+            color: #fff;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 6px 8px;
+        }
+        .table-container .header-sub {
+            background: #e5e7eb;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            padding: 4px 6px;
+        }
+        .table-container .header-sub-alt {
+            background: #f3f4f6;
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 8px;
+            text-transform: uppercase;
+            padding: 3px 5px;
+        }
+        .table-container .header-ministry {
+            background: var(--primary-dark);
+            color: #fff;
+            font-weight: 700;
+            font-size: 16px;
+            text-align: center;
+            padding: 10px 8px;
+            letter-spacing: 2px;
+        }
+        .table-container .header-ministry-sub {
+            background: var(--primary-dark);
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 13px;
+            text-align: center;
+            padding: 4px 8px;
+        }
+        .table-container .row-school {
+            background: #fff;
+        }
+        .table-container .row-school:hover {
+            background: #f0f7ff;
+        }
+        .table-container .row-school .sn {
+            font-weight: 600;
+            color: #9ca3af;
+            font-size: 10px;
+        }
+        .table-container .row-school .school-name {
+            text-align: left;
+            padding-left: 12px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .table-container .row-total {
+            background: var(--primary-light) !important;
+            color: #fff !important;
+            font-weight: 700;
+        }
+        .table-container .row-total td {
+            border-color: var(--primary-light);
+            color: #fff !important;
+        }
+        .table-container .row-percentage {
+            background: #f3f4f6 !important;
+            color: var(--text-light) !important;
+            font-weight: 600;
+            font-size: 9px;
+        }
+        .table-container .row-percentage td {
+            border-color: var(--border);
+        }
 
-        /* Forms */
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-        .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-        .form-group { margin-bottom: 4px; }
-        .form-group label { display: block; font-weight: 600; font-size: 12px; color: var(--text-light); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; background: #fafbfc; transition: 0.2s; }
-        .form-group input:focus, .form-group select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(15, 43, 76, 0.04); background: #fff; }
-        .form-group input[type="number"] { -moz-appearance: textfield; }
-        .form-group input[type="number"]::-webkit-outer-spin-button, .form-group input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        /* ===== TOAST ===== */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            width: 100%;
+            max-width: 480px;
+            padding: 0 16px;
+        }
+        .toast {
+            background: var(--primary);
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid var(--accent);
+        }
+        .toast.show {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+        .toast.success {
+            border-left-color: var(--success);
+        }
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+        .toast.info {
+            border-left-color: var(--info);
+        }
+        .toast .toast-icon {
+            font-size: 18px;
+        }
+        .toast .toast-msg {
+            flex: 1;
+        }
+        .toast .toast-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 0 4px;
+        }
+        .toast .toast-close:hover {
+            color: #fff;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
 
-        .section-label { font-weight: 700; font-size: 14px; color: var(--primary); margin: 16px 0 12px; display: flex; align-items: center; gap: 8px; }
-        .section-label i { color: var(--accent-dark); font-size: 15px; }
+        /* ===== UTILITY ===== */
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .flex {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-decoration: none;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--info);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: #f3f4f6;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+        .text-muted {
+            color: var(--text-light);
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mt-16 {
+            margin-top: 16px;
+        }
+        .mb-12 {
+            margin-bottom: 12px;
+        }
+        .hidden {
+            display: none !important;
+        }
+        input[type="text"],
+        select {
+            padding: 8px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: inherit;
+            background: #fff;
+            transition: 0.2s;
+            min-width: 160px;
+        }
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(10, 37, 64, 0.06);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        .empty-state i {
+            font-size: 40px;
+            color: var(--border);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
 
-        .entry-form-wrap { background: #f8fafc; border-radius: var(--radius-sm); padding: 20px; border: 1px solid var(--border); margin-bottom: 20px; }
-        .entry-actions { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
-        .entry-actions .btn { flex: 1; min-width: 120px; }
-
-        .school-selector { background: #f8fafc; padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-        .school-selector label { font-weight: 600; font-size: 14px; color: var(--text); }
-        .school-selector select { padding: 8px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); font-size: 14px; background: #fff; flex: 1; min-width: 160px; }
-
-        .mt-8 { margin-top: 8px; } .mt-12 { margin-top: 12px; } .mt-16 { margin-top: 16px; }
-        .flex { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .text-right { text-align: right; } .fw-600 { font-weight: 600; }
-        .text-ellipsis { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-block; }
-        .text-muted { color: var(--text-light); }
-        
-        .school-row { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .school-name { font-weight: 500; }
-
-        .empty-state { text-align: center; padding: 40px 10px; color: var(--text-light); }
-        .empty-state i { font-size: 40px; color: var(--border); margin-bottom: 12px; display: block; }
-        .empty-state p { font-size: 14px; }
-
-        .table-scroll { max-height: 420px; overflow-y: auto; }
-        .table-scroll table thead { position: sticky; top: 0; z-index: 5; }
-
-        /* Toast */
-        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--primary); color: #fff; padding: 14px 28px; border-radius: var(--radius-sm); font-size: 14px; z-index: 9999; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); display: none; max-width: 90%; text-align: center; }
-        .toast.show { display: block; animation: slideUp 0.3s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-        .toast-success { background: #10b981; }
-        .toast-error { background: #ef4444; }
-        .toast-info { background: var(--primary); }
-
-        @media (max-width: 640px) {
-            .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .form-grid, .form-grid-3, .entry-form-wrap .form-row, .entry-form-wrap .form-row-3 { grid-template-columns: 1fr; }
-            .app-header .brand { font-size: 18px; }
-            .tab-bar .tab { font-size: 12px; padding: 6px 10px; min-height: 38px; } .tab-bar .tab i { font-size: 13px; }
-            .card { padding: 16px; }
-            .btn { font-size: 13px; padding: 10px 14px; min-height: 40px; }
-            .container { padding: 16px 12px 70px; }
-            .school-selector { flex-direction: column; align-items: stretch; }
-            .entry-actions .btn { flex: 1 1 100%; }
-            table { font-size: 12px; min-width: 480px; } table th, table td { padding: 8px 10px; }
-            #statusFloat { bottom: 16px; right: 16px; padding: 6px 12px; font-size: 12px; }
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            .app-header {
+                padding: 8px 12px;
+            }
+            .app-header .brand {
+                font-size: 14px;
+            }
+            .app-header .brand i {
+                font-size: 18px;
+            }
+            .app-header .header-btn {
+                font-size: 10px;
+                padding: 4px 10px;
+            }
+            .worksheet-tabs {
+                padding: 0 8px;
+            }
+            .worksheet-tabs .sheet-tab {
+                padding: 8px 12px 10px;
+                font-size: 11px;
+            }
+            .worksheet-content {
+                padding: 12px 12px 16px;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .stat-card .number {
+                font-size: 20px;
+            }
+            .stat-card {
+                padding: 10px 12px;
+            }
+            .table-container table {
+                font-size: 9px;
+                min-width: 500px;
+            }
+            .table-container table th,
+            .table-container table td {
+                padding: 3px 5px;
+            }
+            .table-container .header-main {
+                font-size: 9px;
+            }
+            .table-container .header-ministry {
+                font-size: 13px;
+            }
+            .table-container .header-ministry-sub {
+                font-size: 11px;
+            }
+            .flex-between {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toast-container {
+                max-width: 100%;
+                padding: 0 12px;
+                bottom: 12px;
+            }
+            .toast {
+                font-size: 13px;
+                padding: 10px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+            .stat-card .number {
+                font-size: 17px;
+            }
+            .stat-card .label {
+                font-size: 8px;
+            }
+            .stat-card .icon {
+                font-size: 16px;
+            }
+            .app-header .header-actions .status-indicator span:last-child {
+                display: none;
+            }
+            .worksheet-tabs .sheet-tab {
+                font-size: 10px;
+                padding: 6px 10px 8px;
+            }
+            .worksheet-tabs .sheet-tab i {
+                font-size: 11px;
+            }
+            input[type="text"],
+            select {
+                font-size: 12px;
+                padding: 6px 10px;
+                min-width: 120px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Admin Login Popup -->
-    <div id="adminLoginOverlay">
-        <div class="login-box">
-            <div class="brand-lg"><i class="fas fa-lock"></i> Admin Access</div>
-            <p>Enter password to view admin features</p>
-            <div id="loginError" class="login-error">❌ Incorrect password!</div>
-            <input type="password" id="loginPassword" placeholder="Enter Password" onkeydown="if(event.key==='Enter') adminLogin()" />
-            <button class="btn btn-primary" onclick="adminLogin()"><i class="fas fa-lock-open"></i> Login</button>
-            <br><br>
-            <button class="btn btn-outline btn-sm" onclick="closeAdminLogin()">Cancel</button>
+    <!-- ===== TOAST ===== -->
+    <div class="toast-container" id="toastContainer">
+        <div class="toast" id="toast">
+            <span class="toast-icon" id="toastIcon">ℹ️</span>
+            <span class="toast-msg" id="toastMsg">Message</span>
+            <button class="toast-close" onclick="hideToast()">✕</button>
         </div>
     </div>
 
-    <!-- Main App -->
-    <div id="appView">
-        <div id="toast" class="toast"></div>
+    <!-- ===== APP ===== -->
+    <div class="app-container">
 
+        <!-- ===== HEADER ===== -->
         <header class="app-header">
-            <div class="brand">Guidance & Counselling</div>
-            <div class="header-right">
-                <button class="btn btn-sm btn-login-admin" onclick="openAdminLogin()" id="adminToggleBtn"><i class="fas fa-user-shield"></i> Admin</button>
+            <div class="brand">
+                <i class="fas fa-graduation-cap"></i>
+                Mungwi <span>DEB</span>
+                <small>Term 2, 2025</small>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <span class="status-dot offline" id="statusDot"></span>
+                    <span id="statusText">Offline</span>
+                </div>
+                <button class="header-btn" onclick="loadData()" title="Refresh Data">
+                    <i class="fas fa-sync"></i> Refresh
+                </button>
+                <button class="header-btn btn-success" onclick="exportToExcel()" title="Export to Excel">
+                    <i class="fas fa-file-excel"></i> Export
+                </button>
+                <button class="header-btn btn-primary" onclick="syncToSupabase()" title="Sync to Supabase">
+                    <i class="fas fa-cloud-upload-alt"></i> Sync
+                </button>
             </div>
         </header>
 
-        <!-- Custom Government Header Banner -->
-        <div style="background: #ffffff; border-bottom: 1px solid var(--border); padding: 16px 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.02);">
-            <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; gap: 16px;">
-                <img id="headerCoat" src="images/coat_arms.png" style="width: 55px; height: 55px; object-fit: contain; flex-shrink: 0;" alt="Zambia Coat of Arms" />
-                <div>
-                    <div style="font-size: 12px; color: var(--text-light); font-weight: 500; letter-spacing: 0.3px; text-transform: uppercase;">Ministry of Education</div>
-                    <div style="font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.3px; margin-top: 2px;">Mungwi Debs</div>
-                </div>
-            </div>
+        <!-- ===== WORKSHEET TABS ===== -->
+        <div class="worksheet-tabs" id="worksheetTabs">
+            <button class="sheet-tab active" data-sheet="summary">
+                <i class="fas fa-chart-pie"></i> District Summary
+            </button>
+            <button class="sheet-tab" data-sheet="schools">
+                <i class="fas fa-school"></i> Schools
+                <span class="badge" id="schoolBadge">0</span>
+            </button>
+            <button class="sheet-tab" data-sheet="records">
+                <i class="fas fa-table"></i> All Records
+                <span class="badge" id="recordBadge">0</span>
+            </button>
+            <button class="sheet-tab" data-sheet="export">
+                <i class="fas fa-file-export"></i> Export
+            </button>
         </div>
 
-        <!-- Floating Status Bar at Bottom Right -->
-        <div id="statusFloat">
-            <span class="status-dot offline" id="statusDot"></span>
-            <span id="statusText">Connecting...</span>
-            <span class="role-tag" id="roleTag">USER</span>
-        </div>
+        <!-- ===== WORKSHEET CONTENT ===== -->
+        <div class="worksheet-content">
 
-        <div class="container">
-            <div id="adminPanel">
-                <div class="tab-bar">
-                    <button class="tab active admin-only" data-tab="adminDashboard"><i class="fas fa-chart-pie"></i> Dashboard</button>
-                    <button class="tab" data-tab="adminSchools"><i class="fas fa-school"></i> Schools</button>
-                    <button class="tab admin-only" data-tab="adminData"><i class="fas fa-table"></i> All Data</button>
-                    <button class="tab admin-only" data-tab="adminExport"><i class="fas fa-file-export"></i> Export</button>
-                </div>
+            <!-- ===== SHEET 1: DISTRICT SUMMARY ===== -->
+            <div class="worksheet active" id="sheet-summary">
 
-                <!-- DASHBOARD -->
-                <div id="tab-adminDashboard" class="tab-content active admin-only">
-                    <div class="card">
-                        <div class="card-title"><i class="fas fa-chart-simple"></i> District Summary<span class="badge" id="lastUpdatedAdmin">loading...</span></div>
-                        <div id="adminStats" class="stat-grid">
-                            <div class="stat-box"><span class="icon"><i class="fas fa-school"></i></span><div class="num" id="statSchools">-</div><div class="label">Schools</div></div>
-                            <div class="stat-box"><span class="icon"><i class="fas fa-users"></i></span><div class="num" id="statTotalEnrol">-</div><div class="label">Enrolment</div></div>
-                            <div class="stat-box"><span class="icon"><i class="fas fa-baby"></i></span><div class="num" id="statTeenPreg">-</div><div class="label">Teen Preg</div></div>
-                            <div class="stat-box"><span class="icon"><i class="fas fa-user-slash"></i></span><div class="num" id="statDropouts">-</div><div class="label">Dropouts</div></div>
-                            <div class="stat-box"><span class="icon"><i class="fas fa-clock"></i></span><div class="num" id="statAbsenteeism">-</div><div class="label">Absenteeism</div></div>
-                            <div class="stat-box"><span class="icon"><i class="fas fa-heart"></i></span><div class="num" id="statOVC">-</div><div class="label">OVC</div></div>
-                        </div>
+                <!-- Stats Cards -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card primary">
+                        <span class="icon"><i class="fas fa-school"></i></span>
+                        <div class="number" id="statSchools">0</div>
+                        <div class="label">Schools</div>
+                    </div>
+                    <div class="stat-card success">
+                        <span class="icon"><i class="fas fa-users"></i></span>
+                        <div class="number" id="statEnrolment">0</div>
+                        <div class="label">Total Enrolment</div>
+                    </div>
+                    <div class="stat-card danger">
+                        <span class="icon"><i class="fas fa-baby"></i></span>
+                        <div class="number" id="statTeenPreg">0</div>
+                        <div class="label">Teen Pregnancy</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <span class="icon"><i class="fas fa-user-slash"></i></span>
+                        <div class="number" id="statDropouts">0</div>
+                        <div class="label">Dropouts</div>
+                    </div>
+                    <div class="stat-card info">
+                        <span class="icon"><i class="fas fa-clock"></i></span>
+                        <div class="number" id="statAbsenteeism">0</div>
+                        <div class="label">Absenteeism</div>
+                    </div>
+                    <div class="stat-card" style="background:#8b5cf6;border-color:#8b5cf6;">
+                        <span class="icon" style="color:#fff;"><i class="fas fa-heart"></i></span>
+                        <div class="number" style="color:#fff;" id="statOvc">0</div>
+                        <div class="label" style="color:#fff;">OVC</div>
                     </div>
                 </div>
 
-                <!-- SCHOOLS -->
-                <div id="tab-adminSchools" class="tab-content">
-                    <div class="card">
-                        <div class="flex-between">
-                            <div class="card-title" style="margin-bottom:0;"><i class="fas fa-school"></i> Manage Schools</div>
-                            <button class="btn btn-success btn-sm admin-only" onclick="showAddSchoolForm()"><i class="fas fa-plus"></i> Add</button>
-                        </div>
-                        <div id="addSchoolForm" class="hidden admin-only" style="margin-top:16px;padding:16px;background:#f8fafc;border-radius:var(--radius-sm);border:1px solid var(--border);">
-                            <div class="form-grid">
-                                <div class="form-group"><label>School Name</label><input type="text" id="newSchoolName" placeholder="e.g. CHAMFUBU PRIMARY" /></div>
-                                <div class="form-group" style="display:flex;align-items:flex-end;gap:8px;"><button class="btn btn-primary btn-sm" onclick="addSchool()"><i class="fas fa-save"></i> Add</button><button class="btn btn-outline btn-sm" onclick="document.getElementById('addSchoolForm').classList.add('hidden')">Cancel</button></div>
-                            </div>
-                        </div>
-                        <div class="table-wrap mt-8">
-                            <table><thead><tr><th style="width:50px;text-align:center;">#</th><th>School Name</th><th style="width:80px;text-align:right;">Action</th></tr></thead><tbody id="schoolListBody"></tbody></table>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-title"><i class="fas fa-pen"></i> Enter School Data</div>
-                        <div class="school-selector">
-                            <label><i class="fas fa-exchange-alt"></i> Select School:</label>
-                            <select id="teacherSchoolSelect" onchange="loadTeacherData()"></select>
-                        </div>
-                        <div class="entry-form-wrap">
-                            <div style="font-weight:700;font-size:15px;color:var(--primary);margin-bottom:16px;" id="entryFormTitle"><i class="fas fa-plus-circle" style="color:var(--accent-dark);"></i> Add New Entry</div>
-                            <form id="entryForm" onsubmit="return saveEntry(event)">
-                                <input type="hidden" id="editEntryId" value="" />
-                                <div class="form-row">
-                                    <div class="form-group"><label>Term</label><select id="fTerm" required><option value="Term 1">Term 1</option><option value="Term 2" selected>Term 2</option><option value="Term 3">Term 3</option></select></div>
-                                    <div class="form-group"><label>Year</label><select id="fYear" required><option value="2025">2025</option><option value="2026" selected>2026</option><option value="2027">2027</option></select></div>
-                                    <div class="form-group"><label>Grade</label><input type="text" id="fGrade" placeholder="e.g. 1, ECE, 8" required /></div>
-                                    <div class="form-group"><label>Age Range</label><input type="text" id="fAgeRange" placeholder="e.g. 6–11" /></div>
-                                    <div class="form-group"><label>Boys</label><input type="number" id="fEnrolBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Girls</label><input type="number" id="fEnrolGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Teen Preg (Girls)</label><input type="number" id="fTeenPreg" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Early Marriage Boys</label><input type="number" id="fEarlyMarriageBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Early Marriage Girls</label><input type="number" id="fEarlyMarriageGirls" value="0" min="0" /></div>
-                                </div>
-                                <div class="section-label"><i class="fas fa-user-slash"></i> Dropouts due to:</div>
-                                <div class="form-row-3">
-                                    <div class="form-group"><label>Preg Boys</label><input type="number" id="fDropPregBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Preg Girls</label><input type="number" id="fDropPregGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Marriage Boys</label><input type="number" id="fDropMarriageBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Marriage Girls</label><input type="number" id="fDropMarriageGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Death Boys</label><input type="number" id="fDropDeathBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Death Girls</label><input type="number" id="fDropDeathGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Illness Boys</label><input type="number" id="fDropIllnessBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Illness Girls</label><input type="number" id="fDropIllnessGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Orphaned Boys</label><input type="number" id="fDropOrphanedBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Orphaned Girls</label><input type="number" id="fDropOrphanedGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Economic Boys</label><input type="number" id="fDropEconomicBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Economic Girls</label><input type="number" id="fDropEconomicGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>OVC Boys</label><input type="number" id="fDropOvcBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>OVC Girls</label><input type="number" id="fDropOvcGirls" value="0" min="0" /></div>
-                                </div>
-                                <div class="section-label"><i class="fas fa-chart-bar"></i> Other Indicators</div>
-                                <div class="form-row-3">
-                                    <div class="form-group"><label>Absent Boys</label><input type="number" id="fAbsentBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Absent Girls</label><input type="number" id="fAbsentGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Re-entry Boys</label><input type="number" id="fReentryBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Re-entry Girls</label><input type="number" id="fReentryGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Re-admit Boys</label><input type="number" id="fReadmissionBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Re-admit Girls</label><input type="number" id="fReadmissionGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Defilement Boys</label><input type="number" id="fDefilementBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>Defilement Girls</label><input type="number" id="fDefilementGirls" value="0" min="0" /></div>
-                                    <div class="form-group"><label>OVC Boys</label><input type="number" id="fOvcBoys" value="0" min="0" /></div>
-                                    <div class="form-group"><label>OVC Girls</label><input type="number" id="fOvcGirls" value="0" min="0" /></div>
-                                </div>
-                                <div class="entry-actions"><button type="submit" class="btn btn-primary" id="entrySubmitBtn"><i class="fas fa-save"></i> Save</button><button type="button" class="btn btn-outline" onclick="resetEntryForm()"><i class="fas fa-undo"></i> Clear</button></div>
-                            </form>
-                        </div>
-                        <div class="mt-12">
-                            <div class="flex-between"><span style="font-weight:700;font-size:15px;color:var(--primary);"><i class="fas fa-list"></i> Entries</span><span id="entryCount" style="font-size:13px;color:var(--text-light);">0 records</span></div>
-                            <div class="table-scroll mt-8"><table><thead><tr><th>Term</th><th>Year</th><th>Grade</th><th>Boys</th><th>Girls</th><th>Total</th><th>Age</th><th>Preg</th><th>Drop</th><th>Abs</th><th>Re</th><th>Def</th><th>OVC</th><th style="text-align:right;">Action</th></tr></thead><tbody id="teacherDataBody"></tbody></table></div>
-                        </div>
-                    </div>
+                <!-- Excel Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <td colspan="37" class="header-ministry">MINISTRY OF EDUCATION</td>
+                            </tr>
+                            <tr>
+                                <td colspan="37" class="header-ministry-sub">MUNGWI DISTRICT EDUCATION BOARD</td>
+                            </tr>
+                            <tr>
+                                <td colspan="37" class="header-ministry-sub" style="background:#1a3a5c;color:#fff;font-size:14px;padding:6px;">
+                                    TERM TWO 2025
+                                </td>
+                            </tr>
+                            <tr>
+                                <th rowspan="3" class="header-main" style="min-width:30px;">S/N</th>
+                                <th rowspan="3" class="header-main" style="min-width:140px;text-align:left;padding-left:12px;">NAME OF SCHOOL</th>
+                                <th rowspan="3" class="header-main" style="min-width:40px;">GRADE</th>
+                                <th colspan="3" class="header-main">ENROLMENT</th>
+                                <th rowspan="3" class="header-main" style="min-width:50px;">AGE RANGE</th>
+                                <th rowspan="3" class="header-main" style="min-width:40px;">TEEN PREG</th>
+                                <th colspan="3" class="header-main">EARLY MARRIAGES</th>
+                                <th colspan="22" class="header-main">NO OF DROP OUTS DUE TO:</th>
+                                <th colspan="3" class="header-main">ABSENTEEISM</th>
+                                <th colspan="3" class="header-main">RE-ENTRY</th>
+                                <th colspan="2" class="header-main">RE-ADMISSION</th>
+                                <th colspan="3" class="header-main">OVC</th>
+                            </tr>
+                            <tr>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Total</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Total</th>
+                                <th colspan="2" class="header-sub">Pregnancy</th>
+                                <th colspan="2" class="header-sub">Marriage</th>
+                                <th colspan="2" class="header-sub">Death</th>
+                                <th colspan="2" class="header-sub">Illness</th>
+                                <th colspan="2" class="header-sub">Orphaned</th>
+                                <th colspan="2" class="header-sub">Economic</th>
+                                <th colspan="2" class="header-sub">OVC</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Total</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Total</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Boys</th>
+                                <th class="header-sub">Girls</th>
+                                <th class="header-sub">Total</th>
+                            </tr>
+                            <tr>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt">Boys</th>
+                                <th class="header-sub-alt">Girls</th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                                <th class="header-sub-alt"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryBody">
+                            <tr>
+                                <td colspan="37" style="text-align:center;padding:40px;color:#9ca3af;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size:28px;display:block;margin-bottom:10px;"></i>
+                                    Loading data...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+            </div>
 
-                <!-- ALL DATA -->
-                <div id="tab-adminData" class="tab-content admin-only">
-                    <div class="card">
-                        <div class="flex-between"><div class="card-title" style="margin-bottom:0;"><i class="fas fa-table"></i> All Records</div>
-                            <div class="flex"><select id="adminFilterSchool" onchange="loadData()" style="padding:6px 10px;border-radius:var(--radius-sm);border:1.5px solid var(--border);font-size:13px;background:#fff;"><option value="">All Schools</option></select><button class="btn btn-primary btn-sm" onclick="loadData()"><i class="fas fa-sync"></i></button></div>
+            <!-- ===== SHEET 2: SCHOOLS ===== -->
+            <div class="worksheet" id="sheet-schools">
+                <div class="flex-between">
+                    <div class="flex">
+                        <button class="btn btn-success" onclick="toggleAddSchool()">
+                            <i class="fas fa-plus"></i> Add School
+                        </button>
+                        <div id="addSchoolForm" class="hidden" style="display:inline-flex;gap:8px;align-items:center;">
+                            <input type="text" id="newSchoolName" placeholder="Enter school name..." />
+                            <button class="btn btn-primary btn-sm" onclick="addSchool()">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                            <button class="btn btn-outline btn-sm" onclick="toggleAddSchool()">Cancel</button>
                         </div>
-                        <div class="table-scroll mt-8"><table><thead><tr><th>School</th><th>Term</th><th>Year</th><th>Grade</th><th>Boys</th><th>Girls</th><th>Total</th><th>Age</th><th>Preg</th><th>Drop</th><th>Abs</th><th>Re</th><th>Def</th><th>OVC</th><th style="text-align:right;">Action</th></tr></thead><tbody id="adminDataBody"></tbody></table></div>
                     </div>
+                    <span class="text-muted" style="font-size:12px;" id="schoolCount">0 schools</span>
                 </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="header-main" style="width:50px;">#</th>
+                                <th class="header-main" style="text-align:left;padding-left:16px;">School Name</th>
+                                <th class="header-main" style="width:100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schoolsBody">
+                            <tr>
+                                <td colspan="3" class="empty-state">
+                                    <i class="fas fa-school"></i>
+                                    <p>No schools added yet.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                <!-- EXPORT -->
-                <div id="tab-adminExport" class="tab-content admin-only">
-                    <div class="card">
-                        <div class="card-title"><i class="fas fa-file-export"></i> Export Data</div>
-                        <p style="color:var(--text-light);margin-bottom:16px;font-size:14px;">Download the official MOE "Termly Reporting Tool" Excel format.</p>
-                        <div class="flex">
-                            <button class="btn btn-success" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel (MOE Format)</button>
-                            <button class="btn btn-outline" onclick="exportToCSV()"><i class="fas fa-file-csv"></i> CSV</button>
-                        </div>
+            <!-- ===== SHEET 3: ALL RECORDS ===== -->
+            <div class="worksheet" id="sheet-records">
+                <div class="flex-between">
+                    <div class="flex">
+                        <select id="filterSchool" onchange="applyFilter()">
+                            <option value="">All Schools</option>
+                        </select>
+                        <button class="btn btn-primary btn-sm" onclick="loadData()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+                    <span class="text-muted" style="font-size:12px;" id="recordCount">0 records</span>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="header-main" style="text-align:left;padding-left:12px;">School</th>
+                                <th class="header-main">Grade</th>
+                                <th class="header-main">Boys</th>
+                                <th class="header-main">Girls</th>
+                                <th class="header-main">Total</th>
+                                <th class="header-main">Age</th>
+                                <th class="header-main">Preg</th>
+                                <th class="header-main">Drop</th>
+                                <th class="header-main">Abs</th>
+                                <th class="header-main">Re</th>
+                                <th class="header-main">OVC</th>
+                                <th class="header-main" style="width:70px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody">
+                            <tr>
+                                <td colspan="12" class="empty-state">
+                                    <i class="fas fa-inbox"></i>
+                                    <p>No records found.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ===== SHEET 4: EXPORT ===== -->
+            <div class="worksheet" id="sheet-export">
+                <div style="max-width:600px;margin:20px auto;text-align:center;padding:30px 20px;">
+                    <i class="fas fa-file-export" style="font-size:48px;color:var(--accent-dark);margin-bottom:16px;display:block;"></i>
+                    <h2 style="color:var(--primary);margin-bottom:8px;">Export Data</h2>
+                    <p style="color:var(--text-light);margin-bottom:20px;font-size:14px;">
+                        Download all records as Excel or CSV format.
+                    </p>
+                    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+                        <button class="btn btn-success" onclick="exportToExcel()" style="padding:12px 32px;font-size:15px;">
+                            <i class="fas fa-file-excel"></i> Export to Excel
+                        </button>
+                        <button class="btn btn-outline" onclick="exportToCSV()" style="padding:12px 32px;font-size:15px;">
+                            <i class="fas fa-file-csv"></i> Export to CSV
+                        </button>
+                    </div>
+                    <div style="margin-top:20px;font-size:12px;color:var(--text-light);">
+                        <span id="exportCount">0</span> records will be exported.
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 
     <script>
         // ================================================================
-        //  CONFIG
+        //  SUPABASE CONFIG
         // ================================================================
         const SUPABASE_URL = 'https://vnkqhwqolwxoxfwrqqaj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZua3Fod3FvbHd4b3hmd3JxcWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNTA5MjcsImV4cCI6MjEwMDgyNjkyN30.KcNuU2QSpkYKJh8PkNtjKgPCeK13KJNGgXlJZLaY8W8';
-        const ADMIN_PASSWORD = "MungwiDebs2026"; 
 
-        let supabaseClient = null;
+        let supabase = null;
         let schools = [];
         let records = [];
-        let teacherRecords = [];
-        let teacherSchoolId = null;
-        let adminDataCache = [];
+        let filteredRecords = [];
         let isSupabaseConnected = false;
-        let currentUserRole = 'user'; 
+        let dataLoaded = false;
 
+        // ================================================================
+        //  DOM REFS
+        // ================================================================
         const $ = id => document.getElementById(id);
 
         // ================================================================
-        //  ADMIN LOGIN
+        //  TOAST
         // ================================================================
-        function openAdminLogin() {
-            if(currentUserRole === 'admin') {
-                if(confirm('Logout from Admin mode?')) {
-                    currentUserRole = 'user';
-                    applyPermissions();
-                    $('roleTag').textContent = 'USER';
-                    $('adminToggleBtn').innerHTML = '<i class="fas fa-user-shield"></i> Admin';
-                    $('adminToggleBtn').className = 'btn btn-sm btn-login-admin';
-                    showToast('👋 Switched to User Mode', 'info');
-                }
-                return;
-            }
-            $('adminLoginOverlay').classList.add('show');
-            $('loginPassword').value = '';
-            $('loginError').style.display = 'none';
-            setTimeout(() => $('loginPassword').focus(), 100);
-        }
-
-        function closeAdminLogin() { $('adminLoginOverlay').classList.remove('show'); }
-
-        function adminLogin() {
-            const pass = $('loginPassword').value;
-            if (pass === ADMIN_PASSWORD) {
-                currentUserRole = 'admin';
-                $('loginError').style.display = 'none';
-                $('adminLoginOverlay').classList.remove('show');
-                $('roleTag').textContent = 'ADMIN';
-                $('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> Admin';
-                $('adminToggleBtn').className = 'btn btn-sm btn-danger';
-                applyPermissions();
-                showToast('🔓 Welcome Admin!', 'success');
-            } else {
-                $('loginError').style.display = 'block';
-                $('loginPassword').value = '';
-                $('loginPassword').focus();
-            }
-        }
-
-        function applyPermissions() {
-            const isAdmin = currentUserRole === 'admin';
-            document.querySelectorAll('.admin-only').forEach(el => {
-                if(isAdmin) el.classList.remove('hidden-tab', 'hidden');
-                else el.classList.add('hidden-tab');
-            });
-            const activeTab = document.querySelector('.tab-bar .tab.active');
-            if(activeTab && activeTab.classList.contains('hidden-tab')) {
-                document.querySelector('.tab[data-tab="adminSchools"]').click();
-            }
-            loadSchools();
-        }
+        let toastTimeout = null;
 
         function showToast(message, type = 'info') {
             const toast = $('toast');
-            toast.textContent = message; toast.className = 'toast toast-' + type;
+            const icon = $('toastIcon');
+            const msg = $('toastMsg');
+
+            if (toastTimeout) clearTimeout(toastTimeout);
+
+            const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+            icon.textContent = icons[type] || 'ℹ️';
+            msg.textContent = message;
+            toast.className = 'toast ' + type;
             toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 4000);
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
         }
-        function updateStatusDot(connected) {
-            const dot = $('statusDot'); const text = $('statusText');
-            if (connected) { dot.className = 'status-dot online'; text.textContent = 'Supabase Online'; }
-            else { dot.className = 'status-dot offline'; text.textContent = 'Offline (Local)'; }
+
+        function hideToast() {
+            const toast = $('toast');
+            toast.classList.remove('show');
+            if (toastTimeout) clearTimeout(toastTimeout);
         }
 
         // ================================================================
-        //  INIT SUPABASE
+        //  STATUS DOT
         // ================================================================
-        async function initSupabase() {
-            try {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                const { data, error } = await supabaseClient.from('schools').select('count', { count: 'exact', head: true });
-                if (error) {
-                    if (error.message && error.message.includes('relation "schools" does not exist')) {
-                        console.warn('⚠️ Tables not found. Run SQL.');
-                        isSupabaseConnected = false; updateStatusDot(false);
-                        showToast('⚠️ Tables not found. Using local storage.', 'error');
-                        return false;
-                    }
-                    console.warn('⚠️ Supabase connection test failed:', error.message);
-                    isSupabaseConnected = false; updateStatusDot(false);
-                    showToast('⚠️ Supabase error: ' + error.message, 'error');
-                    return false;
-                }
-                isSupabaseConnected = true; updateStatusDot(true);
-                showToast('✅ Connected to Supabase', 'success');
-                return true;
-            } catch (e) {
-                console.warn('⚠️ Supabase not available:', e.message);
-                isSupabaseConnected = false; updateStatusDot(false);
-                showToast('⚠️ Using local storage only', 'info');
-                return false;
+        function updateStatusDot(connected) {
+            const dot = $('statusDot');
+            const text = $('statusText');
+            if (connected) {
+                dot.className = 'status-dot online';
+                text.textContent = 'Online';
+            } else {
+                dot.className = 'status-dot offline';
+                text.textContent = 'Offline';
             }
+        }
+
+        // ================================================================
+        //  SAMPLE DATA
+        // ================================================================
+        function getSampleSchools() {
+            return [
+                { id: 's1', name: 'CHAMFUBU PRIMARY' },
+                { id: 's2', name: 'CHANUNDU PRIMARY' },
+                { id: 's3', name: 'CHEWE PRIMARY' },
+                { id: 's4', name: 'CHIFULO PRIMARY' },
+                { id: 's5', name: 'CHIKULU PRIMARY' },
+                { id: 's6', name: 'CHITANGA PRIMARY' },
+                { id: 's7', name: 'KABWE PRIMARY' },
+                { id: 's8', name: 'KALALA PRIMARY' },
+                { id: 's9', name: 'KAMENA PRIMARY' },
+                { id: 's10', name: 'MILANDO PRIMARY' },
+            ];
+        }
+
+        function getSampleRecords() {
+            return [
+                { id: 'r1', school_id: 's1', grade: '1', enrolment_boys: 154, enrolment_girls: 153, age_range: '6-11',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0,
+                    dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 1, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 1, dropout_orphaned_girls: 0, dropout_economic_boys: 0,
+                    dropout_economic_girls: 1,
+                    dropout_ovc_boys: 0, dropout_ovc_girls: 0,
+                    absenteeism_boys: 28, absenteeism_girls: 34, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 2, readmission_girls: 0, ovc_boys: 8, ovc_girls: 12 },
+                { id: 'r2', school_id: 's2', grade: '1', enrolment_boys: 41, enrolment_girls: 44, age_range: '6–11',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0,
+                    dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 3, dropout_orphaned_girls: 2, dropout_economic_boys: 0,
+                    dropout_economic_girls: 0,
+                    dropout_ovc_boys: 12, dropout_ovc_girls: 11,
+                    absenteeism_boys: 12, absenteeism_girls: 7, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 0, readmission_girls: 0, ovc_boys: 0, ovc_girls: 0 },
+                { id: 'r3', school_id: 's2', grade: '2', enrolment_boys: 40, enrolment_girls: 42, age_range: '8–13',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0,
+                    dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 4, dropout_orphaned_girls: 1, dropout_economic_boys: 0,
+                    dropout_economic_girls: 0,
+                    dropout_ovc_boys: 11, dropout_ovc_girls: 9,
+                    absenteeism_boys: 8, absenteeism_girls: 7, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 0, readmission_girls: 0, ovc_boys: 0, ovc_girls: 0 },
+                { id: 'r4', school_id: 's3', grade: '1', enrolment_boys: 25, enrolment_girls: 15, age_range: '7–8',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0,
+                    dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 0, dropout_orphaned_girls: 0, dropout_economic_boys: 0,
+                    dropout_economic_girls: 0,
+                    dropout_ovc_boys: 0, dropout_ovc_girls: 0,
+                    absenteeism_boys: 180, absenteeism_girls: 150, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 0, readmission_girls: 0, ovc_boys: 0, ovc_girls: 0 },
+                { id: 'r5', school_id: 's4', grade: '3', enrolment_boys: 299, enrolment_girls: 279, age_range: '9–12',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0,
+                    dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 0, dropout_orphaned_girls: 0, dropout_economic_boys: 0,
+                    dropout_economic_girls: 0,
+                    dropout_ovc_boys: 0, dropout_ovc_girls: 0,
+                    absenteeism_boys: 40, absenteeism_girls: 31, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 0, readmission_girls: 0, ovc_boys: 7, ovc_girls: 3 },
+                { id: 'r6', school_id: 's5', grade: '2', enrolment_boys: 184, enrolment_girls: 132, age_range: '8–11',
+                    teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 1,
+                    dropout_preg_boys: 0, dropout_preg_girls: 1, dropout_marriage_boys: 1, dropout_marriage_girls: 0,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 0, dropout_illness_girls: 0,
+                    dropout_orphaned_boys: 28, dropout_orphaned_girls: 37, dropout_economic_boys: 15,
+                    dropout_economic_girls: 16,
+                    dropout_ovc_boys: 0, dropout_ovc_girls: 0,
+                    absenteeism_boys: 36, absenteeism_girls: 29, reentry_boys: 0, reentry_girls: 0,
+                    readmission_boys: 3, readmission_girls: 2, ovc_boys: 14, ovc_girls: 17 },
+                { id: 'r7', school_id: 's6', grade: '4', enrolment_boys: 224, enrolment_girls: 212, age_range: '10–14',
+                    teen_preg: 1, early_marriage_boys: 0, early_marriage_girls: 1,
+                    dropout_preg_boys: 0, dropout_preg_girls: 1, dropout_marriage_boys: 0, dropout_marriage_girls: 1,
+                    dropout_death_boys: 0, dropout_death_girls: 0, dropout_illness_boys: 1, dropout_illness_girls: 1,
+                    dropout_orphaned_boys: 2, dropout_orphaned_girls: 5, dropout_economic_boys: 0,
+                    dropout_economic_girls: 2,
+                    dropout_ovc_boys: 2, dropout_ovc_girls: 0,
+                    absenteeism_boys: 13, absenteeism_girls: 11, reentry_boys: 4, reentry_girls: 1,
+                    readmission_boys: 4, readmission_girls: 1, ovc_boys: 10, ovc_girls: 17 },
+            ];
         }
 
         // ================================================================
         //  LOAD DATA
         // ================================================================
         async function loadData() {
+            showToast('📊 Loading data...', 'info');
+
             try {
-                let schoolsData = [];
-                if (isSupabaseConnected && supabaseClient) {
+                // Try localStorage first (fastest)
+                let schoolsData = JSON.parse(localStorage.getItem('schools') || 'null');
+                let recordsData = JSON.parse(localStorage.getItem('records') || 'null');
+
+                if (schoolsData && recordsData && schoolsData.length > 0) {
+                    schools = schoolsData;
+                    records = recordsData;
+                    filteredRecords = records;
+                    renderAll();
+                    showToast('📊 Loaded ' + records.length + ' records from local storage', 'success');
+                    dataLoaded = true;
+                }
+
+                // Then try Supabase
+                if (supabase) {
                     try {
-                        const { data, error } = await supabaseClient.from('schools').select('*').order('name');
-                        if (!error && data && data.length > 0) schoolsData = data;
-                        else {
-                            schoolsData = JSON.parse(localStorage.getItem('schools') || '[]');
-                            if (schoolsData.length > 0 && isSupabaseConnected) {
-                                for (const s of schoolsData) await supabaseClient.from('schools').upsert(s, { onConflict: 'id' });
-                            }
+                        const { data: sData, error: sErr } = await supabase.from('schools').select('*').order('name');
+                        if (!sErr && sData && sData.length > 0) {
+                            schools = sData;
+                            localStorage.setItem('schools', JSON.stringify(schools));
                         }
-                    } catch (e) { schoolsData = JSON.parse(localStorage.getItem('schools') || '[]'); }
-                } else { schoolsData = JSON.parse(localStorage.getItem('schools') || '[]'); }
 
-                if (schoolsData.length === 0) { await seedSampleData(); return; }
-                schools = schoolsData;
+                        const { data: rData, error: rErr } = await supabase.from('records').select('*').order(
+                            'created_at', { ascending: false });
+                        if (!rErr && rData && rData.length > 0) {
+                            records = rData;
+                            localStorage.setItem('records', JSON.stringify(records));
+                            filteredRecords = records;
+                            renderAll();
+                            showToast('✅ Loaded ' + records.length + ' records from Supabase', 'success');
+                            dataLoaded = true;
+                        }
+                    } catch (e) {
+                        console.warn('Supabase load error:', e);
+                    }
+                }
 
-                let recordsData = [];
-                if (isSupabaseConnected && supabaseClient) {
+                // If still no data, seed sample
+                if (!dataLoaded || (schools.length === 0 && records.length === 0)) {
+                    schools = getSampleSchools();
+                    records = getSampleRecords();
+                    localStorage.setItem('schools', JSON.stringify(schools));
+                    localStorage.setItem('records', JSON.stringify(records));
+                    filteredRecords = records;
+                    renderAll();
+                    showToast('📦 Sample data loaded', 'info');
+                    dataLoaded = true;
+                }
+
+                // Try to sync to Supabase
+                if (isSupabaseConnected && supabase && dataLoaded) {
                     try {
-                        const { data, error } = await supabaseClient.from('records').select('*').order('created_at', { ascending: false });
-                        if (!error && data && data.length > 0) recordsData = data;
-                        else {
-                            recordsData = JSON.parse(localStorage.getItem('records') || '[]');
-                            if (recordsData.length > 0 && isSupabaseConnected) {
-                                for (const r of recordsData) await supabaseClient.from('records').upsert(r, { onConflict: 'id' });
-                            }
+                        for (const s of schools) {
+                            await supabase.from('schools').upsert(s, { onConflict: 'id' });
                         }
-                    } catch (e) { recordsData = JSON.parse(localStorage.getItem('records') || '[]'); }
-                } else { recordsData = JSON.parse(localStorage.getItem('records') || '[]'); }
-                records = recordsData;
+                        for (const r of records) {
+                            await supabase.from('records').upsert(r, { onConflict: 'id' });
+                        }
+                    } catch (e) {
+                        console.warn('Supabase sync error:', e);
+                    }
+                }
 
-                const filterSchool = $('adminFilterSchool'); const filterVal = filterSchool ? filterSchool.value : '';
-                let filteredRecords = records; if (filterVal) filteredRecords = records.filter(r => r.school_id === filterVal);
-                adminDataCache = filteredRecords;
-                renderAdminData(); updateStats(); loadSchools(); loadTeacherSelector();
-                $('lastUpdatedAdmin').textContent = new Date().toLocaleTimeString();
-                if (records.length > 0) showToast('📊 Loaded ' + records.length + ' records', 'success');
-            } catch (err) { console.error('Load error:', err); showToast('Error loading data: ' + err.message, 'error'); }
-        }
-
-        // ================================================================
-        //  SEED SAMPLE DATA
-        // ================================================================
-        async function seedSampleData() {
-            showToast('📦 Seeding sample data...', 'info');
-            const sampleSchools = [ { id: 's1', name: 'CHAMFUBU PRIMARY' }, { id: 's2', name: 'CHANDA-WEYAYA PRIMARY' } ];
-            const sampleRecords = [
-                { id: 'r1', school_id: 's1', term: 'Term 2', year: 2026, grade: '1', enrolment_boys: 154, enrolment_girls: 153, age_range: '6-11', teen_preg: 0, early_marriage_boys: 0, early_marriage_girls: 0, dropout_preg_boys: 0, dropout_preg_girls: 0, dropout_marriage_boys: 0, dropout_marriage_girls: 0, dropout_death_boys: 0, dropout_death_girls: 1, dropout_illness_boys: 0, dropout_illness_girls: 0, dropout_orphaned_boys: 1, dropout_orphaned_girls: 0, dropout_economic_boys: 0, dropout_economic_girls: 1, dropout_ovc_boys: 0, dropout_ovc_girls: 0, absenteeism_boys: 28, absenteeism_girls: 34, reentry_boys: 0, reentry_girls: 0, readmission_boys: 2, readmission_girls: 0, defilement_boys: 0, defilement_girls: 0, ovc_boys: 8, ovc_girls: 12 }
-            ];
-            let savedToSupabase = false;
-            if (isSupabaseConnected && supabaseClient) {
-                try {
-                    for (const s of sampleSchools) await supabaseClient.from('schools').upsert(s, { onConflict: 'id' });
-                    for (const r of sampleRecords) await supabaseClient.from('records').upsert(r, { onConflict: 'id' });
-                    savedToSupabase = true; showToast('✅ Sample data saved to Supabase!', 'success');
-                } catch (e) { console.warn('Supabase seed error:', e); }
+            } catch (err) {
+                console.error('Load error:', err);
+                schools = getSampleSchools();
+                records = getSampleRecords();
+                filteredRecords = records;
+                renderAll();
+                showToast('⚠️ Using sample data', 'warning');
+                dataLoaded = true;
             }
-            localStorage.setItem('schools', JSON.stringify(sampleSchools));
-            localStorage.setItem('records', JSON.stringify(sampleRecords));
-            if (!savedToSupabase) showToast('📦 Sample data saved locally.', 'info');
-            await loadData();
+
+            updateBadges();
         }
 
         // ================================================================
-        //  RENDER FUNCTIONS
+        //  RENDER ALL
         // ================================================================
-        function renderAdminData() {
-            const tbody = $('adminDataBody'); if (!tbody) return;
-            if (adminDataCache.length === 0) { tbody.innerHTML = `<tr><td colspan="15"><div class="empty-state"><i class="fas fa-inbox"></i><p>No records found</p></div></td></tr>`; return; }
-            const schoolMap = {}; schools.forEach(s => schoolMap[s.id] = s.name);
-            tbody.innerHTML = adminDataCache.map(r => {
+        function renderAll() {
+            renderSummary();
+            renderSchools();
+            renderRecords();
+            updateStats();
+            populateFilter();
+            updateBadges();
+        }
+
+        // ================================================================
+        //  RENDER SUMMARY
+        // ================================================================
+        function renderSummary() {
+            const tbody = $('summaryBody');
+            if (!tbody) return;
+
+            if (records.length === 0) {
+                tbody.innerHTML =
+                    `<tr><td colspan="37" class="empty-state"><i class="fas fa-inbox"></i><p>No records found.</p></td></tr>`;
+                return;
+            }
+
+            const schoolMap = {};
+            schools.forEach(s => schoolMap[s.id] = s.name);
+
+            let totals = {
+                boys: 0,
+                girls: 0,
+                total: 0,
+                teen_preg: 0,
+                early_marriage_boys: 0,
+                early_marriage_girls: 0,
+                early_marriage_total: 0,
+                dropout_preg_boys: 0,
+                dropout_preg_girls: 0,
+                dropout_marriage_boys: 0,
+                dropout_marriage_girls: 0,
+                dropout_death_boys: 0,
+                dropout_death_girls: 0,
+                dropout_illness_boys: 0,
+                dropout_illness_girls: 0,
+                dropout_orphaned_boys: 0,
+                dropout_orphaned_girls: 0,
+                dropout_economic_boys: 0,
+                dropout_economic_girls: 0,
+                dropout_ovc_boys: 0,
+                dropout_ovc_girls: 0,
+                absenteeism_boys: 0,
+                absenteeism_girls: 0,
+                absenteeism_total: 0,
+                reentry_boys: 0,
+                reentry_girls: 0,
+                reentry_total: 0,
+                readmission_boys: 0,
+                readmission_girls: 0,
+                ovc_boys: 0,
+                ovc_girls: 0,
+                ovc_total: 0
+            };
+
+            let html = '';
+            records.forEach((r, i) => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
-                const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) + (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) + (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) + (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) + (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) + (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) + (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
+                const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
+                const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
+                const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
+                const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
+                const schoolName = schoolMap[r.school_id] || r.school_id;
+
+                totals.boys += (r.enrolment_boys || 0);
+                totals.girls += (r.enrolment_girls || 0);
+                totals.total += total;
+                totals.teen_preg += (r.teen_preg || 0);
+                totals.early_marriage_boys += (r.early_marriage_boys || 0);
+                totals.early_marriage_girls += (r.early_marriage_girls || 0);
+                totals.early_marriage_total += earlyTotal;
+                totals.dropout_preg_boys += (r.dropout_preg_boys || 0);
+                totals.dropout_preg_girls += (r.dropout_preg_girls || 0);
+                totals.dropout_marriage_boys += (r.dropout_marriage_boys || 0);
+                totals.dropout_marriage_girls += (r.dropout_marriage_girls || 0);
+                totals.dropout_death_boys += (r.dropout_death_boys || 0);
+                totals.dropout_death_girls += (r.dropout_death_girls || 0);
+                totals.dropout_illness_boys += (r.dropout_illness_boys || 0);
+                totals.dropout_illness_girls += (r.dropout_illness_girls || 0);
+                totals.dropout_orphaned_boys += (r.dropout_orphaned_boys || 0);
+                totals.dropout_orphaned_girls += (r.dropout_orphaned_girls || 0);
+                totals.dropout_economic_boys += (r.dropout_economic_boys || 0);
+                totals.dropout_economic_girls += (r.dropout_economic_girls || 0);
+                totals.dropout_ovc_boys += (r.dropout_ovc_boys || 0);
+                totals.dropout_ovc_girls += (r.dropout_ovc_girls || 0);
+                totals.absenteeism_boys += (r.absenteeism_boys || 0);
+                totals.absenteeism_girls += (r.absenteeism_girls || 0);
+                totals.absenteeism_total += absentTotal;
+                totals.reentry_boys += (r.reentry_boys || 0);
+                totals.reentry_girls += (r.reentry_girls || 0);
+                totals.reentry_total += reentryTotal;
+                totals.readmission_boys += (r.readmission_boys || 0);
+                totals.readmission_girls += (r.readmission_girls || 0);
+                totals.ovc_boys += (r.ovc_boys || 0);
+                totals.ovc_girls += (r.ovc_girls || 0);
+                totals.ovc_total += ovcTotal;
+
+                html += `<tr class="row-school">
+                            <td class="sn">${i+1}</td>
+                            <td class="school-name">${schoolName}</td>
+                            <td>${r.grade || '-'}</td>
+                            <td>${r.enrolment_boys || 0}</td>
+                            <td>${r.enrolment_girls || 0}</td>
+                            <td><strong>${total}</strong></td>
+                            <td>${r.age_range || '-'}</td>
+                            <td>${r.teen_preg || 0}</td>
+                            <td>${r.early_marriage_boys || 0}</td>
+                            <td>${r.early_marriage_girls || 0}</td>
+                            <td>${earlyTotal}</td>
+                            <td>${r.dropout_preg_boys || 0}</td>
+                            <td>${r.dropout_preg_girls || 0}</td>
+                            <td>${r.dropout_marriage_boys || 0}</td>
+                            <td>${r.dropout_marriage_girls || 0}</td>
+                            <td>${r.dropout_death_boys || 0}</td>
+                            <td>${r.dropout_death_girls || 0}</td>
+                            <td>${r.dropout_illness_boys || 0}</td>
+                            <td>${r.dropout_illness_girls || 0}</td>
+                            <td>${r.dropout_orphaned_boys || 0}</td>
+                            <td>${r.dropout_orphaned_girls || 0}</td>
+                            <td>${r.dropout_economic_boys || 0}</td>
+                            <td>${r.dropout_economic_girls || 0}</td>
+                            <td>${r.dropout_ovc_boys || 0}</td>
+                            <td>${r.dropout_ovc_girls || 0}</td>
+                            <td>${r.absenteeism_boys || 0}</td>
+                            <td>${r.absenteeism_girls || 0}</td>
+                            <td>${absentTotal}</td>
+                            <td>${r.reentry_boys || 0}</td>
+                            <td>${r.reentry_girls || 0}</td>
+                            <td>${reentryTotal}</td>
+                            <td>${r.readmission_boys || 0}</td>
+                            <td>${r.readmission_girls || 0}</td>
+                            <td>${r.ovc_boys || 0}</td>
+                            <td>${r.ovc_girls || 0}</td>
+                            <td>${ovcTotal}</td>
+                        </tr>`;
+            });
+
+            const grandTotal = totals.total;
+            html += `<tr class="row-total">
+                        <td colspan="3" style="text-align:left;padding-left:12px;">TOTAL</td>
+                        <td>${totals.boys}</td>
+                        <td>${totals.girls}</td>
+                        <td>${grandTotal}</td>
+                        <td></td>
+                        <td>${totals.teen_preg}</td>
+                        <td>${totals.early_marriage_boys}</td>
+                        <td>${totals.early_marriage_girls}</td>
+                        <td>${totals.early_marriage_total}</td>
+                        <td>${totals.dropout_preg_boys}</td>
+                        <td>${totals.dropout_preg_girls}</td>
+                        <td>${totals.dropout_marriage_boys}</td>
+                        <td>${totals.dropout_marriage_girls}</td>
+                        <td>${totals.dropout_death_boys}</td>
+                        <td>${totals.dropout_death_girls}</td>
+                        <td>${totals.dropout_illness_boys}</td>
+                        <td>${totals.dropout_illness_girls}</td>
+                        <td>${totals.dropout_orphaned_boys}</td>
+                        <td>${totals.dropout_orphaned_girls}</td>
+                        <td>${totals.dropout_economic_boys}</td>
+                        <td>${totals.dropout_economic_girls}</td>
+                        <td>${totals.dropout_ovc_boys}</td>
+                        <td>${totals.dropout_ovc_girls}</td>
+                        <td>${totals.absenteeism_boys}</td>
+                        <td>${totals.absenteeism_girls}</td>
+                        <td>${totals.absenteeism_total}</td>
+                        <td>${totals.reentry_boys}</td>
+                        <td>${totals.reentry_girls}</td>
+                        <td>${totals.reentry_total}</td>
+                        <td>${totals.readmission_boys}</td>
+                        <td>${totals.readmission_girls}</td>
+                        <td>${totals.ovc_boys}</td>
+                        <td>${totals.ovc_girls}</td>
+                        <td>${totals.ovc_total}</td>
+                    </tr>`;
+
+            const pct = (val) => grandTotal > 0 ? ((val / grandTotal) * 100).toFixed(1) + '%' : '0.0%';
+            html += `<tr class="row-percentage">
+                        <td colspan="6" style="text-align:left;padding-left:12px;">PERCENTAGE TOTALS</td>
+                        <td></td>
+                        <td>${pct(totals.teen_preg)}</td>
+                        <td>${pct(totals.early_marriage_boys)}</td>
+                        <td>${pct(totals.early_marriage_girls)}</td>
+                        <td>${pct(totals.early_marriage_total)}</td>
+                        <td>${pct(totals.dropout_preg_boys)}</td>
+                        <td>${pct(totals.dropout_preg_girls)}</td>
+                        <td>${pct(totals.dropout_marriage_boys)}</td>
+                        <td>${pct(totals.dropout_marriage_girls)}</td>
+                        <td>${pct(totals.dropout_death_boys)}</td>
+                        <td>${pct(totals.dropout_death_girls)}</td>
+                        <td>${pct(totals.dropout_illness_boys)}</td>
+                        <td>${pct(totals.dropout_illness_girls)}</td>
+                        <td>${pct(totals.dropout_orphaned_boys)}</td>
+                        <td>${pct(totals.dropout_orphaned_girls)}</td>
+                        <td>${pct(totals.dropout_economic_boys)}</td>
+                        <td>${pct(totals.dropout_economic_girls)}</td>
+                        <td>${pct(totals.dropout_ovc_boys)}</td>
+                        <td>${pct(totals.dropout_ovc_girls)}</td>
+                        <td>${pct(totals.absenteeism_boys)}</td>
+                        <td>${pct(totals.absenteeism_girls)}</td>
+                        <td>${pct(totals.absenteeism_total)}</td>
+                        <td>${pct(totals.reentry_boys)}</td>
+                        <td>${pct(totals.reentry_girls)}</td>
+                        <td>${pct(totals.reentry_total)}</td>
+                        <td>${pct(totals.readmission_boys)}</td>
+                        <td>${pct(totals.readmission_girls)}</td>
+                        <td>${pct(totals.ovc_boys)}</td>
+                        <td>${pct(totals.ovc_girls)}</td>
+                        <td>${pct(totals.ovc_total)}</td>
+                    </tr>`;
+
+            tbody.innerHTML = html;
+        }
+
+        // ================================================================
+        //  RENDER SCHOOLS
+        // ================================================================
+        function renderSchools() {
+            const tbody = $('schoolsBody');
+            if (!tbody) return;
+
+            if (schools.length === 0) {
+                tbody.innerHTML =
+                    `<tr><td colspan="3" class="empty-state"><i class="fas fa-school"></i><p>No schools added yet.</p></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = schools.map((s, i) =>
+                `<tr>
+                            <td>${i+1}</td>
+                            <td style="text-align:left;padding-left:16px;font-weight:600;">${s.name}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteSchool('${s.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`
+            ).join('');
+
+            $('schoolCount').textContent = schools.length + ' schools';
+        }
+
+        // ================================================================
+        //  RENDER RECORDS
+        // ================================================================
+        function renderRecords() {
+            const tbody = $('recordsBody');
+            if (!tbody) return;
+
+            const schoolMap = {};
+            schools.forEach(s => schoolMap[s.id] = s.name);
+
+            const data = filteredRecords;
+
+            if (data.length === 0) {
+                tbody.innerHTML =
+                    `<tr><td colspan="12" class="empty-state"><i class="fas fa-inbox"></i><p>No records found.</p></td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map(r => {
+                const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
+                const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) +
+                    (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) +
+                    (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) +
+                    (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) +
+                    (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) +
+                    (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) +
+                    (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
                 const absent = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentry = (r.reentry_boys || 0) + (r.reentry_girls || 0);
-                const defilement = (r.defilement_boys || 0) + (r.defilement_girls || 0);
                 const ovc = (r.ovc_boys || 0) + (r.ovc_girls || 0);
                 const schoolName = schoolMap[r.school_id] || r.school_id;
-                return `<tr><td><span class="text-ellipsis fw-600">${schoolName}</span></td><td>${r.term || '-'}</td><td>${r.year || '-'}</td><td>${r.grade || '-'}</td><td>${r.enrolment_boys || 0}</td><td>${r.enrolment_girls || 0}</td><td><strong>${total}</strong></td><td>${r.age_range || '-'}</td><td>${r.teen_preg || 0}</td><td>${dropouts}</td><td>${absent}</td><td>${reentry}</td><td>${defilement}</td><td>${ovc}</td><td style="text-align:right;"><button class="btn btn-danger btn-xs" onclick="deleteRecord('${r.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+                return `<tr>
+                            <td style="text-align:left;padding-left:12px;font-weight:600;">${schoolName}</td>
+                            <td>${r.grade || '-'}</td>
+                            <td>${r.enrolment_boys || 0}</td>
+                            <td>${r.enrolment_girls || 0}</td>
+                            <td><strong>${total}</strong></td>
+                            <td>${r.age_range || '-'}</td>
+                            <td>${r.teen_preg || 0}</td>
+                            <td>${dropouts}</td>
+                            <td>${absent}</td>
+                            <td>${reentry}</td>
+                            <td>${ovc}</td>
+                            <td>
+                                <button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
             }).join('');
+
+            $('recordCount').textContent = data.length + ' records';
+            $('exportCount').textContent = data.length;
         }
 
+        // ================================================================
+        //  UPDATE STATS
+        // ================================================================
         function updateStats() {
-            const recordsToUse = adminDataCache; const schoolSet = new Set(recordsToUse.map(r => r.school_id));
-            let totalEnrol = 0, teenPreg = 0, dropouts = 0, absent = 0, ovc = 0;
-            recordsToUse.forEach(r => {
-                totalEnrol += (r.enrolment_boys || 0) + (r.enrolment_girls || 0); teenPreg += (r.teen_preg || 0);
-                dropouts += (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) + (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) + (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) + (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) + (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) + (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) + (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
-                absent += (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0); ovc += (r.ovc_boys || 0) + (r.ovc_girls || 0);
+            const schoolSet = new Set(records.map(r => r.school_id));
+            let totalEnrol = 0,
+                teenPreg = 0,
+                dropouts = 0,
+                absent = 0,
+                ovc = 0;
+            records.forEach(r => {
+                totalEnrol += (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
+                teenPreg += (r.teen_preg || 0);
+                dropouts += (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) +
+                    (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) +
+                    (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) +
+                    (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) +
+                    (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) +
+                    (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) +
+                    (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
+                absent += (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
+                ovc += (r.ovc_boys || 0) + (r.ovc_girls || 0);
             });
-            $('statSchools').textContent = schoolSet.size || schools.length;
-            $('statTotalEnrol').textContent = totalEnrol; $('statTeenPreg').textContent = teenPreg;
-            $('statDropouts').textContent = dropouts; $('statAbsenteeism').textContent = absent; $('statOVC').textContent = ovc;
-        }
-
-        function loadSchools() {
-            const tbody = $('schoolListBody'); if (!tbody) return;
-            const isAdmin = currentUserRole === 'admin';
-            tbody.innerHTML = schools.map((s, i) => `<tr><td style="text-align: center; color: var(--text-light);">${i+1}</td><td><span class="school-name">${s.name}</span></td><td style="text-align: right;">${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteSchool('${s.id}')"><i class="fas fa-trash"></i></button>` : `<span style="color:#94a3b8; font-size:11px;">Read Only</span>`}</td></tr>`).join('');
-            const sel = $('adminFilterSchool'); if (sel) { const currentVal = sel.value; sel.innerHTML = `<option value="">All Schools</option>` + schools.map(s => `<option value="${s.id}">${s.name}</option>`).join(''); sel.value = currentVal; }
-        }
-
-        function loadTeacherSelector() {
-            const sel = $('teacherSchoolSelect');
-            if (sel) { sel.innerHTML = schools.map(s => `<option value="${s.id}">${s.name}</option>`).join(''); if (schools.length > 0) { teacherSchoolId = schools[0].id; sel.value = teacherSchoolId; loadTeacherData(); } }
-        }
-
-        function loadTeacherData() {
-            const sel = $('teacherSchoolSelect'); if (sel) teacherSchoolId = sel.value;
-            if (!teacherSchoolId) { if (schools.length > 0) teacherSchoolId = schools[0].id; else return; }
-            teacherRecords = records.filter(r => r.school_id === teacherSchoolId);
-            renderTeacherData(); $('entryCount').textContent = teacherRecords.length + ' records';
-        }
-
-        function renderTeacherData() {
-            const tbody = $('teacherDataBody'); if (!tbody) return;
-            if (teacherRecords.length === 0) { tbody.innerHTML = `<tr><td colspan="14"><div class="empty-state"><i class="fas fa-inbox"></i><p>No entries yet</p></div></td></tr>`; return; }
-            const isAdmin = currentUserRole === 'admin';
-            tbody.innerHTML = teacherRecords.map(r => {
-                const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
-                const dropouts = (r.dropout_preg_boys || 0) + (r.dropout_preg_girls || 0) + (r.dropout_marriage_boys || 0) + (r.dropout_marriage_girls || 0) + (r.dropout_death_boys || 0) + (r.dropout_death_girls || 0) + (r.dropout_illness_boys || 0) + (r.dropout_illness_girls || 0) + (r.dropout_orphaned_boys || 0) + (r.dropout_orphaned_girls || 0) + (r.dropout_economic_boys || 0) + (r.dropout_economic_girls || 0) + (r.dropout_ovc_boys || 0) + (r.dropout_ovc_girls || 0);
-                const absent = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
-                const reentry = (r.reentry_boys || 0) + (r.reentry_girls || 0);
-                const defilement = (r.defilement_boys || 0) + (r.defilement_girls || 0);
-                const ovc = (r.ovc_boys || 0) + (r.ovc_girls || 0);
-                return `<tr><td>${r.term || '-'}</td><td>${r.year || '-'}</td><td><strong>${r.grade || '-'}</strong></td><td>${r.enrolment_boys || 0}</td><td>${r.enrolment_girls || 0}</td><td><strong>${total}</strong></td><td>${r.age_range || '-'}</td><td>${r.teen_preg || 0}</td><td>${dropouts}</td><td>${absent}</td><td>${reentry}</td><td>${defilement}</td><td>${ovc}</td><td style="text-align:right;"><button class="btn btn-primary btn-xs" onclick="editEntry('${r.id}')"><i class="fas fa-edit"></i></button>${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteTeacherRecord('${r.id}')"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`;
-            }).join('');
+            $('statSchools').textContent = schoolSet.size || 0;
+            $('statEnrolment').textContent = totalEnrol;
+            $('statTeenPreg').textContent = teenPreg;
+            $('statDropouts').textContent = dropouts;
+            $('statAbsenteeism').textContent = absent;
+            $('statOvc').textContent = ovc;
         }
 
         // ================================================================
-        //  SCHOOL / RECORD MANAGEMENT
+        //  POPULATE FILTER
         // ================================================================
-        function showAddSchoolForm() { const el = $('addSchoolForm'); if (el) el.classList.toggle('hidden'); if (el && !el.classList.contains('hidden')) $('newSchoolName').focus(); }
+        function populateFilter() {
+            const sel = $('filterSchool');
+            if (!sel) return;
+            const currentVal = sel.value;
+            sel.innerHTML = `<option value="">All Schools</option>` +
+                schools.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            sel.value = currentVal;
+            applyFilter();
+        }
+
+        function applyFilter() {
+            const sel = $('filterSchool');
+            const val = sel ? sel.value : '';
+            if (val) {
+                filteredRecords = records.filter(r => r.school_id === val);
+            } else {
+                filteredRecords = records;
+            }
+            renderRecords();
+        }
+
+        // ================================================================
+        //  UPDATE BADGES
+        // ================================================================
+        function updateBadges() {
+            $('schoolBadge').textContent = schools.length;
+            $('recordBadge').textContent = records.length;
+        }
+
+        // ================================================================
+        //  TOGGLE ADD SCHOOL
+        // ================================================================
+        function toggleAddSchool() {
+            const form = $('addSchoolForm');
+            form.classList.toggle('hidden');
+            if (!form.classList.contains('hidden')) {
+                $('newSchoolName').focus();
+            }
+        }
+
+        // ================================================================
+        //  ADD SCHOOL
+        // ================================================================
         async function addSchool() {
-            const input = $('newSchoolName'); if (!input) return; const name = input.value.trim();
-            if (!name) { showToast('Please enter a school name.', 'error'); return; }
+            const input = $('newSchoolName');
+            const name = input.value.trim();
+            if (!name) {
+                showToast('Please enter a school name.', 'error');
+                return;
+            }
+
             const newSchool = { id: 's' + Date.now(), name: name };
+
             try {
-                if (isSupabaseConnected && supabaseClient) { const { error } = await supabaseClient.from('schools').insert([newSchool]); if (error) throw new Error(error.message); }
-                schools.push(newSchool); localStorage.setItem('schools', JSON.stringify(schools));
-                input.value = ''; $('addSchoolForm').classList.add('hidden'); loadSchools(); loadData();
+                if (isSupabaseConnected && supabase) {
+                    const { error } = await supabase.from('schools').insert([newSchool]);
+                    if (error) throw new Error(error.message);
+                }
+                schools.push(newSchool);
+                localStorage.setItem('schools', JSON.stringify(schools));
+
+                input.value = '';
+                toggleAddSchool();
+                renderAll();
                 showToast('✅ School added!', 'success');
-            } catch (err) { showToast('❌ Failed to add: ' + err.message, 'error'); }
+            } catch (err) {
+                showToast('❌ Failed to add: ' + err.message, 'error');
+            }
         }
+
+        // ================================================================
+        //  DELETE SCHOOL
+        // ================================================================
         async function deleteSchool(id) {
             if (!confirm('Delete this school? All associated data will be removed.')) return;
             try {
-                if (isSupabaseConnected && supabaseClient) { const { error } = await supabaseClient.from('schools').delete().eq('id', id); if (error) throw new Error(error.message); }
-                schools = schools.filter(s => s.id !== id); records = records.filter(r => r.school_id !== id);
-                localStorage.setItem('schools', JSON.stringify(schools)); localStorage.setItem('records', JSON.stringify(records));
-                loadSchools(); loadData(); showToast('✅ School deleted!', 'success');
-            } catch (err) { showToast('❌ Failed to delete: ' + err.message, 'error'); }
+                if (isSupabaseConnected && supabase) {
+                    const { error } = await supabase.from('schools').delete().eq('id', id);
+                    if (error) throw new Error(error.message);
+                }
+                schools = schools.filter(s => s.id !== id);
+                records = records.filter(r => r.school_id !== id);
+                localStorage.setItem('schools', JSON.stringify(schools));
+                localStorage.setItem('records', JSON.stringify(records));
+                renderAll();
+                showToast('✅ School deleted!', 'success');
+            } catch (err) {
+                showToast('❌ Failed to delete: ' + err.message, 'error');
+            }
         }
+
+        // ================================================================
+        //  DELETE RECORD
+        // ================================================================
         async function deleteRecord(id) {
-            if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can delete records.', 'error'); return; }
             if (!confirm('Delete this record?')) return;
             try {
-                if (isSupabaseConnected && supabaseClient) { const { error } = await supabaseClient.from('records').delete().eq('id', id); if (error) throw new Error(error.message); }
-                records = records.filter(r => r.id !== id); localStorage.setItem('records', JSON.stringify(records)); loadData();
+                if (isSupabaseConnected && supabase) {
+                    const { error } = await supabase.from('records').delete().eq('id', id);
+                    if (error) throw new Error(error.message);
+                }
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem('records', JSON.stringify(records));
+                renderAll();
                 showToast('✅ Record deleted!', 'success');
-            } catch (err) { showToast('❌ Failed to delete: ' + err.message, 'error'); }
+            } catch (err) {
+                showToast('❌ Failed to delete: ' + err.message, 'error');
+            }
         }
-        function resetEntryForm() {
-            $('editEntryId').value = '';
-            $('entryFormTitle').innerHTML = '<i class="fas fa-plus-circle" style="color:var(--accent-dark);"></i> Add New Entry';
-            $('entrySubmitBtn').innerHTML = '<i class="fas fa-save"></i> Save';
-            document.querySelectorAll('#entryForm input[type="number"]').forEach(el => el.value = '0');
-            document.querySelectorAll('#entryForm input[type="text"]').forEach(el => el.value = '');
-            $('fGrade').value = ''; $('fAgeRange').value = '';
-            $('fGrade').style.borderColor = ''; $('fTerm').style.borderColor = ''; $('fYear').style.borderColor = '';
-        }
-        function editEntry(id) {
-            const r = teacherRecords.find(rec => rec.id === id); if (!r) return;
-            $('editEntryId').value = r.id;
-            $('entryFormTitle').innerHTML = '<i class="fas fa-edit" style="color:var(--accent-dark);"></i> Edit Entry';
-            $('entrySubmitBtn').innerHTML = '<i class="fas fa-save"></i> Update';
-            $('fTerm').value = r.term || 'Term 2'; $('fYear').value = r.year || 2026;
-            $('fGrade').value = r.grade || ''; $('fAgeRange').value = r.age_range || '';
-            $('fEnrolBoys').value = r.enrolment_boys || 0; $('fEnrolGirls').value = r.enrolment_girls || 0;
-            $('fTeenPreg').value = r.teen_preg || 0; $('fEarlyMarriageBoys').value = r.early_marriage_boys || 0; $('fEarlyMarriageGirls').value = r.early_marriage_girls || 0;
-            $('fDropPregBoys').value = r.dropout_preg_boys || 0; $('fDropPregGirls').value = r.dropout_preg_girls || 0;
-            $('fDropMarriageBoys').value = r.dropout_marriage_boys || 0; $('fDropMarriageGirls').value = r.dropout_marriage_girls || 0;
-            $('fDropDeathBoys').value = r.dropout_death_boys || 0; $('fDropDeathGirls').value = r.dropout_death_girls || 0;
-            $('fDropIllnessBoys').value = r.dropout_illness_boys || 0; $('fDropIllnessGirls').value = r.dropout_illness_girls || 0;
-            $('fDropOrphanedBoys').value = r.dropout_orphaned_boys || 0; $('fDropOrphanedGirls').value = r.dropout_orphaned_girls || 0;
-            $('fDropEconomicBoys').value = r.dropout_economic_boys || 0; $('fDropEconomicGirls').value = r.dropout_economic_girls || 0;
-            $('fDropOvcBoys').value = r.dropout_ovc_boys || 0; $('fDropOvcGirls').value = r.dropout_ovc_girls || 0;
-            $('fAbsentBoys').value = r.absenteeism_boys || 0; $('fAbsentGirls').value = r.absenteeism_girls || 0;
-            $('fReentryBoys').value = r.reentry_boys || 0; $('fReentryGirls').value = r.reentry_girls || 0;
-            $('fReadmissionBoys').value = r.readmission_boys || 0; $('fReadmissionGirls').value = r.readmission_girls || 0;
-            $('fDefilementBoys').value = r.defilement_boys || 0; $('fDefilementGirls').value = r.defilement_girls || 0;
-            $('fOvcBoys').value = r.ovc_boys || 0; $('fOvcGirls').value = r.ovc_girls || 0;
-            $('entryForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-        async function deleteTeacherRecord(id) {
-            if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can delete records.', 'error'); return; }
-            if (!confirm('Delete this entry?')) return;
-            try {
-                if (isSupabaseConnected && supabaseClient) { const { error } = await supabaseClient.from('records').delete().eq('id', id); if (error) throw new Error(error.message); }
-                records = records.filter(r => r.id !== id); localStorage.setItem('records', JSON.stringify(records)); loadTeacherData(); loadData();
-                showToast('✅ Record deleted!', 'success');
-            } catch (err) { showToast('❌ Failed to delete: ' + err.message, 'error'); }
-        }
-        async function saveEntry(e) {
-            e.preventDefault();
-            const sel = $('teacherSchoolSelect'); if (sel) teacherSchoolId = sel.value;
-            if (!teacherSchoolId) { showToast('No school selected.', 'error'); return; }
-            const grade = $('fGrade'); const term = $('fTerm'); const year = $('fYear');
-            if (!grade || !grade.value.trim()) { showToast('Please enter a Grade.', 'error'); return; }
 
-            const editId = $('editEntryId').value;
-            if (!editId) {
-                const existingRecord = records.find(r => r.school_id === teacherSchoolId && r.grade === grade.value.trim() && r.term === term.value && parseInt(r.year) === parseInt(year.value));
-                if (existingRecord) { showToast('❌ Data already exists! Please Edit the existing entry.', 'error'); return; }
+        // ================================================================
+        //  SYNC TO SUPABASE
+        // ================================================================
+        async function syncToSupabase() {
+            if (!isSupabaseConnected || !supabase) {
+                showToast('⚠️ Not connected to Supabase.', 'error');
+                return;
             }
 
-            const payload = {
-                school_id: teacherSchoolId, term: term.value, year: parseInt(year.value) || 2026, grade: grade.value.trim(),
-                age_range: $('fAgeRange').value.trim(), enrolment_boys: parseInt($('fEnrolBoys').value) || 0,
-                enrolment_girls: parseInt($('fEnrolGirls').value) || 0, teen_preg: parseInt($('fTeenPreg').value) || 0,
-                early_marriage_boys: parseInt($('fEarlyMarriageBoys').value) || 0, early_marriage_girls: parseInt($('fEarlyMarriageGirls').value) || 0,
-                dropout_preg_boys: parseInt($('fDropPregBoys').value) || 0, dropout_preg_girls: parseInt($('fDropPregGirls').value) || 0,
-                dropout_marriage_boys: parseInt($('fDropMarriageBoys').value) || 0, dropout_marriage_girls: parseInt($('fDropMarriageGirls').value) || 0,
-                dropout_death_boys: parseInt($('fDropDeathBoys').value) || 0, dropout_death_girls: parseInt($('fDropDeathGirls').value) || 0,
-                dropout_illness_boys: parseInt($('fDropIllnessBoys').value) || 0, dropout_illness_girls: parseInt($('fDropIllnessGirls').value) || 0,
-                dropout_orphaned_boys: parseInt($('fDropOrphanedBoys').value) || 0, dropout_orphaned_girls: parseInt($('fDropOrphanedGirls').value) || 0,
-                dropout_economic_boys: parseInt($('fDropEconomicBoys').value) || 0, dropout_economic_girls: parseInt($('fDropEconomicGirls').value) || 0,
-                dropout_ovc_boys: parseInt($('fDropOvcBoys').value) || 0, dropout_ovc_girls: parseInt($('fDropOvcGirls').value) || 0,
-                absenteeism_boys: parseInt($('fAbsentBoys').value) || 0, absenteeism_girls: parseInt($('fAbsentGirls').value) || 0,
-                reentry_boys: parseInt($('fReentryBoys').value) || 0, reentry_girls: parseInt($('fReentryGirls').value) || 0,
-                readmission_boys: parseInt($('fReadmissionBoys').value) || 0, readmission_girls: parseInt($('fReadmissionGirls').value) || 0,
-                defilement_boys: parseInt($('fDefilementBoys').value) || 0, defilement_girls: parseInt($('fDefilementGirls').value) || 0,
-                ovc_boys: parseInt($('fOvcBoys').value) || 0, ovc_girls: parseInt($('fOvcGirls').value) || 0,
-                created_at: new Date().toISOString()
-            };
+            showToast('🔄 Syncing to Supabase...', 'info');
+
             try {
-                if (editId) {
-                    payload.id = editId;
-                    if (isSupabaseConnected && supabaseClient) { const { error } = await supabaseClient.from('records').update(payload).eq('id', editId); if (error) throw new Error(error.message); }
-                    const idx = records.findIndex(r => r.id === editId); if (idx >= 0) records[idx] = { ...records[idx], ...payload };
-                    showToast('✅ Record updated!', 'success');
-                } else {
-                    payload.id = 'r' + Date.now();
-                    if (isSupabaseConnected && supabaseClient) { const { error } = await supabaseClient.from('records').insert([payload]); if (error) throw new Error(error.message); }
-                    records.push(payload); showToast('✅ Record saved!', 'success');
+                for (const s of schools) {
+                    await supabase.from('schools').upsert(s, { onConflict: 'id' });
                 }
-                localStorage.setItem('records', JSON.stringify(records));
-                resetEntryForm(); loadTeacherData(); loadData();
-            } catch (err) { showToast('❌ Failed to save: ' + err.message, 'error'); }
+                for (const r of records) {
+                    await supabase.from('records').upsert(r, { onConflict: 'id' });
+                }
+                showToast('✅ All data synced to Supabase!', 'success');
+            } catch (err) {
+                showToast('❌ Sync failed: ' + err.message, 'error');
+                console.error('Sync error:', err);
+            }
         }
 
         // ================================================================
-        //  PROFESSIONAL EXPORT - CENTERED TOP HEADERS
+        //  EXPORT TO EXCEL
         // ================================================================
         function exportToExcel() {
-            if (currentUserRole !== 'admin') { showToast('⚠️ Only Admin can export data.', 'error'); return; }
-            if (records.length === 0) { showToast('No data to export.', 'error'); return; }
+            if (records.length === 0) {
+                showToast('No data to export.', 'error');
+                return;
+            }
+
+            const schoolMap = {};
+            schools.forEach(s => schoolMap[s.id] = s.name);
+
+            const rows = records.map((r, i) => {
+                const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
+                const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
+                const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
+                const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
+                const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
+                return {
+                    'S/N': i + 1,
+                    'School': schoolMap[r.school_id] || r.school_id,
+                    'Grade': r.grade || '',
+                    'Enrolment Boys': r.enrolment_boys || 0,
+                    'Enrolment Girls': r.enrolment_girls || 0,
+                    'Enrolment Total': total,
+                    'Age Range': r.age_range || '',
+                    'Teen Pregnancy': r.teen_preg || 0,
+                    'Early Marriage Boys': r.early_marriage_boys || 0,
+                    'Early Marriage Girls': r.early_marriage_girls || 0,
+                    'Early Marriage Total': earlyTotal,
+                    'Drop-Preg Boys': r.dropout_preg_boys || 0,
+                    'Drop-Preg Girls': r.dropout_preg_girls || 0,
+                    'Drop-Marriage Boys': r.dropout_marriage_boys || 0,
+                    'Drop-Marriage Girls': r.dropout_marriage_girls || 0,
+                    'Drop-Death Boys': r.dropout_death_boys || 0,
+                    'Drop-Death Girls': r.dropout_death_girls || 0,
+                    'Drop-Illness Boys': r.dropout_illness_boys || 0,
+                    'Drop-Illness Girls': r.dropout_illness_girls || 0,
+                    'Drop-Orphaned Boys': r.dropout_orphaned_boys || 0,
+                    'Drop-Orphaned Girls': r.dropout_orphaned_girls || 0,
+                    'Drop-Economic Boys': r.dropout_economic_boys || 0,
+                    'Drop-Economic Girls': r.dropout_economic_girls || 0,
+                    'Drop-OVC Boys': r.dropout_ovc_boys || 0,
+                    'Drop-OVC Girls': r.dropout_ovc_girls || 0,
+                    'Absenteeism Boys': r.absenteeism_boys || 0,
+                    'Absenteeism Girls': r.absenteeism_girls || 0,
+                    'Absenteeism Total': absentTotal,
+                    'Re-entry Boys': r.reentry_boys || 0,
+                    'Re-entry Girls': r.reentry_girls || 0,
+                    'Re-entry Total': reentryTotal,
+                    'Re-admission Boys': r.readmission_boys || 0,
+                    'Re-admission Girls': r.readmission_girls || 0,
+                    'OVC Boys': r.ovc_boys || 0,
+                    'OVC Girls': r.ovc_girls || 0,
+                    'OVC Total': ovcTotal
+                };
+            });
 
             const wb = XLSX.utils.book_new();
-            const gv = (r, key) => { return r && r[key] !== undefined && r[key] !== null ? r[key] : 0; };
-            const allGrades = ['ECE', '1', '2', '3', '4', '5', '6', '7', 'FROM 1', 'FROM 2', '10', '11', '12'];
-
-            // ----------------------------------------------------------------
-            // LOOP THROUGH EACH SCHOOL AND CREATE A SEPARATE SHEET
-            // ----------------------------------------------------------------
-            schools.forEach((school) => {
-                const schoolRecords = records.filter(r => r.school_id === school.id);
-                if (schoolRecords.length === 0) return;
-
-                let wsData = [];
-
-                // Helper to push empty rows with correct length
-                const pushEmpty = (count) => { for(let i=0; i<count; i++) wsData.push(Array(35).fill('')); };
-
-                // --- NEW TOP HEADERS (Rows 0 to 3) ---
-                let rowHeader1 = Array(35).fill('');
-                rowHeader1[2] = 'Republic of Zambia';
-                wsData.push(rowHeader1);
-
-                let rowHeader2 = Array(35).fill('');
-                rowHeader2[2] = 'Ministry of Education';
-                wsData.push(rowHeader2);
-
-                let rowHeader3 = Array(35).fill('');
-                rowHeader3[2] = school.name;
-                wsData.push(rowHeader3);
-
-                let rowHeader4 = Array(35).fill('');
-                rowHeader4[2] = 'Guidance and Counselling Report term 2, 2026';
-                wsData.push(rowHeader4);
-
-                pushEmpty(1); // Spacer row
-
-                // --- ORIGINAL MOE HEADERS (Shifted down by 5 rows) ---
-                // Row 1: Ministry Header (Col E -> Index 4)
-                let row1 = Array(35).fill('');
-                row1[4] = 'MINISTRY OF EDUCATION';
-                wsData.push(row1);
-                pushEmpty(5); // Rows 2-6
-
-                // Row 7: NAME OF SCHOOL (Col B -> Index 1)
-                let row7 = Array(35).fill('');
-                row7[1] = 'NAME OF SCHOOL';
-                wsData.push(row7);
-                pushEmpty(3); // Rows 8-10
-
-                // Row 11: The actual School Name (Col B -> Index 1)
-                let row11 = Array(35).fill('');
-                row11[1] = school.name;
-                wsData.push(row11);
-                pushEmpty(3); // Rows 12-14
-
-                // Row 15: Main Headers
-                let row15 = Array(35).fill('');
-                row15[1] = 'NAME OF SCHOOL';
-                row15[5] = 'AGE RANGE';
-                row15[6] = 'TEEN PREG';
-                row15[7] = 'NO OF EARLY MARRIAGES';
-                row15[10] = 'NO OF DROP OUTS  DUE TO:';
-                row15[25] = 'ABSENTEEISM CASES';
-                row15[28] = 'NO OF RE-ENTRY CASES';
-                row15[31] = 'RE-ADMISSION';
-                row15[33] = 'DEFILEMENT';
-                wsData.push(row15);
-
-                // Row 16: Sub-Headers
-                let row16 = Array(35).fill('');
-                row16[10] = 'Pregnancy';
-                row16[12] = 'Marriage';
-                row16[14] = 'DEATH';
-                row16[16] = 'ILLNESS';
-                row16[18] = 'ORPHANED';
-                row16[20] = 'ECONOMIC';
-                row16[22] = 'OVC';
-                wsData.push(row16);
-
-                pushEmpty(1); // Row 17
-
-                // Row 18: Data Columns (Exact Layout)
-                let row18 = Array(35).fill('');
-                row18[1] = 'Grade';     // Col B
-                row18[2] = 'Boys';      // Col C
-                row18[3] = 'Girls';     // Col D
-                row18[4] = 'Total';     // Col E
-                row18[5] = 'Age Range'; // Col F
-                row18[6] = 'Girls';     // Col G
-                row18[7] = 'Boys';      // Col H
-                row18[8] = 'Girls';     // Col I
-                row18[9] = 'Total';     // Col J
-                row18[10] = 'Boys';     // Col K
-                row18[11] = 'Girls';    // Col L
-                row18[12] = 'Boys';     // Col M
-                row18[13] = 'Girls';    // Col N
-                row18[14] = 'BOYS';     // Col O
-                row18[15] = 'GIRLS';    // Col P
-                row18[16] = 'BOYS';     // Col Q
-                row18[17] = 'GIRLS';    // Col R
-                row18[18] = 'BOYS';     // Col S
-                row18[19] = 'GIRLS';    // Col T
-                row18[20] = 'BOYS';     // Col U
-                row18[21] = 'GIRLS';    // Col V
-                row18[22] = 'BOYS';     // Col W
-                row18[23] = 'GIRLS';    // Col X
-                row18[25] = 'Boys';     // Col Z
-                row18[26] = 'Girls';    // Col AA
-                row18[27] = 'Total';    // Col AB
-                row18[28] = 'Boys';     // Col AC
-                row18[29] = 'Girls';    // Col AD
-                row18[30] = 'Total';    // Col AE
-                row18[31] = 'BOYS';     // Col AF
-                row18[32] = 'GIRLS';    // Col AG
-                row18[33] = 'BOYS';     // Col AH
-                row18[34] = 'GIRLS';    // Col AI
-                wsData.push(row18);
-
-                // ----------------------------------------------------------------
-                // LOOP GRADES FOR THIS SCHOOL
-                // ----------------------------------------------------------------
-                allGrades.forEach(gradeName => {
-                    const r = schoolRecords.find(rec => rec.grade === gradeName);
-                    let row = Array(35).fill('');
-
-                    row[1] = gradeName;                     // Col B (Grade)
-                    row[2] = gv(r, 'enrolment_boys');       // Col C (Boys)
-                    row[3] = gv(r, 'enrolment_girls');      // Col D (Girls)
-                    row[4] = gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); // Col E (Total)
-                    row[5] = gv(r, 'age_range');            // Col F (Age)
-                    row[6] = gv(r, 'teen_preg');            // Col G (Teen Preg)
-                    
-                    row[7] = gv(r, 'early_marriage_boys');  // Col H
-                    row[8] = gv(r, 'early_marriage_girls'); // Col I
-                    row[9] = gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); // Col J
-                    
-                    row[10] = gv(r, 'dropout_preg_boys');   // Col K
-                    row[11] = gv(r, 'dropout_preg_girls');  // Col L
-                    row[12] = gv(r, 'dropout_marriage_boys'); // Col M
-                    row[13] = gv(r, 'dropout_marriage_girls'); // Col N
-                    row[14] = gv(r, 'dropout_death_boys');  // Col O
-                    row[15] = gv(r, 'dropout_death_girls'); // Col P
-                    row[16] = gv(r, 'dropout_illness_boys'); // Col Q
-                    row[17] = gv(r, 'dropout_illness_girls'); // Col R
-                    row[18] = gv(r, 'dropout_orphaned_boys'); // Col S
-                    row[19] = gv(r, 'dropout_orphaned_girls'); // Col T
-                    row[20] = gv(r, 'dropout_economic_boys'); // Col U
-                    row[21] = gv(r, 'dropout_economic_girls'); // Col V
-                    row[22] = gv(r, 'dropout_ovc_boys');   // Col W
-                    row[23] = gv(r, 'dropout_ovc_girls');  // Col X
-                    
-                    row[25] = gv(r, 'absenteeism_boys');   // Col Z
-                    row[26] = gv(r, 'absenteeism_girls');  // Col AA
-                    row[27] = gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls'); // Col AB
-                    
-                    row[28] = gv(r, 'reentry_boys');       // Col AC
-                    row[29] = gv(r, 'reentry_girls');      // Col AD
-                    row[30] = gv(r, 'reentry_boys') + gv(r, 'reentry_girls'); // Col AE
-                    
-                    row[31] = gv(r, 'readmission_boys');   // Col AF
-                    row[32] = gv(r, 'readmission_girls');  // Col AG
-                    
-                    row[33] = gv(r, 'defilement_boys');    // Col AH
-                    row[34] = gv(r, 'defilement_girls');   // Col AI
-
-                    wsData.push(row);
-                });
-
-                // ----------------------------------------------------------------
-                // CALCULATE TOTALS
-                // ----------------------------------------------------------------
-                let totalRow = Array(35).fill('');
-                totalRow[1] = 'TOTAL'; // Col B
-                
-                let tBoys = 0, tGirls = 0, tTotal = 0;
-                schoolRecords.forEach(r => { tBoys += gv(r, 'enrolment_boys'); tGirls += gv(r, 'enrolment_girls'); tTotal += gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'); });
-                totalRow[2] = tBoys; totalRow[3] = tGirls; totalRow[4] = tTotal;
-
-                // Teen Preg Total
-                let pregTotal = 0;
-                schoolRecords.forEach(r => { pregTotal += gv(r, 'teen_preg'); });
-                totalRow[6] = pregTotal; // Col G
-
-                // Early Marriage Total
-                let emTotal = 0;
-                schoolRecords.forEach(r => { emTotal += gv(r, 'early_marriage_boys') + gv(r, 'early_marriage_girls'); });
-                totalRow[9] = emTotal; // Col J
-
-                // Dropouts Total
-                let dropTotal = 0;
-                schoolRecords.forEach(r => {
-                    dropTotal += gv(r, 'dropout_preg_boys') + gv(r, 'dropout_preg_girls');
-                    dropTotal += gv(r, 'dropout_marriage_boys') + gv(r, 'dropout_marriage_girls');
-                    dropTotal += gv(r, 'dropout_death_boys') + gv(r, 'dropout_death_girls');
-                    dropTotal += gv(r, 'dropout_illness_boys') + gv(r, 'dropout_illness_girls');
-                    dropTotal += gv(r, 'dropout_orphaned_boys') + gv(r, 'dropout_orphaned_girls');
-                    dropTotal += gv(r, 'dropout_economic_boys') + gv(r, 'dropout_economic_girls');
-                    dropTotal += gv(r, 'dropout_ovc_boys') + gv(r, 'dropout_ovc_girls');
-                });
-                totalRow[10] = dropTotal; // Col K (Boys of Preg Dropout)
-
-                // Absenteeism Total
-                let aBoys = 0, aGirls = 0;
-                schoolRecords.forEach(r => { aBoys += gv(r, 'absenteeism_boys'); aGirls += gv(r, 'absenteeism_girls'); });
-                totalRow[25] = aBoys; totalRow[26] = aGirls; totalRow[27] = aBoys + aGirls;
-
-                // Re-Entry Total
-                let reBoys = 0, reGirls = 0;
-                schoolRecords.forEach(r => { reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls'); });
-                totalRow[28] = reBoys; totalRow[29] = reGirls; totalRow[30] = reBoys + reGirls;
-
-                // Defilement Total
-                let defBoys = 0, defGirls = 0;
-                schoolRecords.forEach(r => { defBoys += gv(r, 'defilement_boys'); defGirls += gv(r, 'defilement_girls'); });
-                totalRow[33] = defBoys; totalRow[34] = defGirls;
-
-                wsData.push(totalRow);
-
-                // ----------------------------------------------------------------
-                // CALCULATE PERCENTAGES (DIRECTLY UNDER TOTALS, SAME COLUMNS)
-                // ----------------------------------------------------------------
-                let pctRow = Array(35).fill('');
-                pctRow[1] = 'PERCENTAGE'; // Col B
-
-                // Teen Preg % (Col G - Index 6)
-                pctRow[6] = tTotal > 0 ? ((pregTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
-
-                // Early Marriage % (Col J - Index 9)
-                pctRow[9] = tTotal > 0 ? ((emTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
-
-                // Dropouts Total % (Col K - Index 10)
-                pctRow[10] = tTotal > 0 ? ((dropTotal / tTotal) * 100).toFixed(1) + '%' : '0%';
-
-                // Absenteeism Total % (Col AB - Index 27)
-                pctRow[27] = tTotal > 0 ? (((aBoys + aGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
-
-                // Re-entry Total % (Col AE - Index 30)
-                pctRow[30] = tTotal > 0 ? (((reBoys + reGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
-
-                // Defilement Total % (Col AH - Index 33)
-                pctRow[33] = tTotal > 0 ? (((defBoys + defGirls) / tTotal) * 100).toFixed(1) + '%' : '0%';
-
-                wsData.push(pctRow);
-
-                pushEmpty(2); // Bottom spacer
-
-                // ----------------------------------------------------------------
-                // APPEND THIS SHEET TO THE WORKBOOK WITH FORMATTING
-                // ----------------------------------------------------------------
-                const ws = XLSX.utils.aoa_to_sheet(wsData);
-                
-                // Apply Professional Styling
-                ws['!cols'] = [ 
-                    { wch: 5 }, { wch: 30 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, 
-                    { wch: 12 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, 
-                    { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
-                    { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
-                    { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, 
-                    { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 10 } 
-                ];
-                
-                // Apply MERGES
-                ws['!merges'] = [
-                    // Merge MINISTRY OF EDUCATION (Row 6, Col B to E) - Adjusted row index due to new headers
-                    { s: { r: 5, c: 1 }, e: { r: 5, c: 4 } },
-                    // Merge NO OF EARLY MARRIAGES (Row 20, Col H to J) - Adjusted row index
-                    { s: { r: 19, c: 7 }, e: { r: 19, c: 9 } },
-                    // Merge NO OF DROP OUTS DUE TO: (Row 20, Col K to X) - Adjusted row index
-                    { s: { r: 19, c: 10 }, e: { r: 19, c: 23 } },
-                    // Custom Top Headers Merges (Rows 0 to 3, Columns C to H)
-                    { s: { r: 0, c: 2 }, e: { r: 0, c: 7 } },
-                    { s: { r: 1, c: 2 }, e: { r: 1, c: 7 } },
-                    { s: { r: 2, c: 2 }, e: { r: 2, c: 7 } },
-                    { s: { r: 3, c: 2 }, e: { r: 3, c: 7 } }
-                ];
-
-                // Apply Borders and Bold to specific cells
-                const range = XLSX.utils.decode_range(ws['!ref']);
-                ws['!rows'] = [];
-                ws['!rows'][6] = { hpx: 20 }; // Row height for school name
-
-                // Bold & Center the headers (Rows 0 to 3)
-                for(let r=0; r<=3; r++) {
-                    for(let c = range.s.c; c <= range.e.c; c++) {
-                        const cell = XLSX.utils.encode_cell({r:r, c:c});
-                        if(ws[cell]) {
-                            ws[cell].s = { 
-                                bold: true,
-                                alignment: { horizontal: "center", vertical: "center" }
-                            };
-                        }
-                    }
-                }
-
-                // Bold the other headers and school row
-                for(let c = range.s.c; c <= range.e.c; c++) {
-                    // Row 6 (Ministry)
-                    const cell6 = XLSX.utils.encode_cell({r:5, c:c});
-                    if(ws[cell6]) ws[cell6].s = { bold: true, alignment: { horizontal: "left" } };
-                    // Row 12 (Label)
-                    const cell12 = XLSX.utils.encode_cell({r:11, c:c});
-                    if(ws[cell12]) ws[cell12].s = { bold: true, alignment: { horizontal: "left" } };
-                    // Row 16 (School Name)
-                    const cell16 = XLSX.utils.encode_cell({r:15, c:c});
-                    if(ws[cell16]) ws[cell16].s = { bold: true, alignment: { horizontal: "left" } };
-                }
-
-                // Bold the data headers, Totals, and Percentages
-                let lastDataRow = wsData.length - 3; // Total row
-                let secondLastDataRow = wsData.length - 2; // Percentage row
-                for(let r = 22; r < wsData.length - 1; r++) {
-                    for(let c = 1; c < 35; c++) { // Start at Col B
-                        const cell = XLSX.utils.encode_cell({r:r, c:c});
-                        if(ws[cell]) {
-                            ws[cell].s = { 
-                                border: {
-                                    top: {style: "thin"},
-                                    bottom: {style: "thin"},
-                                    left: {style: "thin"},
-                                    right: {style: "thin"}
-                                },
-                                alignment: { horizontal: (c === 1 ? "left" : "center") } // Center numbers, left align Grade
-                            };
-                            if(r === lastDataRow || r === secondLastDataRow) {
-                                ws[cell].s.bold = true; // Bold the Totals and Percentages
-                            }
-                        }
-                    }
-                }
-
-                // Sanitize sheet name (Excel max 31 chars)
-                let sheetName = school.name.substring(0, 31); 
-                XLSX.utils.book_append_sheet(wb, ws, sheetName);
-            });
-
-            // ----------------------------------------------------------------
-            // CREATE FINAL "DISTRICT SUMMARY" SHEET (KEPT ORIGINAL CLEAN HEADER)
-            // ----------------------------------------------------------------
-            let wsDataSummary = [];
-            let sumRow1 = ['SCHOOL', 'TOTAL ENROL', 'BOYS', 'GIRLS', 'TOTAL DROPOUTS', 'DROP %', 'TOTAL ABSENT', 'ABS %', 'TEEN PREG', 'PREG %', 'RE-ENTRY BOYS', 'RE-ENTRY GIRLS', 'RE-ENTRY TOTAL', 'DEFILEMENT BOYS', 'DEFILEMENT GIRLS', 'DEFILEMENT TOTAL', 'OVC BOYS', 'OVC GIRLS', 'OVC TOTAL'];
-            wsDataSummary.push(sumRow1);
-
-            let grandEnrol = 0, grandBoys = 0, grandGirls = 0, grandDrop = 0, grandAbs = 0, grandPreg = 0;
-            let grandReBoys = 0, grandReGirls = 0, grandDefBoys = 0, grandDefGirls = 0, grandOvcBoys = 0, grandOvcGirls = 0;
-
-            schools.forEach(school => {
-                const schoolRecords = records.filter(r => r.school_id === school.id);
-                if (schoolRecords.length === 0) return;
-
-                let boys = 0, girls = 0, totalEnrol = 0;
-                let dropouts = 0, absent = 0, preg = 0;
-                let reBoys = 0, reGirls = 0, defBoys = 0, defGirls = 0, ovcBoys = 0, ovcGirls = 0;
-
-                schoolRecords.forEach(r => {
-                    boys += gv(r, 'enrolment_boys'); girls += gv(r, 'enrolment_girls');
-                    totalEnrol += (gv(r, 'enrolment_boys') + gv(r, 'enrolment_girls'));
-                    dropouts += (gv(r, 'dropout_preg_boys') + gv(r, 'dropout_preg_girls') + gv(r, 'dropout_marriage_boys') + gv(r, 'dropout_marriage_girls') + gv(r, 'dropout_death_boys') + gv(r, 'dropout_death_girls') + gv(r, 'dropout_illness_boys') + gv(r, 'dropout_illness_girls') + gv(r, 'dropout_orphaned_boys') + gv(r, 'dropout_orphaned_girls') + gv(r, 'dropout_economic_boys') + gv(r, 'dropout_economic_girls') + gv(r, 'dropout_ovc_boys') + gv(r, 'dropout_ovc_girls'));
-                    absent += gv(r, 'absenteeism_boys') + gv(r, 'absenteeism_girls');
-                    preg += gv(r, 'teen_preg');
-                    reBoys += gv(r, 'reentry_boys'); reGirls += gv(r, 'reentry_girls');
-                    defBoys += gv(r, 'defilement_boys'); defGirls += gv(r, 'defilement_girls');
-                    ovcBoys += gv(r, 'ovc_boys'); ovcGirls += gv(r, 'ovc_girls');
-                });
-
-                grandEnrol += totalEnrol; grandBoys += boys; grandGirls += girls;
-                grandDrop += dropouts; grandAbs += absent; grandPreg += preg;
-                grandReBoys += reBoys; grandReGirls += reGirls;
-                grandDefBoys += defBoys; grandDefGirls += defGirls;
-                grandOvcBoys += ovcBoys; grandOvcGirls += ovcGirls;
-
-                let dropRate = totalEnrol > 0 ? ((dropouts / totalEnrol) * 100).toFixed(1) : 0;
-                let absRate = totalEnrol > 0 ? ((absent / totalEnrol) * 100).toFixed(1) : 0;
-                let pregRate = totalEnrol > 0 ? ((preg / totalEnrol) * 100).toFixed(1) : 0;
-
-                wsDataSummary.push([ school.name, totalEnrol, boys, girls, dropouts, dropRate + '%', absent, absRate + '%', preg, pregRate + '%', reBoys, reGirls, reBoys + reGirls, defBoys, defGirls, defBoys + defGirls, ovcBoys, ovcGirls, ovcBoys + ovcGirls ]);
-            });
-
-            // Push Grand Totals Row
-            let gDropRate = grandEnrol > 0 ? ((grandDrop / grandEnrol) * 100).toFixed(1) : 0;
-            let gAbsRate = grandEnrol > 0 ? ((grandAbs / grandEnrol) * 100).toFixed(1) : 0;
-            let gPregRate = grandEnrol > 0 ? ((grandPreg / grandEnrol) * 100).toFixed(1) : 0;
-            wsDataSummary.push([ 'GRAND TOTAL', grandEnrol, grandBoys, grandGirls, grandDrop, gDropRate + '%', grandAbs, gAbsRate + '%', grandPreg, gPregRate + '%', grandReBoys, grandReGirls, grandReBoys + grandReGirls, grandDefBoys, grandDefGirls, grandDefBoys + grandDefGirls, grandOvcBoys, grandOvcGirls, grandOvcBoys + grandOvcGirls ]);
-
-            const wsSum = XLSX.utils.aoa_to_sheet(wsDataSummary);
-            wsSum['!cols'] = [ { wch: 30 }, { wch: 12 }, { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, { wch: 10 }, { wch: 10 }, { wch: 10 } ];
-            XLSX.utils.book_append_sheet(wb, wsSum, 'DISTRICT SUMMARY');
-
-            // Save the file
-            XLSX.writeFile(wb, `TERMLY REPORTING TOOL, 2026.xlsx`);
-            showToast('✅ Professional, Clean Export Completed!', 'success');
+            const ws = XLSX.utils.json_to_sheet(rows);
+            XLSX.utils.book_append_sheet(wb, ws, 'Termly Report 2026');
+            XLSX.writeFile(wb, `Mungwi_Termly_Report_2026_${new Date().toISOString().slice(0,10)}.xlsx`);
+            showToast('✅ Excel exported successfully!', 'success');
         }
 
         // ================================================================
-        //  TAB LOGIC
+        //  EXPORT TO CSV
         // ================================================================
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab-bar .tab');
-            const contents = { adminDashboard: document.getElementById('tab-adminDashboard'), adminSchools: document.getElementById('tab-adminSchools'), adminData: document.getElementById('tab-adminData'), adminExport: document.getElementById('tab-adminExport') };
-            tabs.forEach(tab => { tab.addEventListener('click', function() { tabs.forEach(t => t.classList.remove('active')); Object.values(contents).forEach(c => c.classList.remove('active')); this.classList.add('active'); const targetId = this.getAttribute('data-tab'); if (contents[targetId]) contents[targetId].classList.add('active'); }); });
+        function exportToCSV() {
+            if (records.length === 0) {
+                showToast('No data to export.', 'error');
+                return;
+            }
+
+            const schoolMap = {};
+            schools.forEach(s => schoolMap[s.id] = s.name);
+
+            let csv = 'S/N,School,Grade,Enrolment Boys,Enrolment Girls,Enrolment Total,Age Range,Teen Pregnancy,' +
+                'Early Marriage Boys,Early Marriage Girls,Early Marriage Total,' +
+                'Drop-Preg Boys,Drop-Preg Girls,Drop-Marriage Boys,Drop-Marriage Girls,' +
+                'Drop-Death Boys,Drop-Death Girls,Drop-Illness Boys,Drop-Illness Girls,' +
+                'Drop-Orphaned Boys,Drop-Orphaned Girls,Drop-Economic Boys,Drop-Economic Girls,' +
+                'Drop-OVC Boys,Drop-OVC Girls,Absenteeism Boys,Absenteeism Girls,Absenteeism Total,' +
+                'Re-entry Boys,Re-entry Girls,Re-entry Total,Re-admission Boys,Re-admission Girls,' +
+                'OVC Boys,OVC Girls,OVC Total\n';
+
+            records.forEach((r, i) => {
+                const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
+                const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
+                const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
+                const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
+                const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
+
+                csv +=
+                    `${i+1},"${schoolMap[r.school_id] || r.school_id}","${r.grade||''}",${r.enrolment_boys||0},${r.enrolment_girls||0},${total},"${r.age_range||''}",${r.teen_preg||0},${r.early_marriage_boys||0},${r.early_marriage_girls||0},${earlyTotal},${r.dropout_preg_boys||0},${r.dropout_preg_girls||0},${r.dropout_marriage_boys||0},${r.dropout_marriage_girls||0},${r.dropout_death_boys||0},${r.dropout_death_girls||0},${r.dropout_illness_boys||0},${r.dropout_illness_girls||0},${r.dropout_orphaned_boys||0},${r.dropout_orphaned_girls||0},${r.dropout_economic_boys||0},${r.dropout_economic_girls||0},${r.dropout_ovc_boys||0},${r.dropout_ovc_girls||0},${r.absenteeism_boys||0},${r.absenteeism_girls||0},${absentTotal},${r.reentry_boys||0},${r.reentry_girls||0},${reentryTotal},${r.readmission_boys||0},${r.readmission_girls||0},${r.ovc_boys||0},${r.ovc_girls||0},${ovcTotal}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Mungwi_Termly_Report_2026_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('✅ CSV exported successfully!', 'success');
+        }
+
+        // ================================================================
+        //  WORKSHEET TABS
+        // ================================================================
+        document.querySelectorAll('.sheet-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.sheet-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.worksheet').forEach(w => w.classList.remove('active'));
+                const target = $('sheet-' + this.dataset.sheet);
+                if (target) target.classList.add('active');
+            });
+        });
+
+        // ================================================================
+        //  INIT SUPABASE
+        // ================================================================
+        async function initSupabase() {
+            try {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase client created');
+
+                const { error } = await supabase.from('schools').select('count', { count: 'exact', head: true });
+
+                if (error && error.message && error.message.includes('relation "schools" does not exist')) {
+                    isSupabaseConnected = false;
+                    updateStatusDot(false);
+                    showToast('⚠️ Tables not found. Using local storage.', 'warning');
+                    return false;
+                }
+
+                isSupabaseConnected = true;
+                updateStatusDot(true);
+                showToast('✅ Connected to Supabase', 'success');
+                return true;
+
+            } catch (e) {
+                isSupabaseConnected = false;
+                updateStatusDot(false);
+                showToast('⚠️ Using local storage only', 'info');
+                return false;
+            }
         }
 
         // ================================================================
         //  BOOT
         // ================================================================
-        async function initApp() {
-            await initSupabase(); await loadData();
-            const teacherSelect = $('teacherSchoolSelect'); if (teacherSelect) { teacherSelect.onchange = function() { teacherSchoolId = this.value; loadTeacherData(); }; }
-            setupTabs(); applyPermissions();
-            console.log('📊 Mungwi System loaded.');
+        async function init() {
+            await initSupabase();
+            await loadData();
+            console.log('📊 Mungwi Termly Reporting Tool 2026 loaded.');
+            console.log('📡 Connection:', isSupabaseConnected ? 'Online' : 'Offline');
+            console.log('📚 Records:', records.length);
+            console.log('🏫 Schools:', schools.length);
         }
-        document.addEventListener('DOMContentLoaded', initApp);
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
