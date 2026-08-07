@@ -12,6 +12,7 @@
     </script>
 
     <style>
+        /* ... existing styles ... */
         *,
         *::before,
         *::after {
@@ -709,8 +710,8 @@
         <header class="app-header">
             <div class="brand">
                 <i class="fas fa-graduation-cap"></i>
-                Mungwi <span>DEBS</span>
-                <small>Term 2, 2026</small>
+                Mungwi <span>DEB</span>
+                <small>Term 2, 2025</small>
             </div>
             <div class="header-actions">
                 <div class="status-indicator">
@@ -1055,7 +1056,7 @@
         }
 
         // ================================================================
-        //  SAMPLE DATA (built-in fallback)
+        //  SAMPLE DATA
         // ================================================================
         function getSampleSchools() {
             return [
@@ -1147,11 +1148,9 @@
             showToast('📊 Loading data...', 'info');
 
             try {
-                // Try to load from localStorage first (fastest)
                 let schoolsData = JSON.parse(localStorage.getItem('schools') || 'null');
                 let recordsData = JSON.parse(localStorage.getItem('records') || 'null');
 
-                // If localStorage has data, use it immediately
                 if (schoolsData && recordsData && schoolsData.length > 0) {
                     schools = schoolsData;
                     records = recordsData;
@@ -1161,7 +1160,6 @@
                     dataLoaded = true;
                 }
 
-                // Then try Supabase for latest data
                 if (supabase) {
                     try {
                         const { data: sData, error: sErr } = await supabase.from('schools').select('*').order('name');
@@ -1185,7 +1183,6 @@
                     }
                 }
 
-                // If still no data, seed sample
                 if (!dataLoaded || (schools.length === 0 && records.length === 0)) {
                     schools = getSampleSchools();
                     records = getSampleRecords();
@@ -1197,7 +1194,6 @@
                     dataLoaded = true;
                 }
 
-                // Try to sync to Supabase if connected
                 if (isSupabaseConnected && supabase && dataLoaded) {
                     try {
                         for (const s of schools) {
@@ -1213,7 +1209,6 @@
 
             } catch (err) {
                 console.error('Load error:', err);
-                // Last resort - use sample data
                 schools = getSampleSchools();
                 records = getSampleRecords();
                 filteredRecords = records;
@@ -1699,7 +1694,7 @@
         }
 
         // ================================================================
-        //  EXPORT TO EXCEL
+        //  EXPORT TO EXCEL - WITH MERGED HEADERS!
         // ================================================================
         function exportToExcel() {
             if (records.length === 0) {
@@ -1710,13 +1705,84 @@
             const schoolMap = {};
             schools.forEach(s => schoolMap[s.id] = s.name);
 
-            const rows = records.map((r, i) => {
+            // Build data rows
+            const dataRows = [];
+            let totals = {
+                boys: 0,
+                girls: 0,
+                total: 0,
+                teen_preg: 0,
+                early_marriage_boys: 0,
+                early_marriage_girls: 0,
+                early_marriage_total: 0,
+                dropout_preg_boys: 0,
+                dropout_preg_girls: 0,
+                dropout_marriage_boys: 0,
+                dropout_marriage_girls: 0,
+                dropout_death_boys: 0,
+                dropout_death_girls: 0,
+                dropout_illness_boys: 0,
+                dropout_illness_girls: 0,
+                dropout_orphaned_boys: 0,
+                dropout_orphaned_girls: 0,
+                dropout_economic_boys: 0,
+                dropout_economic_girls: 0,
+                dropout_ovc_boys: 0,
+                dropout_ovc_girls: 0,
+                absenteeism_boys: 0,
+                absenteeism_girls: 0,
+                absenteeism_total: 0,
+                reentry_boys: 0,
+                reentry_girls: 0,
+                reentry_total: 0,
+                readmission_boys: 0,
+                readmission_girls: 0,
+                ovc_boys: 0,
+                ovc_girls: 0,
+                ovc_total: 0
+            };
+
+            records.forEach((r, i) => {
                 const total = (r.enrolment_boys || 0) + (r.enrolment_girls || 0);
                 const earlyTotal = (r.early_marriage_boys || 0) + (r.early_marriage_girls || 0);
                 const absentTotal = (r.absenteeism_boys || 0) + (r.absenteeism_girls || 0);
                 const reentryTotal = (r.reentry_boys || 0) + (r.reentry_girls || 0);
                 const ovcTotal = (r.ovc_boys || 0) + (r.ovc_girls || 0);
-                return {
+
+                totals.boys += (r.enrolment_boys || 0);
+                totals.girls += (r.enrolment_girls || 0);
+                totals.total += total;
+                totals.teen_preg += (r.teen_preg || 0);
+                totals.early_marriage_boys += (r.early_marriage_boys || 0);
+                totals.early_marriage_girls += (r.early_marriage_girls || 0);
+                totals.early_marriage_total += earlyTotal;
+                totals.dropout_preg_boys += (r.dropout_preg_boys || 0);
+                totals.dropout_preg_girls += (r.dropout_preg_girls || 0);
+                totals.dropout_marriage_boys += (r.dropout_marriage_boys || 0);
+                totals.dropout_marriage_girls += (r.dropout_marriage_girls || 0);
+                totals.dropout_death_boys += (r.dropout_death_boys || 0);
+                totals.dropout_death_girls += (r.dropout_death_girls || 0);
+                totals.dropout_illness_boys += (r.dropout_illness_boys || 0);
+                totals.dropout_illness_girls += (r.dropout_illness_girls || 0);
+                totals.dropout_orphaned_boys += (r.dropout_orphaned_boys || 0);
+                totals.dropout_orphaned_girls += (r.dropout_orphaned_girls || 0);
+                totals.dropout_economic_boys += (r.dropout_economic_boys || 0);
+                totals.dropout_economic_girls += (r.dropout_economic_girls || 0);
+                totals.dropout_ovc_boys += (r.dropout_ovc_boys || 0);
+                totals.dropout_ovc_girls += (r.dropout_ovc_girls || 0);
+                totals.absenteeism_boys += (r.absenteeism_boys || 0);
+                totals.absenteeism_girls += (r.absenteeism_girls || 0);
+                totals.absenteeism_total += absentTotal;
+                totals.reentry_boys += (r.reentry_boys || 0);
+                totals.reentry_girls += (r.reentry_girls || 0);
+                totals.reentry_total += reentryTotal;
+                totals.readmission_boys += (r.readmission_boys || 0);
+                totals.readmission_girls += (r.readmission_girls || 0);
+                totals.ovc_boys += (r.ovc_boys || 0);
+                totals.ovc_girls += (r.ovc_girls || 0);
+                totals.ovc_total += ovcTotal;
+
+                dataRows.push({
                     'S/N': i + 1,
                     'School': schoolMap[r.school_id] || r.school_id,
                     'Grade': r.grade || '',
@@ -1753,18 +1819,262 @@
                     'OVC Boys': r.ovc_boys || 0,
                     'OVC Girls': r.ovc_girls || 0,
                     'OVC Total': ovcTotal
-                };
+                });
             });
 
+            // Create workbook
             const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet(rows);
-            XLSX.utils.book_append_sheet(wb, ws, 'Termly Report 2026');
+
+            // Create worksheet from data
+            const ws = XLSX.utils.json_to_sheet(dataRows);
+
+            // Get current range
+            const range = XLSX.utils.decode_range(ws['!ref']);
+
+            // Insert 7 header rows at top (Ministry headers + merged headers)
+            // We'll build from scratch with proper merged cells
+
+            // Create new worksheet manually with merged headers
+            const wsData = [];
+
+            // Row 0: Ministry header
+            wsData.push(['MINISTRY OF EDUCATION', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+            ]);
+
+            // Row 1: District header
+            wsData.push(['MUNGWI DISTRICT EDUCATION BOARD', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+            ]);
+
+            // Row 2: Term header
+            wsData.push(['TERM TWO 2025', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''
+            ]);
+
+            // Row 3: Main headers with merges
+            // 37 columns: S/N(1), School(2), Grade(3), Enrolment Boys(4), Girls(5), Total(6), Age(7), Teen Preg(8),
+            // Early Marriages: Girls(9), Boys(10), Girls(11), Total(12),
+            // Dropouts: Pregnancy Boys(13), Girls(14), Marriage Boys(15), Girls(16), Death Boys(17), Girls(18),
+            // Illness Boys(19), Girls(20), Orphaned Boys(21), Girls(22), Economic Boys(23), Girls(24), OVC Boys(25), Girls(26),
+            // Absenteeism Boys(27), Girls(28), Total(29),
+            // Re-entry Boys(30), Girls(31), Total(32),
+            // Re-admission Boys(33), Girls(34),
+            // OVC Boys(35), Girls(36), Total(37)
+            wsData.push([
+                'S/N', 'NAME OF SCHOOL', 'GRADE',
+                'ENROLMENT', '', '',
+                'AGE RANGE', 'TEEN PREG',
+                'EARLY MARRIAGES', '', '',
+                '', '', '', '', '', '', '', '', '', '', '', '', '', '',
+                'ABSENTEEISM', '', '',
+                'RE-ENTRY', '', '',
+                'RE-ADMISSION', '',
+                'OVC', '', ''
+            ]);
+
+            // Row 4: Sub-headers
+            wsData.push([
+                '', '', '',
+                'Boys', 'Girls', 'Total',
+                '', '',
+                'Girls', 'Boys', 'Girls', 'Total',
+                'Pregnancy', '', 'Marriage', '', 'Death', '', 'Illness', '', 'Orphaned', '', 'Economic', '', 'OVC', '',
+                'Boys', 'Girls', 'Total',
+                'Boys', 'Girls', 'Total',
+                'Boys', 'Girls',
+                'Boys', 'Girls', 'Total'
+            ]);
+
+            // Row 5: Sub-sub-headers
+            wsData.push([
+                '', '', '',
+                '', '', '',
+                '', '',
+                '', '', '', '',
+                'Boys', 'Girls', 'Boys', 'Girls', 'Boys', 'Girls', 'Boys', 'Girls', 'Boys', 'Girls', 'Boys', 'Girls',
+                'Boys', 'Girls', '',
+                '', '', '',
+                '', '', '',
+                '', '', '',
+                '', '', '', '', '', ''
+            ]);
+
+            // Row 6+: Data rows
+            dataRows.forEach(row => {
+                wsData.push([
+                    row['S/N'],
+                    row['School'],
+                    row['Grade'],
+                    row['Enrolment Boys'],
+                    row['Enrolment Girls'],
+                    row['Enrolment Total'],
+                    row['Age Range'],
+                    row['Teen Pregnancy'],
+                    row['Early Marriage Girls'],
+                    row['Early Marriage Boys'],
+                    row['Early Marriage Girls'],
+                    row['Early Marriage Total'],
+                    row['Drop-Preg Boys'],
+                    row['Drop-Preg Girls'],
+                    row['Drop-Marriage Boys'],
+                    row['Drop-Marriage Girls'],
+                    row['Drop-Death Boys'],
+                    row['Drop-Death Girls'],
+                    row['Drop-Illness Boys'],
+                    row['Drop-Illness Girls'],
+                    row['Drop-Orphaned Boys'],
+                    row['Drop-Orphaned Girls'],
+                    row['Drop-Economic Boys'],
+                    row['Drop-Economic Girls'],
+                    row['Drop-OVC Boys'],
+                    row['Drop-OVC Girls'],
+                    row['Absenteeism Boys'],
+                    row['Absenteeism Girls'],
+                    row['Absenteeism Total'],
+                    row['Re-entry Boys'],
+                    row['Re-entry Girls'],
+                    row['Re-entry Total'],
+                    row['Re-admission Boys'],
+                    row['Re-admission Girls'],
+                    row['OVC Boys'],
+                    row['OVC Girls'],
+                    row['OVC Total']
+                ]);
+            });
+
+            // Add Totals row
+            const grandTotal = totals.total;
+            wsData.push([
+                '', 'TOTAL', '',
+                totals.boys, totals.girls, grandTotal,
+                '', totals.teen_preg,
+                totals.early_marriage_girls, totals.early_marriage_boys, totals.early_marriage_girls,
+                totals.early_marriage_total,
+                totals.dropout_preg_boys, totals.dropout_preg_girls,
+                totals.dropout_marriage_boys, totals.dropout_marriage_girls,
+                totals.dropout_death_boys, totals.dropout_death_girls,
+                totals.dropout_illness_boys, totals.dropout_illness_girls,
+                totals.dropout_orphaned_boys, totals.dropout_orphaned_girls,
+                totals.dropout_economic_boys, totals.dropout_economic_girls,
+                totals.dropout_ovc_boys, totals.dropout_ovc_girls,
+                totals.absenteeism_boys, totals.absenteeism_girls, totals.absenteeism_total,
+                totals.reentry_boys, totals.reentry_girls, totals.reentry_total,
+                totals.readmission_boys, totals.readmission_girls,
+                totals.ovc_boys, totals.ovc_girls, totals.ovc_total
+            ]);
+
+            // Add Percentage row
+            const pct = (val) => grandTotal > 0 ? ((val / grandTotal) * 100).toFixed(1) + '%' : '0.0%';
+            wsData.push([
+                '', 'PERCENTAGE TOTALS', '',
+                pct(totals.boys), pct(totals.girls), '',
+                '', pct(totals.teen_preg),
+                pct(totals.early_marriage_girls), pct(totals.early_marriage_boys), pct(totals.early_marriage_girls),
+                pct(totals.early_marriage_total),
+                pct(totals.dropout_preg_boys), pct(totals.dropout_preg_girls),
+                pct(totals.dropout_marriage_boys), pct(totals.dropout_marriage_girls),
+                pct(totals.dropout_death_boys), pct(totals.dropout_death_girls),
+                pct(totals.dropout_illness_boys), pct(totals.dropout_illness_girls),
+                pct(totals.dropout_orphaned_boys), pct(totals.dropout_orphaned_girls),
+                pct(totals.dropout_economic_boys), pct(totals.dropout_economic_girls),
+                pct(totals.dropout_ovc_boys), pct(totals.dropout_ovc_girls),
+                pct(totals.absenteeism_boys), pct(totals.absenteeism_girls), pct(totals.absenteeism_total),
+                pct(totals.reentry_boys), pct(totals.reentry_girls), pct(totals.reentry_total),
+                pct(totals.readmission_boys), pct(totals.readmission_girls),
+                pct(totals.ovc_boys), pct(totals.ovc_girls), pct(totals.ovc_total)
+            ]);
+
+            // Create worksheet from array data
+            const wsFinal = XLSX.utils.aoa_to_sheet(wsData);
+
+            // Set column widths
+            wsFinal['!cols'] = [
+                { wch: 6 }, // S/N
+                { wch: 25 }, // School
+                { wch: 8 }, // Grade
+                { wch: 10 }, // Enrolment Boys
+                { wch: 10 }, // Enrolment Girls
+                { wch: 10 }, // Enrolment Total
+                { wch: 12 }, // Age Range
+                { wch: 12 }, // Teen Preg
+                { wch: 12 }, // Early Marriage Girls
+                { wch: 12 }, // Early Marriage Boys
+                { wch: 12 }, // Early Marriage Girls
+                { wch: 12 }, // Early Marriage Total
+                { wch: 10 }, // Drop-Preg Boys
+                { wch: 10 }, // Drop-Preg Girls
+                { wch: 12 }, // Drop-Marriage Boys
+                { wch: 12 }, // Drop-Marriage Girls
+                { wch: 10 }, // Drop-Death Boys
+                { wch: 10 }, // Drop-Death Girls
+                { wch: 10 }, // Drop-Illness Boys
+                { wch: 10 }, // Drop-Illness Girls
+                { wch: 12 }, // Drop-Orphaned Boys
+                { wch: 12 }, // Drop-Orphaned Girls
+                { wch: 12 }, // Drop-Economic Boys
+                { wch: 12 }, // Drop-Economic Girls
+                { wch: 10 }, // Drop-OVC Boys
+                { wch: 10 }, // Drop-OVC Girls
+                { wch: 12 }, // Absenteeism Boys
+                { wch: 12 }, // Absenteeism Girls
+                { wch: 12 }, // Absenteeism Total
+                { wch: 10 }, // Re-entry Boys
+                { wch: 10 }, // Re-entry Girls
+                { wch: 10 }, // Re-entry Total
+                { wch: 12 }, // Re-admission Boys
+                { wch: 12 }, // Re-admission Girls
+                { wch: 10 }, // OVC Boys
+                { wch: 10 }, // OVC Girls
+                { wch: 10 } // OVC Total
+            ];
+
+            // Set merges
+            wsFinal['!merges'] = [
+                // Ministry header merges (row 0, cols 0-36)
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 36 } },
+                // District header (row 1, cols 0-36)
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 36 } },
+                // Term header (row 2, cols 0-36)
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 36 } },
+                // Enrolment header (row 3, cols 3-5)
+                { s: { r: 3, c: 3 }, e: { r: 3, c: 5 } },
+                // Early Marriages header (row 3, cols 8-11)
+                { s: { r: 3, c: 8 }, e: { r: 3, c: 11 } },
+                // Absenteeism header (row 3, cols 26-28)
+                { s: { r: 3, c: 26 }, e: { r: 3, c: 28 } },
+                // Re-entry header (row 3, cols 29-31)
+                { s: { r: 3, c: 29 }, e: { r: 3, c: 31 } },
+                // Re-admission header (row 3, cols 32-33)
+                { s: { r: 3, c: 32 }, e: { r: 3, c: 33 } },
+                // OVC header (row 3, cols 34-36)
+                { s: { r: 3, c: 34 }, e: { r: 3, c: 36 } },
+                // Pregnancy sub-header (row 4, cols 12-13)
+                { s: { r: 4, c: 12 }, e: { r: 4, c: 13 } },
+                // Marriage sub-header (row 4, cols 14-15)
+                { s: { r: 4, c: 14 }, e: { r: 4, c: 15 } },
+                // Death sub-header (row 4, cols 16-17)
+                { s: { r: 4, c: 16 }, e: { r: 4, c: 17 } },
+                // Illness sub-header (row 4, cols 18-19)
+                { s: { r: 4, c: 18 }, e: { r: 4, c: 19 } },
+                // Orphaned sub-header (row 4, cols 20-21)
+                { s: { r: 4, c: 20 }, e: { r: 4, c: 21 } },
+                // Economic sub-header (row 4, cols 22-23)
+                { s: { r: 4, c: 22 }, e: { r: 4, c: 23 } },
+                // OVC sub-header (row 4, cols 24-25)
+                { s: { r: 4, c: 24 }, e: { r: 4, c: 25 } }
+            ];
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, wsFinal, 'Termly Report');
+
+            // Write file
             XLSX.writeFile(wb, `Mungwi_Termly_Report_2026_${new Date().toISOString().slice(0,10)}.xlsx`);
-            showToast('✅ Excel exported successfully!', 'success');
+            showToast('✅ Excel exported successfully with merged headers!', 'success');
         }
 
         // ================================================================
-        //  EXPORT TO CSV
+        //  EXPORT TO CSV (simple version)
         // ================================================================
         function exportToCSV() {
             if (records.length === 0) {
@@ -1826,7 +2136,6 @@
                 supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
                 console.log('✅ Supabase client created');
 
-                // Test connection
                 const { error } = await supabase.from('schools').select('count', { count: 'exact', head: true });
 
                 if (error && error.message && error.message.includes('relation "schools" does not exist')) {
